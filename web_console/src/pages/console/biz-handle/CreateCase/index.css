@@ -1,0 +1,27 @@
+.case-form-area {
+    border: 1px solid #efefef;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0px 0px 6px rgba(0,0,0,0.2);
+    height: calc(100vh - 190px);
+    overflow: auto;
+}
+
+.case-form-step-data {
+    height: calc(100vh - 353px);
+    overflow: auto;
+}
+
+.site-tag-plus {
+    background: #fff;
+    border-style: dashed;
+  }
+
+.edit-tag {
+    user-select: none;
+}
+.tag-input {
+    width: 78px;
+    margin-right: 8px;
+    vertical-align: top;
+}

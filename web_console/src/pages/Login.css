@@ -1,0 +1,19 @@
+.login-container {
+    width: 100vw;
+    height: 100vh;
+    background: url(../assets/images/login-bg.jpg) fixed center;
+    background-size: cover;
+}
+
+.login-box {
+    width: 300px;
+    height: 260px;
+    position: absolute;
+    top: 30vh;
+    right: 20vw;
+    opacity: 0.9;
+}
+
+.login-form {
+    margin: 5px 0;
+}

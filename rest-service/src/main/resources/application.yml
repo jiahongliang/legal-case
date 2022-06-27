@@ -1,0 +1,41 @@
+server:
+  port: 9090
+  servlet:
+    context-path: /legal-case
+
+spring:
+  application:
+    name: legal-case-rest
+  datasource:
+    driver-class-name: com.p6spy.engine.spy.P6SpyDriver
+    url: jdbc:p6spy:mysql://localhost:3306/law-case?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&useSSL=false
+    username: root
+    password: mima
+  jpa:
+    database: mysql
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+
+
+  # security:
+  #  user:
+  #    name: admin
+  #    password: 123456
+  #    roles: ADMIN
+
+  jackson:
+    default-property-inclusion: non_null
+
+
+legalCase:
+  security:
+    user:
+      defaultPassword: 123456
+      defaultRole: USER
+p6spy:
+  config:
+    appender: com.p6spy.engine.spy.appender.Slf4JLogger
+    logMessageFormat: com.p6spy.engine.spy.appender.CustomLineFormat
+    customLogMessageFormat: "%(sqlSingleLine)"
