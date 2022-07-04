@@ -16,3 +16,7 @@
     height: calc(100vh - 300px);
     overflow: auto;
 }
+
+.ant-form-item-label {
+    font-weight: 600;
+}

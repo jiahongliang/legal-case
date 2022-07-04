@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef, createRef } from "react";
-import { PageHeader,Button,Form, Input,Row,Col, Radio,Tag, Collapse,Popconfirm, Modal, Result } from "antd";
-import {PlusOutlined} from '@ant-design/icons';
+import { useEffect, useState, createRef } from "react";
+import { PageHeader,Button,Form, Input,Row,Col, Radio,Tag, Collapse,Popconfirm, Modal, Result, Tooltip } from "antd";
+import {CloseOutlined} from '@ant-design/icons';
 import {caseTypeList, createCaseExecution} from '../../../../api/biz'
+import moment from 'moment'
 import newCaseIcon from '../../../../assets/images/new-case.jpg';
 import './index.css';
 
@@ -9,11 +10,12 @@ const { Panel } = Collapse;
 
 const CreateCase = () => {
     const [caseForm] = Form.useForm();
-    const [suspectInputVisible, setSuspectInputVisible] = useState(false);
-    const [suspectsData, setSuspectsData] = useState([]);
+    //const [suspectInputVisible, setSuspectInputVisible] = useState(false);
+    //const [suspectsData, setSuspectsData] = useState([]);
     const suspectInputRef = createRef(); 
-    const [suspectInputValue, setSuspectInputValue] = useState('');
+    //const [suspectInputValue, setSuspectInputValue] = useState('');
     const [stepData, setStepData] = useState([]);
+    const [selectedStepData, setSelectedStepData] = useState([]);
     const [stepActiveKey, setStepActiveKey] = useState([]);
     const [saveResult,setSaveResult] = useState({
         code: null,
@@ -25,6 +27,10 @@ const CreateCase = () => {
     useEffect(() => {
         loadCaseTypeData();
     },[])
+
+    useEffect(() => {
+       setStepActiveKey(selectedStepData.map(step => step.keyid));
+    },[selectedStepData])
 
     /*
     useEffect(() => {
@@ -52,14 +58,25 @@ const CreateCase = () => {
 
     const onCaseTypeChange = (event) => {
         let ct = caseTypeData.find(o => o.id === event.target.value)
-        let newStepData = ct.caseTypeSteps.map(step => ({
-            ...step, itemData: (step.items&&step.items.length > 0) ? step.items.split(",") : []
-        }))
-        setStepData(newStepData);
-        setStepActiveKey(ct.caseTypeSteps.map(step => '' + step.id));
-
+        setStepData(ct.caseTypeSteps);
+        setSelectedStepData([])
+        setStepActiveKey([]);
+        caseForm.setFieldsValue({name: ct.name + moment().format('YYYYMMDDHHmm')});
     }
 
+    const handleClickSourceStep = (stepId) => {
+        let clickedStep = stepData.find(step => step.id === stepId);
+        setSelectedStepData([...selectedStepData, {...clickedStep,keyid: moment().format('X') + '' + selectedStepData.length}]);
+    }
+
+    const handleRemoveSelectedStep = (keyid) => {
+        setSelectedStepData(selectedStepData.filter(step => step.keyid !== keyid));
+    }
+
+    const handleSuspectChange = (keyId,value) => {
+        setSelectedStepData(selectedStepData.map(step => step.keyid === keyId ? {...step, suspect: value} : step));
+    }
+    /*
     const showSuspectInput = () => {
         setSuspectInputVisible(true);
     }
@@ -79,14 +96,16 @@ const CreateCase = () => {
     const handleSuspectTagClose = (removedTag) => {
         const newTags = suspectsData.filter(tag => tag !== removedTag);
         setSuspectsData(newTags);
-    }
+    }*/
 
-    const handleStepItemTagClose = (stepId,removedTag) => {
-        let newStepData = stepData.map(step => (step.id === stepId ? 
-            {...step,itemData: step.itemData.filter(item => item !==removedTag)} :
-            {...step}
-        ))
-        setStepData(newStepData);
+    const handleStepItemTagClose = (stepKeyId,itemId) => {
+        setSelectedStepData(
+            selectedStepData.map(
+                step => step.keyid === stepKeyId ? 
+                {...step,caseTypeStepItems : step.caseTypeStepItems.filter(item => item.id !== itemId)} : 
+                step
+            )
+        )
     }
 
     const handleCollapseChange = (keys) => {
@@ -99,9 +118,6 @@ const CreateCase = () => {
         let errorInfo = '';
         if(!name || name.length === 0) {
             errorInfo += '请输入名称；'
-        }
-        if(suspectsData.length === 0) {
-            errorInfo += '请输入对象；'
         }
         if(typeId == null) {
             errorInfo += '请选择类型；'
@@ -119,15 +135,7 @@ const CreateCase = () => {
             entity:{
                 name,
                 typeId,
-                suspects: suspectsData.map(data => ({
-                    name: data
-                })),
-                steps: stepData.filter(sd => sd.itemData && sd.itemData.length > 0).map(sd => ({
-                    name: sd.name,
-                    items: sd.itemData.map(i => ({
-                        itemName: i
-                    }))
-                }))
+                steps: selectedStepData.filter(sd => sd.caseTypeStepItems && sd.caseTypeStepItems.length > 0)
             }
         }
 
@@ -142,14 +150,13 @@ const CreateCase = () => {
 
     const resetPage = () => {
         caseForm.resetFields();
-        setSuspectsData([]);
+        setSelectedStepData([]);
         setStepData([]);
         setStepActiveKey([]);
         setSaveResult({
             code: null,
             message: null
         });
-
     }
 
     return (
@@ -170,45 +177,6 @@ const CreateCase = () => {
                         <Form form={caseForm} layout="vertical">
                             <Row gutter={16} className="case-form-row" justify="space-between">
                                 <Col span={9} className="case-form-area">
-                                    <Form.Item name="name" label="名称">
-                                        <Input placeholder="请输入名称" maxLength={50}/>
-                                    </Form.Item>
-
-                                    <Form.Item label="对象">
-                                        {
-                                            suspectsData.map((tag,index) => {
-                                                return (
-                                                    <Tag
-                                                        className="edit-tag"
-                                                        key={tag}
-                                                        closable={true}
-                                                        onClose={() => handleSuspectTagClose(tag)}
-                                                    >
-                                                        {tag}
-                                                    </Tag>
-                                                )
-                                            })
-                                        }
-                                    {suspectInputVisible && (
-                                        <Input
-                                        ref={suspectInputRef}
-                                        type="text"
-                                        size="small"
-                                        className="tag-input"
-                                        value={suspectInputValue}
-                                        onChange={handleSuspectInputChange}
-                                        onBlur={handleSuspectInputConfirm}
-                                        onPressEnter={handleSuspectInputConfirm}
-                                        />
-                                    )}
-                                    {!suspectInputVisible && (
-                                        <Tag className="site-tag-plus" onClick={showSuspectInput}>
-                                        <PlusOutlined /> 新增
-                                        </Tag>
-                                    )}
-                                    </Form.Item>
-                                </Col>
-                                <Col span={15} className="case-form-area">
                                     <Form.Item name="typeId" label="类型">
                                         <Radio.Group onChange={onCaseTypeChange}>
                                             {
@@ -218,26 +186,46 @@ const CreateCase = () => {
                                             }
                                         </Radio.Group>
                                     </Form.Item>
-                                    <Form.Item label="步骤及事项">
+
+                                    <Form.Item name="name" label="名称">
+                                        <Input placeholder="请输入名称" maxLength={50} onFocus={e => e.target.select()}/>
+                                    </Form.Item>
+                                    <span style={{fontWeight: 600}}>可选步骤</span>
+                                    <div className="case-type-source-step-area">
+                                        {
+                                            stepData.map(step => (
+                                                <Button key={step.id} block className="case-step-button" onClick={() => {handleClickSourceStep(step.id)}}>{step.name}</Button>
+                                            ))
+                                        }
+                                        </div>
+                                </Col>
+                                <Col span={15} className="case-form-area">
+                                    <span style={{fontWeight: 600}}>步骤及事项</span>
                                     <Collapse
                                         activeKey={stepActiveKey}
                                         onChange={handleCollapseChange}
                                         className="case-form-step-data"
+                                        style={{marginTop: '10px'}}
+                                        expandIconPosition="left"
                                     >
                                         {
-                                            stepData.map(step => (
-                                                <Panel header={step.name} key={'' + step.id} collapsible="header">
+                                            selectedStepData.map(step => (
+                                                <Panel header={step.name} key={step.keyid} collapsible="header" extra={
+                                                <><Input style={{width: "80%",marginRight: "20px"}} placeholder="对象名称" onChange={(event) => handleSuspectChange(step.keyid,event.target.value)}></Input><CloseOutlined  onClick={() => handleRemoveSelectedStep(step.keyid)}/></>
+                                                }>
                                                     {
-                                                        (step.itemData && step.itemData.length > 0) ? 
-                                                            step.itemData.map(item => (
-                                                                <Tag
-                                                                    className="edit-tag"
-                                                                    key={item}
-                                                                    closable={true}
-                                                                    onClose={() => handleStepItemTagClose(step.id,item)}
-                                                                >
-                                                                    {item}
-                                                                </Tag>
+                                                        (step.caseTypeStepItems && step.caseTypeStepItems.length > 0) ? 
+                                                            step.caseTypeStepItems.map(item => (
+                                                                <Tooltip key={item.name}  placement="topLeft" title={item.lawTitle} color="gold" arrowPointAtCenter>
+                                                                    <Tag
+                                                                        className="edit-tag"
+                                                                        key={item.id}
+                                                                        closable={true}
+                                                                        onClose={() => handleStepItemTagClose(step.keyid,item.id)}
+                                                                    >
+                                                                        {item.name}
+                                                                    </Tag>
+                                                                </Tooltip>
                                                             ))
                                                             : ""
                                                     }
@@ -245,7 +233,6 @@ const CreateCase = () => {
                                             ))
                                         }
                                     </Collapse>
-                                    </Form.Item>
                                 </Col>
                             </Row>
                             

@@ -41,46 +41,47 @@ public class LcCaseExecutionService {
     public void saveCaseExcution(LcCaseExecutionVo caseExecutionVo) {
         LcCaseExecution caseExecution = LcCaseExecution.builder().typeId(caseExecutionVo.getTypeId())
                 .name(caseExecutionVo.getName())
-                .suspects(caseExecutionVo.getSuspects() != null ? caseExecutionVo.getSuspects().stream().map(obj -> obj.getName()).collect(Collectors.joining(",")) : "")
                 .status(CASE_EXECUTION_CREATED)
                 .build();
         caseExecutionRepository.save(caseExecution);
 
-        List<LcCaseExecutionSuspect> lcCaseExecutionSuspects = caseExecutionVo.getSuspects().stream().map(obj -> LcCaseExecutionSuspect.builder().name(obj.getName()).executionId(caseExecution.getId()).build()).toList();
-        caseExecutionSuspectRepository.saveAll(lcCaseExecutionSuspects);
 
         caseExecutionVo.getSteps().forEach(obj -> {
-            LcCaseExecutionStep step = LcCaseExecutionStep.builder().executionId(caseExecution.getId()).name(obj.getName()).build();
+            LcCaseExecutionStep step = LcCaseExecutionStep.builder()
+                    .executionId(caseExecution.getId())
+                    .name(obj.getName())
+                    .suspect(obj.getSuspect())
+                    .build();
             caseExecutionStepRepository.save(step);
 
-            lcCaseExecutionSuspects.forEach(suspect -> {
-                List<LcCaseExecutionStepItem> lcCaseExecutionStepItems = obj.getItems().stream().map(item -> {
-                    return LcCaseExecutionStepItem.builder().executionId(caseExecution.getId()).stepId(step.getId()).itemName(item.getItemName()).status(CASE_EXECUTION_STEP_ITEM_CREATED).suspectId(suspect.getId()).build();
-                }).toList();
-                caseExecutionStepItemRepository.saveAll(lcCaseExecutionStepItems);
+            obj.getCaseTypeStepItems().forEach(stepItem -> {
+                LcCaseExecutionStepItem item = LcCaseExecutionStepItem.builder()
+                        .executionId(caseExecution.getId())
+                        .stepId(step.getId())
+                        .name(stepItem.getName())
+                        .lawTitle(stepItem.getLawTitle())
+                        .status(CASE_EXECUTION_STEP_ITEM_CREATED)
+                        .build();
+                caseExecutionStepItemRepository.save(item);
             });
         });
     }
 
     public LcCaseExecutionVo get(@NonNull LcCaseExecution caseExecution) {
-        List<LcCaseExecutionSuspect> suspects = getSuspects(caseExecution.getId());
         List<LcCaseExecutionStep> steps = getSteps(caseExecution.getId());
         List<LcCaseExecutionStepItem> stepItems = getStepItems(caseExecution.getId());
 
         LcCaseExecutionVo executionVo = LcCaseExecutionVo.builder()
-                .suspects(suspects.stream().map(obj -> {
-                    LcCaseExecutionSuspectVo vo = LcCaseExecutionSuspectVo.builder().build();
-                    BeanUtils.copyProperties(obj, vo);
-                    return vo;
-                }).toList())
                 .steps(steps.stream().map(obj -> {
                     LcCaseExecutionStepVo vo = LcCaseExecutionStepVo.builder().build();
                     BeanUtils.copyProperties(obj, vo);
-                    vo.setItems(stepItems.stream().filter(stepItem -> stepItem.getStepId().equals(obj.getId())).map(stepItem -> {
-                        LcCaseExecutionStepItemVo stepItemVo = LcCaseExecutionStepItemVo.builder().build();
-                        BeanUtils.copyProperties(stepItem, stepItemVo);
-                        return stepItemVo;
-                    }).toList());
+                    vo.setCaseTypeStepItems(stepItems.stream().filter(item -> item.getStepId().equals( obj.getId()))
+                            .map(item -> {
+                                LcCaseExecutionStepItemVo itemVo = LcCaseExecutionStepItemVo.builder().build();
+                                BeanUtils.copyProperties(item,itemVo);
+                                return itemVo;
+                            })
+                            .toList());
                     return vo;
                 }).toList())
                 .build();

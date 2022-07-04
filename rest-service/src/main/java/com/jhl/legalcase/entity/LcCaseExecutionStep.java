@@ -16,4 +16,5 @@ import javax.persistence.Table;
 public class LcCaseExecutionStep extends JpaAudit {
     private Long executionId;
     private String name;
+    private String suspect;
 }

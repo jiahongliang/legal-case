@@ -12,5 +12,6 @@ import java.util.List;
 public class LcCaseExecutionStepVo extends BaseVo{
     private Long executionId;
     private String name;
-    private List<LcCaseExecutionStepItemVo> items;
+    private String suspect;
+    private List<LcCaseExecutionStepItemVo> caseTypeStepItems;
 }

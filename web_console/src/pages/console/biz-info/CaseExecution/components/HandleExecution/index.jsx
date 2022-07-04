@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import newCaseIcon from '../../../../../../assets/images/new-case.jpg';
-import { PageHeader, Row, Col, Tag, Collapse, Tabs } from "antd";
+import { PageHeader, Row, Col, Tag, Collapse, Tabs, Form, Tooltip } from "antd";
 import { UserOutlined } from '@ant-design/icons';
 import './index.css'
 
@@ -10,12 +10,20 @@ const { Panel } = Collapse;
 const HandleExecution = (props) => {
     const [data, setData] = useState({});
     const [caseTypeData, setCaseTypeData] = useState([]);
+    const [stepActiveKey, setStepActiveKey] = useState([]);
+    const [userData, setUserData] = useState([]);
 
     useEffect(() => {
         console.log(props)
         setData(props.data);
         setCaseTypeData(props.caseTypeData);
-    }, [])
+        setStepActiveKey(props.data.steps ? props.data.steps.map(step => step.id) : []);
+        setUserData(props.userData);
+    }, []);
+
+    const handleCollapseChange = (keys) => {
+        setStepActiveKey(keys);
+    }
 
     return (
         <>
@@ -26,57 +34,67 @@ const HandleExecution = (props) => {
                 avatar={{ src: newCaseIcon }}
                 onBack={() => props.onExit()}
             >
-                <div className='case-execution-handle-area'>
-                    <Row gutter={16}>
-                        <Col span="8"><span className='case-execution-handle-title'>案件名称：</span>{data.name}</Col>
-                        <Col span="8"><span className='case-execution-handle-title'>案件类型：</span>{caseTypeData && caseTypeData.length > 0 ? caseTypeData.find(ctd => ctd.id === data.typeId).name : ""}</Col>
-                        <Col span="8"><span className='case-execution-handle-title'>创建时间：</span>{data.createdTime}</Col>
-                    </Row>
-                    <Row>
-                        <Col span="24">
-                            <Tabs>
-                                {
-                                    data && data.suspects ? data.suspects.map(suspect => (
-                                        <TabPane
-                                            tab={
-                                                <span>
-                                                    <UserOutlined />
-                                                    {suspect.name}
-                                                </span>
-                                            }
-                                            key={suspect.id}
-                                        >
-                                            <Collapse
-                                                defaultActiveKey={data && data.steps ? data.steps.map(step => step.id) : []}
-                                                className="case-form-step-data"
-                                            >
-                                                {
-                                                    data && data.steps ? data.steps.map(step => (
-                                                        <Panel header={step.name} key={step.id} collapsible="header">
-                                                            {
-                                                                (step.items && step.items.length > 0) ?
-                                                                    step.items.filter(item => item.suspectId === suspect.id && item.stepId === step.id && item.status === 1).map(item => (
-                                                                        <Tag
-                                                                            className="edit-tag"
-                                                                            key={item.id}
-                                                                        >
-                                                                            {item.itemName}
-                                                                        </Tag>
-                                                                    ))
-                                                                    : ""
-                                                            }
-                                                        </Panel>
-                                                    )) : ""
-                                                }
-                                            </Collapse>
-                                        </TabPane>
-                                    )) : ""
-                                }
+            <Form layout="vertical">
+                <Row gutter={16} className="case-form-row" justify="space-between">
+                        <Col span={9} className="case-form-area">
+                            <Form.Item label="类型">
+                                {caseTypeData && caseTypeData.length > 0 ? caseTypeData.find(ctd => ctd.id === data.typeId).name : ""}
+                            </Form.Item>
 
-                            </Tabs>
+                            <Form.Item label="名称">
+                                {data.name}
+                            </Form.Item>
+
+                            <Form.Item label="负责人">
+                                {
+                                    userData.length > 0 ? userData.find(user => user.id === data.createdBy).name : ''
+                                }
+                            </Form.Item>
+                            
+                            <Form.Item label="创建时间">
+                                {data.createdTime}
+                            </Form.Item>
+
+                            <Form.Item label="最后修改时间">
+                                {data.lastmodifiedTime}
+                            </Form.Item>
                         </Col>
-                    </Row>
-                </div>
+                        <Col span={15} className="case-form-area">
+                            <span style={{fontWeight: 600}}>步骤及事项</span>
+                            <Collapse
+                                activeKey={stepActiveKey}
+                                onChange={handleCollapseChange}
+                                className="case-form-step-data"
+                                style={{marginTop: '10px'}}
+                                expandIconPosition="left"
+                            >
+                                {
+                                    data.steps ? data.steps.map(step => (
+                                        <Panel header={step.name} key={step.id} collapsible="header" extra={
+                                        <span>{step.suspect}</span>
+                                        }>
+                                            {
+                                                (step.caseTypeStepItems && step.caseTypeStepItems.length > 0) ? 
+                                                    step.caseTypeStepItems.map(item => item.status === 1 ? (
+                                                        <Tooltip key={item.name}  placement="topLeft" title={item.lawTitle} color="gold" arrowPointAtCenter>
+                                                            <Tag
+                                                                className="edit-tag"
+                                                                key={item.id}
+                                                                closable={false}
+                                                            >
+                                                                {item.name}
+                                                            </Tag>
+                                                        </Tooltip>
+                                                    ) : '')
+                                                    : ''
+                                            }
+                                        </Panel>
+                                    )) : []
+                                }
+                            </Collapse>
+                        </Col>
+                </Row>
+                    </Form>
             </PageHeader>
         </>
     )

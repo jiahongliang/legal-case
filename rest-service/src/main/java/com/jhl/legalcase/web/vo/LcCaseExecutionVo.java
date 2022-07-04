@@ -14,7 +14,6 @@ import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_CREATED;
 public class LcCaseExecutionVo extends BaseVo {
     private Long typeId;
     private String name;
-    private List<LcCaseExecutionSuspectVo> suspects;
     private List<LcCaseExecutionStepVo> steps;
     private Integer status = CASE_EXECUTION_CREATED;
 }

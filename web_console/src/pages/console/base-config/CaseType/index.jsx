@@ -8,9 +8,6 @@ import CaseStep from "../components/CaseStep";
 import { caseTypeList, saveCaseType, removeCaseType } from "../../../../api/biz"
 import "./index.css"
 
-
-const {TextArea} = Input;
-
 const CaseType = () => {
     const [data, setData] = useState([]);
     const [dataLoading, setDataLoading] = useState(false);
@@ -98,11 +95,7 @@ const CaseType = () => {
         if(r != null) {
             detailForm.setFieldsValue(r);
             setDetailId(r.id);
-            if(r.caseTypeSteps && r.caseTypeSteps.length > 0) {
-                setStepData(r.caseTypeSteps.map(cts => ({...cts,items: (cts.items && cts.items.length > 0 ? cts.items.split(',') : [])})));
-            } else {
-                setStepData([]);
-            }
+            setStepData(r.caseTypeSteps);
         }
         setDetailVisible(true);
     }
@@ -118,14 +111,11 @@ const CaseType = () => {
 
     const saveForm = (caseType) => {
         console.log('formdata',caseType)
-        let savingStepData = stepData.map((step) => ({
-            ...step, items: step.items.join()
-        }));
         let params = {
             entity: {
                 id: detailId,
                 ...caseType,
-                caseTypeSteps: savingStepData
+                caseTypeSteps: stepData
             }
         }
         saveCaseType(params).then(res => {
@@ -194,7 +184,7 @@ const CaseType = () => {
                     type: "checkbox"
                 }}
             ></Table>
-            <Drawer title="详细信息" placement="right" width={680} visible={detailVisible} onClose={closeDrawer}>
+            <Drawer title="详细信息" placement="right" width={800} visible={detailVisible} onClose={closeDrawer}>
                 {
                     saveResult.code == null ? (
                         <Form form={detailForm} layout="vertical" onFinish={saveForm}>

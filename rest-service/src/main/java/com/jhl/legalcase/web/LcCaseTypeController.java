@@ -2,7 +2,9 @@ package com.jhl.legalcase.web;
 
 import com.jhl.legalcase.entity.LcCaseType;
 import com.jhl.legalcase.entity.LcCaseTypeStep;
+import com.jhl.legalcase.entity.LcCaseTypeStepItem;
 import com.jhl.legalcase.repository.LcCaseTypeRepository;
+import com.jhl.legalcase.repository.LcCaseTypeStepItemRepository;
 import com.jhl.legalcase.repository.LcCaseTypeStepRepository;
 import com.jhl.legalcase.util.common.MyBeanUtils;
 import com.jhl.legalcase.util.webmsg.WebReq;
@@ -34,6 +36,9 @@ public class LcCaseTypeController {
     @Autowired
     private LcCaseTypeStepRepository caseTypeStepRepository;
 
+    @Autowired
+    private LcCaseTypeStepItemRepository caseTypeStepItemRepository;
+
     @PostMapping("/list")
     public WebResp<LcCaseType, Long> list(@RequestBody WebReq<LcCaseType, Long> req) throws ClassNotFoundException {
         Page<LcCaseType> result = caseTypeRepository.findAll(req.specification(), req.pageable());
@@ -62,6 +67,25 @@ public class LcCaseTypeController {
             return entity;
         }).toList();
         caseTypeStepRepository.saveAll(cts);
+
+        List<LcCaseTypeStepItem> items = CollectionUtils.isEmpty(cts) ?
+                new ArrayList<>() :
+                cts.stream().collect(() -> new ArrayList<>(),
+                        (theList, item) -> theList.addAll(item.getCaseTypeStepItems().stream().map(o -> {
+                            o.setCaseTypeStep(item);
+                            return o;
+                        }).toList()),
+                        (list1, list2) -> {
+                            list1.addAll(list2);
+                        }
+                );
+        List<Long> itemIds = items.stream().filter(stepItem -> stepItem.getId() != null).map(stepItem -> stepItem.getId()).toList();
+        if(itemIds != null && itemIds.size() > 0) {
+            caseTypeStepItemRepository.deleteAllByCaseTypeStepInAndIdNotIn(cts, itemIds);
+        } else {
+            caseTypeStepItemRepository.deleteAllByCaseTypeStepIn(cts);
+        }
+        caseTypeStepItemRepository.saveAll(items);
 
         return WebResp.newInstance().msg("操作成功");
     }

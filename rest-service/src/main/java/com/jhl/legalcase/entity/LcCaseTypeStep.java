@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author
@@ -24,4 +26,8 @@ public class LcCaseTypeStep extends JpaAudit {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_id")
     private LcCaseType caseType;
+
+    @OneToMany(cascade = CascadeType.ALL,
+            mappedBy = "caseTypeStep")
+    private List<LcCaseTypeStepItem> caseTypeStepItems = new ArrayList<>();
 }

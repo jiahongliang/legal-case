@@ -56,7 +56,7 @@ const CaseStep = (props) => {
         const newStep = {
             orderValue: '' + stepIndex.current++,
             name: '办案环节',
-            items: []
+            caseTypeStepItems: []
         }
         setStepData([...stepData,newStep])
         setActiveKey(newStep.orderValue)
@@ -85,14 +85,12 @@ const CaseStep = (props) => {
       };
 
       const changeItems = (newItems) => {
-        if(newItems && newItems.length > 0) {
         setStepData(stepData.map((step) => (
             step.orderValue === activeKey ? 
             {
-            ...step, items: newItems
+            ...step, caseTypeStepItems: newItems
             } : step
         )));
-        }
       }
 
       const onStepNameChange = (e) => {
@@ -117,9 +115,9 @@ const CaseStep = (props) => {
                     stepData.map((panel) => (
                         <TabPane tab={panel.name} key={panel.orderValue}>
                             <div className="case-definition-step-panel">
-                                <Input addonBefore="环节名称" defaultValue={panel.name} size="medium" onChange={onStepNameChange} onFocus={handlePanelNameFocus}/>
+                                <Input addonBefore="环节名称" defaultValue={panel.name} size="medium" onChange={onStepNameChange} onFocus={handlePanelNameFocus} onPressEnter={(e) => {e.preventDefault()}}/>
                                 <Divider ></Divider>
-                                <StepItems items={panel.items} onChange={changeItems}></StepItems>
+                                <StepItems items={panel.caseTypeStepItems} onChange={changeItems}></StepItems>
                             </div>
                         </TabPane>
                     ))

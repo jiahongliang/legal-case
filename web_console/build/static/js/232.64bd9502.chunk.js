@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkweb_console=self.webpackChunkweb_console||[]).push([[232],{7232:function(e,t,n){n.r(t);var s=n(2791),c=n(184);t.default=function(){return(0,s.useEffect)((function(){console.log("CaseStatistic page mounted.")}),[]),(0,c.jsx)("div",{children:"CaseStatistic."})}}}]);
+//# sourceMappingURL=232.64bd9502.chunk.js.map

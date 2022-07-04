@@ -134,16 +134,12 @@ const BizHandle = () => {
             onHeaderCell: function (column) {
                 column.align = "center"
             },
-            render: (_,record) => caseTypeData.find(ct => ct.id === record.typeId).name,
-            width: 60
-            
-        },
-        {
-            title: '对象',
-            onHeaderCell: function (column) {
-                column.align = "center"
+            render: (_,record) => {
+                let caseType = caseTypeData.find(ct => ct.id === record.typeId);
+                return caseType ? caseType.name : ''
             },
-            render: (_,record) => record.suspects.map(obj => obj.name).join()
+            width: 120
+            
         },
         {
             title: '环节数量',

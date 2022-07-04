@@ -72,7 +72,7 @@ public class LcCaseExecutionController {
     @PostMapping("/handle")
     public WebResp<LcCaseExecutionVo, Long> handle(@RequestBody WebReq<LcCaseExecutionVo, Long> req) throws ClassNotFoundException {
         Assert.notNull(req.getEntity(), "参数不能为空");
-        List<LcCaseExecutionStepItemVo> collect = req.getEntity().getSteps().stream().collect(() -> new ArrayList<>(), (list, step) -> list.addAll(step.getItems()), (one, two) -> one.addAll(two));
+        List<LcCaseExecutionStepItemVo> collect = req.getEntity().getSteps().stream().collect(() -> new ArrayList<>(), (list, step) -> list.addAll(step.getCaseTypeStepItems()), (one, two) -> one.addAll(two));
         List<LcCaseExecutionStepItem> lcCaseExecutionStepItems = collect.stream().map(item -> {
             LcCaseExecutionStepItem build = LcCaseExecutionStepItem.builder().build();
             BeanUtils.copyProperties(item, build);

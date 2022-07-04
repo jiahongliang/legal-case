@@ -156,7 +156,10 @@ const BizHandle = () => {
             onHeaderCell: function (column) {
                 column.align = "center"
             },
-            render: (_,record) => caseTypeData.find(ct => ct.id === record.typeId).name,
+            render: (_,record) => {
+                let caseType = caseTypeData.find(ct => ct.id === record.typeId);
+                return caseType ? caseType.name : '.name'
+            },
             width: 120
             
         },
@@ -185,7 +188,10 @@ const BizHandle = () => {
             render: (_,record) => {
                 let restCount = 0;
                 record.steps.forEach(step => {
-                    restCount += step.items.filter(item => item.status === 1).length;
+                    if(step.caseTypeStepItems) {
+                        restCount += step.caseTypeStepItems.filter(item => item.status === 1).length;
+                    }
+                    
                 });
                 return restCount;
             },
@@ -295,7 +301,7 @@ const BizHandle = () => {
             ></Table>
         </>
     ) : (
-        <HandleExecution data={detailData} caseTypeData={caseTypeData} onExit={exitHandleCaseExecution} onSaveSuccess={handleSaveSuccess}></HandleExecution>
+        <HandleExecution data={detailData} caseTypeData={caseTypeData} userData={userData} onExit={exitHandleCaseExecution} onSaveSuccess={handleSaveSuccess}></HandleExecution>
     )
 }
 
