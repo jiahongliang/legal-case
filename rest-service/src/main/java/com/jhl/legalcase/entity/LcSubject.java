@@ -3,6 +3,7 @@ package com.jhl.legalcase.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jhl.legalcase.util.jpa.JpaAudit;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -15,7 +16,7 @@ import java.util.List;
 @Entity
 @Table(name = "lc_subject")
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class LcSubject extends JpaAudit {

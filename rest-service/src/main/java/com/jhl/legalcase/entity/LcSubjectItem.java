@@ -2,6 +2,7 @@ package com.jhl.legalcase.entity;
 
 import com.jhl.legalcase.util.jpa.JpaAudit;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "lc_subject_item")
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class LcSubjectItem extends JpaAudit {
