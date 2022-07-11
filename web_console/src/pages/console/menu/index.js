@@ -8,7 +8,9 @@ import {
     PartitionOutlined, 
     ReadOutlined,
     FormOutlined,
-    CopyOutlined
+    CopyOutlined,
+    BookOutlined,
+    GoldOutlined
 } from '@ant-design/icons';
 
 export const menus = [
@@ -47,12 +49,13 @@ export const menus = [
                 url: '/console/base-config/case-type',
                 role: 'ADMIN',
             },
-            /*{
-                key: '/console/base-config/definition',
-                label: '案件定义',
-                icon: <ProfileOutlined />,
-                url: '/console/base-config/definition'
-            }*/
+            {
+                key: '/console/base-config/subject-manage',
+                label: '专题管理',
+                icon: <BookOutlined />,
+                url: '/console/base-config/subject-manage',
+                role: 'ADMIN',
+            }
         ]
     },
     {
@@ -73,6 +76,21 @@ export const menus = [
                 label: '案件办理',
                 icon: <CopyOutlined />,
                 url: '/console/biz-handle/instance-list',
+                role: 'USER',
+            },
+        ]
+    },
+    {
+        key: '/console/subject-data',
+        label: '专题数据',
+        icon: <BookOutlined />,
+        role: 'USER',
+        children: [
+            {
+                key: '/console/subject-data/subject-item',
+                label: '专题查询',
+                icon: <GoldOutlined />,
+                url: '/console/subject-data/subject-item',
                 role: 'USER',
             },
         ]

@@ -1,6 +1,7 @@
 package com.jhl.legalcase.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jhl.legalcase.util.jpa.JpaAudit;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -26,7 +27,7 @@ public class LcSubject extends JpaAudit {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
     private List<LcSubject> children = new ArrayList<>();
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private LcSubject parent;

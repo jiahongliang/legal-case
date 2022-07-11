@@ -63,3 +63,50 @@ export const handleCaseExecution = (data) => {
         method: 'post',
     });
 }
+
+export const subjectTreeData = () => {
+    return serviceJson({
+        url: '/subject/tree',
+        method: 'get',
+    });
+}
+
+export const saveSubject = (data) => {
+    return serviceJson({
+        url: '/subject/save',
+        data,
+        method: 'post',
+    });
+}
+
+export const removeSubject = (data) => {
+    return serviceJson({
+        url: '/subject/remove',
+        data,
+        method: 'post',
+    });
+}
+
+export const subjectItemList = (data) => {
+    return serviceJson({
+        url: '/subject/item-list',
+        data,
+        method: 'post',
+    });
+}
+
+export const saveSubjectItem = (data) => {
+    return serviceJson({
+        url: '/subject/save-item',
+        data,
+        method: 'post',
+    });
+}
+
+export const removeSubjectItem = (data) => {
+    return serviceJson({
+        url: '/subject/remove-item',
+        data,
+        method: 'post',
+    });
+}

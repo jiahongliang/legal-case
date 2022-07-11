@@ -11,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,9 +29,9 @@ public class LcSubjectController {
     @Autowired
     private LcSubjectItemRepository subjectItemRepository;
 
-    @PostMapping("/tree")
-    public WebResp<LcSubject, Long> list(@RequestBody WebReq<LcSubject, Long> req) throws ClassNotFoundException {
-        List<LcSubject> lst = subjectRepository.findAll(req.specification());
+    @GetMapping("/tree")
+    public WebResp<LcSubject, Long> list() throws ClassNotFoundException {
+        List<LcSubject> lst = subjectRepository.findAllByParentIsNull();
         return WebResp.newInstance().rows(lst).pages(0).total(lst.size());
     }
 
@@ -51,6 +48,8 @@ public class LcSubjectController {
         LcSubject dest = req.getEntity();
         if (req.getEntity().getParent() != null && req.getEntity().getParent().getId() != null) {
             dest.setParent(subjectRepository.getReferenceById(req.getEntity().getParent().getId()));
+        } else {
+            dest.setParent(null);
         }
         subjectRepository.save(dest);
         return WebResp.newInstance().rows(Arrays.asList(dest));

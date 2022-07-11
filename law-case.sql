@@ -11,7 +11,7 @@
  Target Server Version : 50717
  File Encoding         : 65001
 
- Date: 03/07/2022 20:26:05
+ Date: 10/07/2022 10:49:12
 */
 
 SET NAMES utf8mb4;
@@ -32,13 +32,14 @@ CREATE TABLE `lc_case_execution` (
   `lastmodified_by` bigint(20) DEFAULT NULL,
   `lastmodified_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of lc_case_execution
 -- ----------------------------
 BEGIN;
 INSERT INTO `lc_case_execution` VALUES (10, 1, '行政202207031835', NULL, 1, 1, '2022-07-03 18:36:00', 1, '2022-07-03 20:18:52');
+INSERT INTO `lc_case_execution` VALUES (11, 3, '刑事202207091933', NULL, 1, 1, '2022-07-09 19:33:43', 1, '2022-07-09 19:33:43');
 COMMIT;
 
 -- ----------------------------
@@ -55,7 +56,7 @@ CREATE TABLE `lc_case_execution_step` (
   `lastmodified_by` bigint(20) DEFAULT NULL,
   `lastmodified_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of lc_case_execution_step
@@ -64,6 +65,8 @@ BEGIN;
 INSERT INTO `lc_case_execution_step` VALUES (24, 10, '受案', '张三', 1, '2022-07-03 18:36:00', 1, '2022-07-03 18:36:00');
 INSERT INTO `lc_case_execution_step` VALUES (25, 10, '受案', '李四', 1, '2022-07-03 18:36:00', 1, '2022-07-03 18:36:00');
 INSERT INTO `lc_case_execution_step` VALUES (26, 10, '受案', '王五', 1, '2022-07-03 18:36:00', 1, '2022-07-03 18:36:00');
+INSERT INTO `lc_case_execution_step` VALUES (27, 11, '立案', NULL, 1, '2022-07-09 19:33:43', 1, '2022-07-09 19:33:43');
+INSERT INTO `lc_case_execution_step` VALUES (28, 11, '勘验', NULL, 1, '2022-07-09 19:33:43', 1, '2022-07-09 19:33:43');
 COMMIT;
 
 -- ----------------------------
@@ -82,7 +85,7 @@ CREATE TABLE `lc_case_execution_step_item` (
   `lastmodified_by` bigint(20) DEFAULT NULL,
   `lastmodified_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=136 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of lc_case_execution_step_item
@@ -94,6 +97,10 @@ INSERT INTO `lc_case_execution_step_item` VALUES (128, 10, 25, '受案表', '依
 INSERT INTO `lc_case_execution_step_item` VALUES (129, 10, 25, '受案回执', '受案回执依据', 1, 1, '2022-07-03 18:36:00', 1, '2022-07-03 18:36:00');
 INSERT INTO `lc_case_execution_step_item` VALUES (130, 10, 26, '受案表', '依据', 1, 1, '2022-07-03 18:36:00', 1, '2022-07-03 18:36:00');
 INSERT INTO `lc_case_execution_step_item` VALUES (131, 10, 26, '受案回执', '受案回执依据', 1, 1, '2022-07-03 18:36:00', 1, '2022-07-03 18:36:00');
+INSERT INTO `lc_case_execution_step_item` VALUES (132, 11, 27, '立案决定书', '立案依据', 1, 1, '2022-07-09 19:33:43', 1, '2022-07-09 19:33:43');
+INSERT INTO `lc_case_execution_step_item` VALUES (133, 11, 27, '立案告知书', '立案依据', 1, 1, '2022-07-09 19:33:43', 1, '2022-07-09 19:33:43');
+INSERT INTO `lc_case_execution_step_item` VALUES (134, 11, 28, '勘验笔录', '勘验依据', 1, 1, '2022-07-09 19:33:43', 1, '2022-07-09 19:33:43');
+INSERT INTO `lc_case_execution_step_item` VALUES (135, 11, 28, '现场照片', '勘验依据', 2, 1, '2022-07-09 19:33:43', 1, '2022-07-09 19:33:57');
 COMMIT;
 
 -- ----------------------------
@@ -296,6 +303,76 @@ INSERT INTO `lc_case_type_step_item` VALUES (59, 55, '扣押物品清单', '扣�
 COMMIT;
 
 -- ----------------------------
+-- Table structure for lc_subject
+-- ----------------------------
+DROP TABLE IF EXISTS `lc_subject`;
+CREATE TABLE `lc_subject` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `parent_id` bigint(20) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `created_by` bigint(20) DEFAULT NULL,
+  `created_time` datetime DEFAULT NULL,
+  `lastmodified_by` bigint(20) DEFAULT NULL,
+  `lastmodified_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKlsa69jp0c73ahpmdkoqntitg` (`parent_id`),
+  CONSTRAINT `FKlsa69jp0c73ahpmdkoqntitg` FOREIGN KEY (`parent_id`) REFERENCES `lc_subject` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of lc_subject
+-- ----------------------------
+BEGIN;
+INSERT INTO `lc_subject` VALUES (15, NULL, '环保', 1, '2022-07-10 09:25:07', 1, '2022-07-10 09:25:07');
+INSERT INTO `lc_subject` VALUES (16, NULL, '涉税', 1, '2022-07-10 09:25:21', 1, '2022-07-10 09:25:21');
+INSERT INTO `lc_subject` VALUES (17, NULL, '烟草', 1, '2022-07-10 09:25:36', 1, '2022-07-10 09:25:36');
+INSERT INTO `lc_subject` VALUES (18, NULL, '消防', 1, '2022-07-10 09:25:46', 1, '2022-07-10 09:25:46');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for lc_subject_item
+-- ----------------------------
+DROP TABLE IF EXISTS `lc_subject_item`;
+CREATE TABLE `lc_subject_item` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `subject_id` bigint(20) DEFAULT NULL,
+  `name` varchar(50) DEFAULT NULL,
+  `law_title` varchar(200) DEFAULT NULL,
+  `law_content` longtext,
+  `created_by` bigint(20) DEFAULT NULL,
+  `created_time` datetime DEFAULT NULL,
+  `lastmodified_by` bigint(20) DEFAULT NULL,
+  `lastmodified_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of lc_subject_item
+-- ----------------------------
+BEGIN;
+INSERT INTO `lc_subject_item` VALUES (1, 15, '无环评不停建', '环境保护法63.1.1', '      第六十三条 企业事业单位和其他生产经营者有下列行为之一，尚不构成犯罪的，除依照有关法律法规规定予以处罚外，由县级以上人民政府环境保护主管部门或者其他有关部门将案件移送公安机关，对其直接负责的主管人员和其他直接责任人员，处十日以上十五日以下拘留；情节较轻的，处五日以上十日以下拘留：\n\n（一）建设项目未依法进行环境影响评价，被责令停止建设，拒不执行的；\n\n（二）违反法律规定，未取得排污许可证排放污染物，被责令停止排污，拒不执行的；\n\n（三）通过暗管、渗井、渗坑、灌注或者篡改、伪造监测数据，或者不正常运行防治污染设施等逃避监管的方式违法排放污染物的；\n\n（四）生产、使用国家明令禁止生产、使用的农药，被责令改正，拒不改正的。', 1, '2022-07-10 09:29:21', 1, '2022-07-10 09:31:33');
+INSERT INTO `lc_subject_item` VALUES (2, 15, '无许可不停排', '环境保护法63.1.2', '      第六十三条 企业事业单位和其他生产经营者有下列行为之一，尚不构成犯罪的，除依照有关法律法规规定予以处罚外，由县级以上人民政府环境保护主管部门或者其他有关部门将案件移送公安机关，对其直接负责的主管人员和其他直接责任人员，处十日以上十五日以下拘留；情节较轻的，处五日以上十日以下拘留：\n\n（一）建设项目未依法进行环境影响评价，被责令停止建设，拒不执行的；\n\n（二）违反法律规定，未取得排污许可证排放污染物，被责令停止排污，拒不执行的；\n\n（三）通过暗管、渗井、渗坑、灌注或者篡改、伪造监测数据，或者不正常运行防治污染设施等逃避监管的方式违法排放污染物的；\n\n（四）生产、使用国家明令禁止生产、使用的农药，被责令改正，拒不改正的。', 1, '2022-07-10 09:32:16', 1, '2022-07-10 09:32:25');
+INSERT INTO `lc_subject_item` VALUES (3, 15, '逃避监管偷排', '环境保护法63.1.3', '      第六十三条 企业事业单位和其他生产经营者有下列行为之一，尚不构成犯罪的，除依照有关法律法规规定予以处罚外，由县级以上人民政府环境保护主管部门或者其他有关部门将案件移送公安机关，对其直接负责的主管人员和其他直接责任人员，处十日以上十五日以下拘留；情节较轻的，处五日以上十日以下拘留：\n\n（一）建设项目未依法进行环境影响评价，被责令停止建设，拒不执行的；\n\n（二）违反法律规定，未取得排污许可证排放污染物，被责令停止排污，拒不执行的；\n\n（三）通过暗管、渗井、渗坑、灌注或者篡改、伪造监测数据，或者不正常运行防治污染设施等逃避监管的方式违法排放污染物的；\n\n（四）生产、使用国家明令禁止生产、使用的农药，被责令改正，拒不改正的。', 1, '2022-07-10 09:33:14', 1, '2022-07-10 09:33:23');
+INSERT INTO `lc_subject_item` VALUES (4, 15, '生产使用禁用农药', '环境保护法63.1.4', '      第六十三条 企业事业单位和其他生产经营者有下列行为之一，尚不构成犯罪的，除依照有关法律法规规定予以处罚外，由县级以上人民政府环境保护主管部门或者其他有关部门将案件移送公安机关，对其直接负责的主管人员和其他直接责任人员，处十日以上十五日以下拘留；情节较轻的，处五日以上十日以下拘留：\n\n（一）建设项目未依法进行环境影响评价，被责令停止建设，拒不执行的；\n\n（二）违反法律规定，未取得排污许可证排放污染物，被责令停止排污，拒不执行的；\n\n（三）通过暗管、渗井、渗坑、灌注或者篡改、伪造监测数据，或者不正常运行防治污染设施等逃避监管的方式违法排放污染物的；\n\n（四）生产、使用国家明令禁止生产、使用的农药，被责令改正，拒不改正的。', 1, '2022-07-10 09:33:46', 1, '2022-07-10 09:33:55');
+INSERT INTO `lc_subject_item` VALUES (6, 16, '阻碍执行职务', '阻碍执行职务', '阻碍执行职务', 1, '2022-07-10 09:40:22', 1, '2022-07-10 09:40:22');
+INSERT INTO `lc_subject_item` VALUES (7, 16, '逃税', '逃税', '逃税', 1, '2022-07-10 09:40:34', 1, '2022-07-10 09:40:34');
+INSERT INTO `lc_subject_item` VALUES (8, 16, '虚开增值税专用发票', '虚开增值税专用发票', '虚开增值税专用发票', 1, '2022-07-10 09:40:45', 1, '2022-07-10 09:40:45');
+INSERT INTO `lc_subject_item` VALUES (9, 17, '阻碍执行职务', '阻碍执行职务', '阻碍执行职务', 1, '2022-07-10 09:41:08', 1, '2022-07-10 09:41:08');
+INSERT INTO `lc_subject_item` VALUES (10, 17, '非法经营', '非法经营', '非法经营', 1, '2022-07-10 09:41:20', 1, '2022-07-10 09:41:20');
+INSERT INTO `lc_subject_item` VALUES (11, 17, '生产销售伪劣', '生产销售伪劣', '生产销售伪劣', 1, '2022-07-10 09:41:30', 1, '2022-07-10 09:41:30');
+INSERT INTO `lc_subject_item` VALUES (12, 17, '假冒注册商标', '假冒注册商标', '假冒注册商标', 1, '2022-07-10 09:41:42', 1, '2022-07-10 09:41:42');
+INSERT INTO `lc_subject_item` VALUES (13, 18, '违反规定进入危险场所', '消防法63.1.1', '   第六十三条 违反本法规定，有下列行为之一的，处警告或者五百元以下罚款；情节严重的，处五日以下拘留：\n\n（一）违反消防安全规定进入生产、储存易燃易爆危险品场所的；\n\n（二）违反规定使用明火作业或者在具有火灾、爆炸危险的场所吸烟、使用明火的。', 1, '2022-07-10 09:42:58', 1, '2022-07-10 09:42:58');
+INSERT INTO `lc_subject_item` VALUES (14, 18, '危险场所使用明火', '消防法63.1.2', '  第六十三条 违反本法规定，有下列行为之一的，处警告或者五百元以下罚款；情节严重的，处五日以下拘留：\n\n（一）违反消防安全规定进入生产、储存易燃易爆危险品场所的；\n\n（二）违反规定使用明火作业或者在具有火灾、爆炸危险的场所吸烟、使用明火的。', 1, '2022-07-10 09:43:35', 1, '2022-07-10 09:43:35');
+INSERT INTO `lc_subject_item` VALUES (15, 18, '过失火灾', '消防法64.1.1', '  第六十四条 违反本法规定，有下列行为之一，尚不构成犯罪的，处十日以上十五日以下拘留，可以并处五百元以下罚款；情节较轻的，处警告或者五百元以下罚款：\n\n（一）指使或者强令他人违反消防安全规定，冒险作业的；\n\n（二）过失引起火灾的；\n\n（三）在火灾发生后阻拦报警，或者负有报告职责的人员不及时报警的；\n\n（四）扰乱火灾现场秩序，或者拒不执行火灾现场指挥员指挥，影响灭火救援的；\n\n（五）故意破坏或者伪造火灾现场的；\n\n（六）擅自拆封或者使用被消防救援机构查封的场所、部位的。', 1, '2022-07-10 09:44:11', 1, '2022-07-10 09:44:11');
+INSERT INTO `lc_subject_item` VALUES (16, 18, '冒险作业', '消防法64.1.2', '  第六十四条 违反本法规定，有下列行为之一，尚不构成犯罪的，处十日以上十五日以下拘留，可以并处五百元以下罚款；情节较轻的，处警告或者五百元以下罚款：\n\n（一）指使或者强令他人违反消防安全规定，冒险作业的；\n\n（二）过失引起火灾的；\n\n（三）在火灾发生后阻拦报警，或者负有报告职责的人员不及时报警的；\n\n（四）扰乱火灾现场秩序，或者拒不执行火灾现场指挥员指挥，影响灭火救援的；\n\n（五）故意破坏或者伪造火灾现场的；\n\n（六）擅自拆封或者使用被消防救援机构查封的场所、部位的。', 1, '2022-07-10 09:44:51', 1, '2022-07-10 09:44:51');
+INSERT INTO `lc_subject_item` VALUES (17, 18, '不及时报警', '消防法64.1.3', '  第六十四条 违反本法规定，有下列行为之一，尚不构成犯罪的，处十日以上十五日以下拘留，可以并处五百元以下罚款；情节较轻的，处警告或者五百元以下罚款：\n\n（一）指使或者强令他人违反消防安全规定，冒险作业的；\n\n（二）过失引起火灾的；\n\n（三）在火灾发生后阻拦报警，或者负有报告职责的人员不及时报警的；\n\n（四）扰乱火灾现场秩序，或者拒不执行火灾现场指挥员指挥，影响灭火救援的；\n\n（五）故意破坏或者伪造火灾现场的；\n\n（六）擅自拆封或者使用被消防救援机构查封的场所、部位的。', 1, '2022-07-10 09:45:57', 1, '2022-07-10 09:45:57');
+INSERT INTO `lc_subject_item` VALUES (18, 18, '扰乱火场秩序', '消防法64.1.4', '  第六十四条 违反本法规定，有下列行为之一，尚不构成犯罪的，处十日以上十五日以下拘留，可以并处五百元以下罚款；情节较轻的，处警告或者五百元以下罚款：\n\n（一）指使或者强令他人违反消防安全规定，冒险作业的；\n\n（二）过失引起火灾的；\n\n（三）在火灾发生后阻拦报警，或者负有报告职责的人员不及时报警的；\n\n（四）扰乱火灾现场秩序，或者拒不执行火灾现场指挥员指挥，影响灭火救援的；\n\n（五）故意破坏或者伪造火灾现场的；\n\n（六）擅自拆封或者使用被消防救援机构查封的场所、部位的。', 1, '2022-07-10 09:46:25', 1, '2022-07-10 09:46:25');
+INSERT INTO `lc_subject_item` VALUES (19, 18, '破坏、伪造现场', '消防法64.1.5', '  第六十四条 违反本法规定，有下列行为之一，尚不构成犯罪的，处十日以上十五日以下拘留，可以并处五百元以下罚款；情节较轻的，处警告或者五百元以下罚款：\n\n（一）指使或者强令他人违反消防安全规定，冒险作业的；\n\n（二）过失引起火灾的；\n\n（三）在火灾发生后阻拦报警，或者负有报告职责的人员不及时报警的；\n\n（四）扰乱火灾现场秩序，或者拒不执行火灾现场指挥员指挥，影响灭火救援的；\n\n（五）故意破坏或者伪造火灾现场的；\n\n（六）擅自拆封或者使用被消防救援机构查封的场所、部位的。', 1, '2022-07-10 09:47:07', 1, '2022-07-10 09:47:07');
+INSERT INTO `lc_subject_item` VALUES (20, 18, '擅自解封', '消防法64.1.6', '  第六十四条 违反本法规定，有下列行为之一，尚不构成犯罪的，处十日以上十五日以下拘留，可以并处五百元以下罚款；情节较轻的，处警告或者五百元以下罚款：\n\n（一）指使或者强令他人违反消防安全规定，冒险作业的；\n\n（二）过失引起火灾的；\n\n（三）在火灾发生后阻拦报警，或者负有报告职责的人员不及时报警的；\n\n（四）扰乱火灾现场秩序，或者拒不执行火灾现场指挥员指挥，影响灭火救援的；\n\n（五）故意破坏或者伪造火灾现场的；\n\n（六）擅自拆封或者使用被消防救援机构查封的场所、部位的。', 1, '2022-07-10 09:47:56', 1, '2022-07-10 09:47:56');
+INSERT INTO `lc_subject_item` VALUES (21, 18, '不组织疏散', '消防法68', '    第六十八条 人员密集场所发生火灾，该场所的现场工作人员不履行组织、引导在场人员疏散的义务，情节严重，尚不构成犯罪的，处五日以上十日以下拘留。', 1, '2022-07-10 09:48:42', 1, '2022-07-10 09:48:42');
+COMMIT;
+
+-- ----------------------------
 -- Table structure for sys_role
 -- ----------------------------
 DROP TABLE IF EXISTS `sys_role`;
@@ -344,7 +421,7 @@ CREATE TABLE `sys_user` (
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` VALUES (1, '管理员', '男', '行政部', '13000000000', '$2a$10$5.RuK.TUuUGHh5T0Aoa6xe0djCE/LlJoBYl4rAsoZD3hZTAns/t9K', NULL, 'ADMIN,USER', 1, 1, '2022-06-08 21:26:23', 1, '2022-07-03 20:24:21');
+INSERT INTO `sys_user` VALUES (1, '管理员', '男', '行政部', '13000000000', '$2a$10$EpY/PC9nnJA.iivgMoETVOQVwa.D2lq3qglCwb442gDgDu60GQzUG', NULL, 'ADMIN,USER', 1, 1, '2022-06-08 21:26:23', 1, '2022-07-10 10:47:37');
 INSERT INTO `sys_user` VALUES (2, 'test1', '男', '井店镇派出所', '13000000002', '$2a$10$bYFKJ8xCrDXQ2ytmV3SeAe0b2gvNtbNHVvhx7/AGrBBT77N.R4Msa', '123', 'USER', 2, 1, '2022-06-12 13:02:35', 1, '2022-06-27 14:31:17');
 INSERT INTO `sys_user` VALUES (3, '秦始皇', '男', '长安派出所', '13000000001', '$2a$10$FE1CTfWlD0zCa6YJ/BmifOb9ZVvJy2kx9Yy.EXCJsR4Yc1hun9F7y', '我是长安派出所的秦始皇，请审批', 'USER', 1, 1, '2022-06-27 14:06:27', 1, '2022-06-27 14:31:17');
 INSERT INTO `sys_user` VALUES (4, '刘邦', '男', '泗水亭长', '13000000003', '$2a$10$C3CBkHLjWi9NFZ0dctgbtupzXR7eZqMYeR/NnKcyqlB12rmuuyOCS', '我是泗水亭长，请审批', 'USER', 0, 1, '2022-06-27 14:07:11', 1, '2022-06-27 14:07:11');

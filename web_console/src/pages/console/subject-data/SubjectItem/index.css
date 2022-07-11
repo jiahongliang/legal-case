@@ -1,0 +1,43 @@
+.case-form-area {
+    border: 1px solid #efefef;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0px 0px 6px rgba(0,0,0,0.2);
+    height: calc(100vh - 190px);
+    overflow: auto;
+}
+
+.panel-title {
+    padding: 10px;
+    border-bottom: 1px solid #efefef;
+    height: 45px;
+}
+
+.panel-title-text {
+    font-weight: 600;
+    float: left;
+}
+
+.panel-title-toolbar {
+    float: right;
+}
+
+.panel-title-toolbar-button {
+    margin-left: 1px;
+}
+
+.panel-content {
+    margin-top: 10px;
+    height: calc(100vh - 270px);
+    overflow: auto;
+}
+
+.panel-content-law-title {
+    font-weight: 600;
+    height: 40px;
+    line-height: 40px;
+}
+
+.panel-content-law-content {
+    height: calc(100vh - 330px);
+}

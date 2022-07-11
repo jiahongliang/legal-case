@@ -2,6 +2,7 @@ package com.jhl.legalcase.entity;
 
 import com.jhl.legalcase.util.jpa.JpaAudit;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -10,7 +11,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "lc_case_execution_suspect")
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 public class LcCaseExecutionSuspect extends JpaAudit {

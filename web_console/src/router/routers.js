@@ -5,12 +5,14 @@ import { wrapper } from '../pages';
 export const Console = lazy(() => import('../pages/console/Console'));
 export const Dashboard = lazy(() => import('../pages/console/Dashboard'));
 export const CaseType = lazy(() => import('../pages/console/base-config/CaseType'));
+export const SubjectManage = lazy(() => import('../pages/console/base-config/SubjectManage'));
 export const CaseDefinition = lazy(() => import('../pages/console/base-config/CaseDefinition'));
 export const ConfirmUser = lazy(() => import('../pages/console/users/ConfirmUser'));
 export const UserManage = lazy(() => import('../pages/console/users/UserManage'));
 export const CaseInstance = lazy(() => import('../pages/console/biz-info/CaseExecution'));
 export const CaseStatistic = lazy(() => import('../pages/console/biz-info/CaseStatistic'));
 export const BizHandle = lazy(() => import('../pages/console/biz-handle/BizHandle'));
+export const SubjectItem = lazy(() => import('../pages/console/subject-data/SubjectItem'));
 export const CreateCase = lazy(() => import('../pages/console/biz-handle/CreateCase'));
 export const UserRegister = lazy(() => import('../pages/register/UserRegister'));
 export const Login = lazy(() => import('../pages/Login.jsx'));
@@ -45,6 +47,10 @@ const GetRoutes = () => {
                 {
                     path: '/console/base-config/case-type',
                     element: wrapper(CaseType)
+                }, 
+                {
+                    path: '/console/base-config/subject-manage',
+                    element: wrapper(SubjectManage)
                 },
                 {
                     path: '/console/base-config/definition',
@@ -57,6 +63,10 @@ const GetRoutes = () => {
                 {
                     path: '/console/biz-handle/new-instance',
                     element: wrapper(CreateCase)
+                },
+                {
+                    path: '/console/subject-data/subject-item',
+                    element: wrapper(SubjectItem)
                 },
                 {
                     path: '/console/biz-info/statistic',
