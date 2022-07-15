@@ -93,7 +93,7 @@ const BizHandle = () => {
     const loadData = () => {
         setDataLoading(true);
         let searchData = searchForm.getFieldsValue();
-        console.log('searchData',searchData);
+        // console.log('searchData',searchData);
         let param = {
             entity: {
                 typeId: searchData.typeId,
@@ -116,7 +116,7 @@ const BizHandle = () => {
         };
 
         if(searchData.creator && searchData.creator.trim().length > 0) {
-            console.log('creator is inputed')
+            // console.log('creator is inputed')
             let createdBys = userData.filter(user => user.name.indexOf(searchData.creator) > -1).map(user => user.id + '').join();
             if(createdBys.trim().length === 0) {
                 createdBys = '0';
@@ -129,7 +129,7 @@ const BizHandle = () => {
         }
 
         caseExecutionList(param).then(res => {
-            console.log(res)
+            // console.log(res)
             setData(res.rows);
             setTotal(res.total)
         });
@@ -138,9 +138,9 @@ const BizHandle = () => {
     }
 
     const onSelectionChange = (selectedRowKeys, selectedRows, info) => {
-        console.log("selectedRowKeys", selectedRowKeys)
-        console.log("selectedRows", selectedRows)
-        console.log("info", info)
+        // console.log("selectedRowKeys", selectedRowKeys)
+        // console.log("selectedRows", selectedRows)
+        // console.log("info", info)
     }
     
     const columns = [

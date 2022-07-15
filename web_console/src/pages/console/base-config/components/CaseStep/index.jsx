@@ -18,7 +18,7 @@ const CaseStep = (props) => {
 
     useEffect(() => {
         if(triggerDataChangeSource === 'parent') {
-            console.log('props.data...')
+            // console.log('props.data...')
             stepIndex.current = 1;
             if(props.data && props.data.length > 0) {
                 setStepData(props.data.map(step => ({...step,orderValue: '' + stepIndex.current ++})));

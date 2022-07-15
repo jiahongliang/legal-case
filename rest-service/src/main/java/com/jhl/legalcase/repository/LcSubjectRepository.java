@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author
  */
-public interface LcSubjectRepository  extends JpaRepositoryImplementation<LcSubject, Long> {
+public interface LcSubjectRepository extends JpaRepositoryImplementation<LcSubject, Long> {
     /**
      * 查找所有顶层目录
      *

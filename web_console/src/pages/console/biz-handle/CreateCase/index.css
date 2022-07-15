@@ -35,7 +35,7 @@
     height: calc(100vh - 419px);
     overflow: auto;
     border: 1px solid #efefef;
-    margin-top: 10px;
+    margin-top: 10px 5px 0 0;
 }
 
 .ant-form-item-label {

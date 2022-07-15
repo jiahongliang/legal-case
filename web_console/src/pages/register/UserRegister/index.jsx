@@ -25,7 +25,7 @@ const UserRegister = () => {
             entity: formData
         }
         registerUser(params).then(res => {
-            console.log(res);
+            // console.log(res);
             if(res.subCode === 0) {
                 setSaveResult({code:"success",message:res.subMsg});
             } else {

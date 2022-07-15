@@ -18,7 +18,7 @@ const StepItems = (props) => {
     },[]);
 
     useEffect(() => {
-        console.log('data changed:',data)
+        // console.log('data changed:',data)
         props.onChange(data);
     },[data]);
 

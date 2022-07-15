@@ -1,0 +1,21 @@
+.case-type-wrapper {
+    height: 100%;
+}
+
+.case-type-wrapper .toolbar-area {
+    padding: 5px;
+    box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.2);
+    margin: 0 0 5px 0;
+    border-radius: 2px;
+}
+
+.ant-table-container {
+    height: calc(100vh - 200px);
+}
+
+.search-form {
+    padding: 5px;
+    box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.2);
+    margin: 0 0 5px 0;
+    border-radius: 2px;
+}

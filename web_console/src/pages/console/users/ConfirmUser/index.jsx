@@ -125,9 +125,9 @@ const ToBeConfirmed = () => {
     }
 
     const onSelectionChange = (selectedRowKeys, selectedRows, info) => {
-        console.log("selectedRowKeys", selectedRowKeys)
-        console.log("selectedRows", selectedRows)
-        console.log("info", info)
+        // console.log("selectedRowKeys", selectedRowKeys)
+        // console.log("selectedRows", selectedRows)
+        // console.log("info", info)
     }
 
     return (

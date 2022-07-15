@@ -110,3 +110,27 @@ export const removeSubjectItem = (data) => {
         method: 'post',
     });
 }
+
+export const lawArticleList = (data) => {
+    return serviceJson({
+        url: '/law-article/list',
+        data,
+        method: 'post',
+    });
+}
+
+export const saveLawArticle = (data) => {
+    return serviceJson({
+        url: '/law-article/save',
+        data,
+        method: 'post',
+    });
+}
+
+export const removeLawArticle = (data) => {
+    return serviceJson({
+        url: '/law-article/remove',
+        data,
+        method: 'post',
+    });
+}

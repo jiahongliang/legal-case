@@ -92,11 +92,33 @@ const Console = () => {
         }
     }, []);
 
+    useEffect(() => {
+        let key = location.pathname;
+        let keyNode = getMenuItem(key);
+        if(keyNode != null) {
+            let pathArr = [];
+            keyNode.keyPath.slice().reverse().forEach(item => {
+                pathArr.push(getMenuItem(item));
+            });
+            setPathNode(pathArr);
+            setSelectedMenuKey(key);
+            activeNavigateTab(keyNode);
+        } else {
+            setPathNode([]);
+            setSelectedMenuKey(null);
+            activeNavigateTab(navigateTabs[0]);
+        }
+
+    },[location]);
+
+    
+
     const toggle = () => {
         setCollapsed(!collapsed);
     }
 
     const menuClick = (e) => {
+        //console.log(e);
         let keyNode = getMenuItem(e.key);
         if(keyNode != null) {
             let pathArr = [];
@@ -116,7 +138,7 @@ const Console = () => {
     const userMenuClick = (item) => {
         switch(item.key) {
             case "userCenter":
-                console.log("0");
+                //console.log("0");
                 break;
             case "updPassword":
                 setPwdVisible(true);
@@ -211,13 +233,13 @@ const Console = () => {
         let result = null;
         menus.find((item) => {
             if (item.key === k) {
-                result = item;
+                result = {...item, keyPath: [item.key]};
                 return true;
             }
             if (item.children) {
                 if (item.children.find(i => {
                     if (i.key === k) {
-                        result = i;
+                        result = {...i, keyPath:[i.key, item.key]};
                         return true;
                     }
                     return false;
@@ -238,11 +260,11 @@ const Console = () => {
     }
 
     const savePassword = (formData) => {
-        console.log("formData:",formData)
-        console.log(JSON.stringify(formData));
+        // console.log("formData:",formData)
+        // console.log(JSON.stringify(formData));
         let params = Base64.encode(JSON.stringify(formData));
         updatePassword(params).then(res => {
-            console.log(res);
+            // console.log(res);
             if(res.subCode === 0) {
                 setPwdResult("success");
             } else {
@@ -258,7 +280,7 @@ const Console = () => {
     return (
         <Layout className="console-container">
             <Sider trigger={null} collapsible collapsed={collapsed}>
-                <div className="logo">{collapsed ? 'M' : 'Management'}</div>
+                <div className="logo">{collapsed ? '执法' : '公安执法办案智能辅助平台'}</div>
                 <Menu
                     theme="dark"
                     mode="inline"

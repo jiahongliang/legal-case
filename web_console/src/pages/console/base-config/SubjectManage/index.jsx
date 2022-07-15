@@ -231,15 +231,15 @@ const SubjectManage = () => {
     return (
         <>
             <PageHeader
-                title="专题管理"
+                title="专项执法管理"
                 className="site-page-header"
-                subTitle="管理专题类别和内容"
+                subTitle="管理专项执法类别和内容"
                 avatar={{ icon: <BookTwoTone /> }}
             >
                 <Row gutter={16} className="case-form-row" justify="space-between">
                     <Col span={8} className="case-form-area">
                         <div className="panel-title">
-                            <div className="panel-title-text">专题类别</div>
+                            <div className="panel-title-text">类别</div>
                             <div className="panel-title-toolbar">
                                 <Button size="small" className="panel-title-toolbar-button" onClick={handleAddSubject}>新增同级</Button>
                                 <Button size="small" className="panel-title-toolbar-button" onClick={handleAddChildSubject}>新增子项</Button>
@@ -310,7 +310,7 @@ const SubjectManage = () => {
                     <Form.Item name="id" label="主键" hidden={true}>
                         <Input />
                     </Form.Item>
-                    <Form.Item name="subjectId" label="专题类别" hidden={true}>
+                    <Form.Item name="subjectId" label="类别" hidden={true}>
                         <Input />
                     </Form.Item>
                     <Form.Item name="name" label="项目名称" rules={[{ required: true, message: '项目名称必须输入' }]}>

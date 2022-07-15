@@ -70,15 +70,15 @@ const SubjectItem = () => {
     return (
         <>
             <PageHeader
-                title="专题数据"
+                title="专项执法数据"
                 className="site-page-header"
-                subTitle="展示专题相关数据"
+                subTitle="展示专项执法相关数据"
                 avatar={{ icon: <BookTwoTone /> }}
             >
                 <Row gutter={16} className="case-form-row" justify="space-between">
                     <Col span={8} className="case-form-area">
                         <div className="panel-title">
-                            <div className="panel-title-text">专题类别</div>
+                            <div className="panel-title-text">类别</div>
                         </div>
                         <div className="panel-content">
                             <Tree

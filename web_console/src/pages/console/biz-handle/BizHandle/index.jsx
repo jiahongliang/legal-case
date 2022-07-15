@@ -107,7 +107,7 @@ const BizHandle = () => {
 
         };
         caseExecutionList(param).then(res => {
-            console.log(res)
+            // console.log(res)
             setData(res.rows);
             setTotal(res.total)
         });
@@ -116,9 +116,9 @@ const BizHandle = () => {
     }
 
     const onSelectionChange = (selectedRowKeys, selectedRows, info) => {
-        console.log("selectedRowKeys", selectedRowKeys)
-        console.log("selectedRows", selectedRows)
-        console.log("info", info)
+        // console.log("selectedRowKeys", selectedRowKeys)
+        // console.log("selectedRows", selectedRows)
+        // console.log("info", info)
     }
     
     const columns = [

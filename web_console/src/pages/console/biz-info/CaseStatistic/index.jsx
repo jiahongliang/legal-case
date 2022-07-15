@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 const CaseStatistic = () => {
     useEffect(() => {
-        console.log('CaseStatistic page mounted.');
+        // console.log('CaseStatistic page mounted.');
     },[]);
 
     return (

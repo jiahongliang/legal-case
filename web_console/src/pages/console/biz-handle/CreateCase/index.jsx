@@ -15,6 +15,7 @@ const CreateCase = () => {
     const suspectInputRef = createRef(); 
     //const [suspectInputValue, setSuspectInputValue] = useState('');
     const [stepData, setStepData] = useState([]);
+    const [stepFilterText, setStepFilterText] = useState('');
     const [selectedStepData, setSelectedStepData] = useState([]);
     const [stepActiveKey, setStepActiveKey] = useState([]);
     const [saveResult,setSaveResult] = useState({
@@ -159,10 +160,14 @@ const CreateCase = () => {
         });
     }
 
+    const handleStepFilterText = (e) => {
+        setStepFilterText(e.target.value);
+    }
+
     return (
         <>
             <PageHeader
-                title="新建案件"
+                title="案件新增"
                 className="site-page-header"
                 subTitle="选择类型并设置案件事项后，创建案件"
                 extra={[
@@ -176,7 +181,7 @@ const CreateCase = () => {
                      saveResult.code == null ? (
                         <Form form={caseForm} layout="vertical">
                             <Row gutter={16} className="case-form-row" justify="space-between">
-                                <Col span={9} className="case-form-area">
+                                <Col span={6} className="case-form-area">
                                     <Form.Item name="typeId" label="类型">
                                         <Radio.Group onChange={onCaseTypeChange}>
                                             {
@@ -190,16 +195,16 @@ const CreateCase = () => {
                                     <Form.Item name="name" label="名称">
                                         <Input placeholder="请输入名称" maxLength={50} onFocus={e => e.target.select()}/>
                                     </Form.Item>
-                                    <span style={{fontWeight: 600}}>可选步骤</span>
+                                    <span style={{fontWeight: 600}}>可选步骤 <Input onChange={handleStepFilterText}></Input></span>
                                     <div className="case-type-source-step-area">
                                         {
-                                            stepData.map(step => (
-                                                <Button key={step.id} block className="case-step-button" onClick={() => {handleClickSourceStep(step.id)}}>{step.name}</Button>
+                                            stepData.filter(step => stepFilterText.length === 0 || step.name.indexOf(stepFilterText) >= 0).map(step => (
+                                                <Button key={step.id} type="primary" style={{width: '95%'}} shape="round" block className="case-step-button" onClick={() => {handleClickSourceStep(step.id)}}>{step.name}</Button>
                                             ))
                                         }
                                         </div>
                                 </Col>
-                                <Col span={15} className="case-form-area">
+                                <Col span={18} className="case-form-area">
                                     <span style={{fontWeight: 600}}>步骤及事项</span>
                                     <Collapse
                                         activeKey={stepActiveKey}
@@ -210,8 +215,10 @@ const CreateCase = () => {
                                     >
                                         {
                                             selectedStepData.map(step => (
-                                                <Panel header={step.name} key={step.keyid} collapsible="header" extra={
-                                                <><Input style={{width: "80%",marginRight: "20px"}} placeholder="对象名称" onChange={(event) => handleSuspectChange(step.keyid,event.target.value)}></Input><CloseOutlined  onClick={() => handleRemoveSelectedStep(step.keyid)}/></>
+                                                <Panel header={<div style={{width: '300px',display: 'flex'}}><div style={{wordBreak: 'keep-all'}}>{step.name}</div>
+                                                    <Input style={{float: "right",marginLeft: '5px'}} size="small" placeholder="对象名称" onChange={(event) => handleSuspectChange(step.keyid,event.target.value)} onClick={(event) => {event.stopPropagation()}}></Input></div>
+                                                } key={step.keyid} collapsible="header" extra={
+                                                <><CloseOutlined  onClick={() => handleRemoveSelectedStep(step.keyid)}/></>
                                                 }>
                                                     {
                                                         (step.caseTypeStepItems && step.caseTypeStepItems.length > 0) ? 

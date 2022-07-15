@@ -14,7 +14,7 @@ const HandleExecution = (props) => {
     const [userData, setUserData] = useState([]);
 
     useEffect(() => {
-        console.log(props)
+        // console.log(props)
         setData(props.data);
         setCaseTypeData(props.caseTypeData);
         setStepActiveKey(props.data.steps ? props.data.steps.map(step => step.id) : []);

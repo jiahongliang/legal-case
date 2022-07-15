@@ -7,12 +7,14 @@ export const Dashboard = lazy(() => import('../pages/console/Dashboard'));
 export const CaseType = lazy(() => import('../pages/console/base-config/CaseType'));
 export const SubjectManage = lazy(() => import('../pages/console/base-config/SubjectManage'));
 export const CaseDefinition = lazy(() => import('../pages/console/base-config/CaseDefinition'));
+export const LawArticle = lazy(() => import('../pages/console/base-config/LawArticle'));
 export const ConfirmUser = lazy(() => import('../pages/console/users/ConfirmUser'));
 export const UserManage = lazy(() => import('../pages/console/users/UserManage'));
 export const CaseInstance = lazy(() => import('../pages/console/biz-info/CaseExecution'));
 export const CaseStatistic = lazy(() => import('../pages/console/biz-info/CaseStatistic'));
 export const BizHandle = lazy(() => import('../pages/console/biz-handle/BizHandle'));
 export const SubjectItem = lazy(() => import('../pages/console/subject-data/SubjectItem'));
+export const LawArticleData = lazy(() => import('../pages/console/subject-data/LawArticleData'));
 export const CreateCase = lazy(() => import('../pages/console/biz-handle/CreateCase'));
 export const UserRegister = lazy(() => import('../pages/register/UserRegister'));
 export const Login = lazy(() => import('../pages/Login.jsx'));
@@ -57,6 +59,10 @@ const GetRoutes = () => {
                     element: wrapper(CaseDefinition)
                 },
                 {
+                    path: '/console/base-config/law-article',
+                    element: wrapper(LawArticle)
+                },
+                {
                     path: '/console/biz-handle/instance-list',
                     element: wrapper(BizHandle)
                 },
@@ -67,6 +73,10 @@ const GetRoutes = () => {
                 {
                     path: '/console/subject-data/subject-item',
                     element: wrapper(SubjectItem)
+                },
+                {
+                    path: '/console/subject-data/law-article',
+                    element: wrapper(LawArticleData)
                 },
                 {
                     path: '/console/biz-info/statistic',

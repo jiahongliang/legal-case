@@ -1,14 +1,11 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useState } from "react";
-import {
-    Form, Input, Button, Space, Table, Popconfirm, Drawer, Result, message,
-    Row, Col
-} from 'antd';
-import CaseStep from "../components/CaseStep";
-import { caseTypeList, saveCaseType, removeCaseType } from "../../../../api/biz"
-import "./index.css"
+import { Form, Input, Button, Space, Table, Popconfirm, Drawer, Result, message, Row, Col } from 'antd';
+import { lawArticleList, saveLawArticle, removeLawArticle } from "../../../../api/biz"
+import './index.css';
 
-const CaseType = () => {
+const LawArticle = () => {
+    const [searchForm] = Form.useForm();
+
     const [data, setData] = useState([]);
     const [dataLoading, setDataLoading] = useState(false);
     const [total, setTotal] = useState(null);
@@ -23,8 +20,6 @@ const CaseType = () => {
         message: null
     });
 
-    const [stepData, setStepData] = useState([]);
-
     useEffect(() => {
         loadData();
     }, []);
@@ -33,26 +28,26 @@ const CaseType = () => {
         
         {
             title: '名称',
-            dataIndex: 'name',
-            onHeaderCell: function (column) {
-                column.align = "center"
-            },
-            width: 220
-        },
-        {
-            title: '备注',
-            dataIndex: 'memo',
+            dataIndex: 'title',
             onHeaderCell: function (column) {
                 column.align = "center"
             }
         },
         {
-            title: '步骤数量',
+            title: '序号',
+            dataIndex: 'orderValue',
             onHeaderCell: function (column) {
                 column.align = "center"
             },
-            width: 120,
-            render: (_,record) => (record.caseTypeSteps.length)
+            width: 80
+        },
+        {
+            title: '录入时间',
+            dataIndex: 'createdTime',
+            onHeaderCell: function (column) {
+                column.align = "center"
+            },
+            width: 170
         },
         {
             title: '操作',
@@ -78,13 +73,14 @@ const CaseType = () => {
 
     const loadData = () => {
         setDataLoading(true);
+        let formData = searchForm.getFieldsValue();
         let params = {
-            entity:{},
+            entity: formData,
             pageNum: page - 1,
             pageSize,
-            orderBy: "id asc"
+            orderBy: "orderValue asc"
         }
-        caseTypeList(params).then(res => {
+        lawArticleList(params).then(res => {
             setData(res.rows);
             setTotal(res.total)
         });
@@ -95,7 +91,6 @@ const CaseType = () => {
         if(r != null) {
             detailForm.setFieldsValue(r);
             setDetailId(r.id);
-            setStepData(r.caseTypeSteps);
         }
         setDetailVisible(true);
     }
@@ -105,20 +100,17 @@ const CaseType = () => {
         detailForm.resetFields();
         setDetailId(null);
         setSaveResult({code:null,message:null});
-        setStepData([]);
-    
     }
 
-    const saveForm = (caseType) => {
-        // console.log('formdata',caseType)
+    const saveForm = (lawArticle) => {
+        // console.log('formdata',lawArticle)
         let params = {
             entity: {
                 id: detailId,
-                ...caseType,
-                caseTypeSteps: stepData
+                ...lawArticle
             }
         }
-        saveCaseType(params).then(res => {
+        saveLawArticle(params).then(res => {
             if(res.subCode === 0) {
                 setSaveResult({code:"success",message:res.subMsg});
                 loadData();
@@ -126,7 +118,6 @@ const CaseType = () => {
                 setSaveResult({code:"error",message:res.subMsg});
             }
         });
-        setStepData([]);
     }
 
     const deleteData = (r) => {
@@ -135,21 +126,31 @@ const CaseType = () => {
                 id: r.id
             }
         }
-        removeCaseType(params).then(res => {
+        removeLawArticle(params).then(res => {
             message.success(res.subMsg);
             loadData();
         });
-    }
-
-    const onStepDataChange = (newStepData) => {
-        setStepData(newStepData);
     }
 
     return (
         <div className="case-type-wrapper">
             <div className="toolbar-area">
                 <Row>
-                    <Col span={20}></Col>
+                    <Col span={20}>
+                    <Form form={searchForm} 
+                        layout="inline"
+                        onFinish={() => loadData()}
+                        >
+                        <Form.Item name="title" label="标题">
+                            <Input maxLength={10} placeholder="标题" size="small"/>
+                        </Form.Item>
+                        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                            <Button type="primary" size="small" htmlType="submit">
+                                查询
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                    </Col>
                     <Col span={4}>
                         <div style={{ textAlign: "right", padding: "0 5px 0 0" }}>
                             <Button size="small" onClick={() => {showDrawer(null)}}>新增</Button>
@@ -187,14 +188,21 @@ const CaseType = () => {
             <Drawer title="详细信息" placement="right" width={800} visible={detailVisible} onClose={closeDrawer}>
                 {
                     saveResult.code == null ? (
-                        <Form form={detailForm} layout="vertical" onFinish={saveForm}>
-                            <Form.Item name="name" label="名称" rules={[{ required: true, message: '名称必须输入' }]}>
+                        <Form form={detailForm} layout="vertical" onFinish={saveForm} initialValues={{orderValue: 100}}>
+                            <Form.Item name="title" label="名称" rules={[{ required: true, message: '名称必须输入' }]}>
                                 <Input placeholder="请输入名称" maxLength={50}/>
                             </Form.Item>
-                            
-                            <Form.Item label="办案环节" >
-                                <CaseStep data={stepData} onChange={onStepDataChange}></CaseStep>
+
+                            <Form.Item name="orderValue" label="序号" rules={[{ required: true, message: '名称必须输入' }]}>
+                                <Input placeholder="请输入名称" maxLength={50}/>
                             </Form.Item>
+
+                            <Form.Item name="content" label="正文" rules={[{ required: true, message: '正文必须输入' }]}>
+                                <Input.TextArea placeholder="请输入法律详情" style={{
+                                    height: 560,
+                                }} />
+                            </Form.Item>
+                            
                             <Form.Item wrapperCol= {{ offset: 0, span: 24 }} style={{textAlign: "center"}}>
                                 <Button type="primary" htmlType="submit">
                                     保存
@@ -215,4 +223,4 @@ const CaseType = () => {
     );
 }
 
-export default CaseType;
+export default LawArticle;

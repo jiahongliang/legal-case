@@ -14,14 +14,14 @@ const HandleExecution = (props) => {
     const [stepActiveKey, setStepActiveKey] = useState([]);
 
     useEffect(() => {
-        console.log(props)
+        // console.log(props)
         setData(props.data);
         setCaseTypeData(props.caseTypeData);
         setStepActiveKey(props.data.steps ? props.data.steps.map(step => step.id) : [])
     }, []);
 
     useEffect(() => {
-        console.log(data)
+        // console.log(data)
     }, [data]);
 
     const handleCollapseChange = (keys) => {
@@ -51,7 +51,7 @@ const HandleExecution = (props) => {
     return (
         <>
             <PageHeader
-                title="办理案件"
+                title="已办案件"
                 className="site-page-header"
                 subTitle="设置案件已完成事件"
                 extra={[
@@ -64,7 +64,7 @@ const HandleExecution = (props) => {
             >
             <Form layout="vertical">
                 <Row gutter={16} className="case-form-row" justify="space-between">
-                        <Col span={9} className="case-form-area">
+                        <Col span={6} className="case-form-area">
                             <Form.Item label="类型">
                                 {caseTypeData && caseTypeData.length > 0 ? caseTypeData.find(ctd => ctd.id === data.typeId).name : ""}
                             </Form.Item>
@@ -81,7 +81,7 @@ const HandleExecution = (props) => {
                                 {data.lastmodifiedTime}
                             </Form.Item>
                         </Col>
-                        <Col span={15} className="case-form-area">
+                        <Col span={18} className="case-form-area">
                             <span style={{fontWeight: 600}}>步骤及事项</span>
                             <Collapse
                                 activeKey={stepActiveKey}
@@ -92,9 +92,7 @@ const HandleExecution = (props) => {
                             >
                                 {
                                     data.steps ? data.steps.map(step => (
-                                        <Panel header={step.name} key={step.id} collapsible="header" extra={
-                                        <span>{step.suspect}</span>
-                                        }>
+                                        <Panel header={<>{step.name}-{step.suspect}</>} key={step.id} collapsible="header">
                                             {
                                                 (step.caseTypeStepItems && step.caseTypeStepItems.length > 0) ? 
                                                     step.caseTypeStepItems.map(item => item.status === 1 ? (

@@ -10,7 +10,9 @@ import {
     FormOutlined,
     CopyOutlined,
     BookOutlined,
-    GoldOutlined
+    GoldOutlined,
+    ProjectOutlined,
+    FileSearchOutlined 
 } from '@ant-design/icons';
 
 export const menus = [
@@ -51,9 +53,16 @@ export const menus = [
             },
             {
                 key: '/console/base-config/subject-manage',
-                label: '专题管理',
+                label: '专项执法',
                 icon: <BookOutlined />,
                 url: '/console/base-config/subject-manage',
+                role: 'ADMIN',
+            },
+            {
+                key: '/console/base-config/law-article',
+                label: '执法依据',
+                icon: <ProjectOutlined />,
+                url: '/console/base-config/law-article',
                 role: 'ADMIN',
             }
         ]
@@ -66,7 +75,7 @@ export const menus = [
         children: [
             {
                 key: '/console/biz-handle/new-instance',
-                label: '新建案件',
+                label: '案件新增',
                 icon: <FormOutlined />,
                 url: '/console/biz-handle/new-instance',
                 role: 'USER',
@@ -82,15 +91,22 @@ export const menus = [
     },
     {
         key: '/console/subject-data',
-        label: '专题数据',
+        label: '数据查询',
         icon: <BookOutlined />,
         role: 'USER',
         children: [
             {
                 key: '/console/subject-data/subject-item',
-                label: '专题查询',
+                label: '专项执法',
                 icon: <GoldOutlined />,
                 url: '/console/subject-data/subject-item',
+                role: 'USER',
+            },
+            {
+                key: '/console/subject-data/law-article',
+                label: '执法依据',
+                icon: <FileSearchOutlined />,
+                url: '/console/subject-data/law-article',
                 role: 'USER',
             },
         ]

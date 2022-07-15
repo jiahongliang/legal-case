@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunkweb_console=self.webpackChunkweb_console||[]).push([[567],{2567:function(e,n,s){s.r(n);var o=s(2791),c=s(184);n.default=function(){return(0,o.useEffect)((function(){console.log("Dashboard Page mounted.")}),[]),(0,c.jsx)("div",{children:"This is the Dashboard page."})}}}]);
-//# sourceMappingURL=567.32b447fd.chunk.js.map
