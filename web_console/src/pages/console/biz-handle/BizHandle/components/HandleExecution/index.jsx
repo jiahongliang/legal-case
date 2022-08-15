@@ -64,7 +64,7 @@ const HandleExecution = (props) => {
             >
             <Form layout="vertical">
                 <Row gutter={16} className="case-form-row" justify="space-between">
-                        <Col span={6} className="case-form-area">
+                        <Col span={5} className="case-form-area">
                             <Form.Item label="类型">
                                 {caseTypeData && caseTypeData.length > 0 ? caseTypeData.find(ctd => ctd.id === data.typeId).name : ""}
                             </Form.Item>
@@ -81,7 +81,7 @@ const HandleExecution = (props) => {
                                 {data.lastmodifiedTime}
                             </Form.Item>
                         </Col>
-                        <Col span={18} className="case-form-area">
+                        <Col span={19} className="case-form-area">
                             <span style={{fontWeight: 600}}>步骤及事项</span>
                             <Collapse
                                 activeKey={stepActiveKey}

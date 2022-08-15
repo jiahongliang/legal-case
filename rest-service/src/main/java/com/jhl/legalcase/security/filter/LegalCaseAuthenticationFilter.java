@@ -8,6 +8,7 @@ import com.jhl.legalcase.security.handler.LegalCaseAuthenticationFailureHandler;
 import com.jhl.legalcase.security.handler.LegalCaseAuthenticationSuccessHandler;
 import com.jhl.legalcase.security.manager.LegalCaseAuthenticationManager;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -25,6 +26,9 @@ public class LegalCaseAuthenticationFilter extends UsernamePasswordAuthenticatio
 
     private String verifyCodeParameter = SPRING_SECURITY_FORM_VERIFY_CODE_KEY;
 
+    @Value("${legalCase.security.login.validateCode:false}")
+    private Boolean validateCodeRequired;
+
     public LegalCaseAuthenticationFilter(LegalCaseAuthenticationManager authenticationManager, LegalCaseAuthenticationSuccessHandler authenticationSuccessHandler, LegalCaseAuthenticationFailureHandler authenticationFailureHandler) {
         this.setAuthenticationManager(authenticationManager);
         this.setAuthenticationSuccessHandler(authenticationSuccessHandler);
@@ -39,10 +43,12 @@ public class LegalCaseAuthenticationFilter extends UsernamePasswordAuthenticatio
         String str = new String(Base64.getDecoder().decode(loginToken), "utf-8");
         JSONObject obj = JSON.parseObject(str);
 
-        String verifyCode = obj.getString(verifyCodeParameter);
-        String sessionVerifyCode = (String) request.getSession().getAttribute(LegalCaseConstants.GENERATED_VERIFY_CODE);
-        if (verifyCode == null || sessionVerifyCode == null || !verifyCode.equals(sessionVerifyCode)) {
-            throw new VerifyCodeErrorAuthenticationException();
+        if(validateCodeRequired) {
+            String verifyCode = obj.getString(verifyCodeParameter);
+            String sessionVerifyCode = (String) request.getSession().getAttribute(LegalCaseConstants.GENERATED_VERIFY_CODE);
+            if (verifyCode == null || sessionVerifyCode == null || !verifyCode.equals(sessionVerifyCode)) {
+                throw new VerifyCodeErrorAuthenticationException();
+            }
         }
 
         String username = obj.getString("userName");

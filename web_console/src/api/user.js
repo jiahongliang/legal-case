@@ -9,6 +9,13 @@ export const login = (loginToken) => {
     });
 }
 
+export const fetchValidateCodeRequiredFlag = () => {
+    return service({
+        url: '/verify_code/required_flag',
+        method: 'get'
+    })
+}
+
 export const fetchValidateCodeImage = () => {
     return service({
         url: '/verify_code/generate',
@@ -25,7 +32,7 @@ export const logout = () => {
 }
 
 export const updatePassword = (params) => {
-    const data = {params};
+    const data = { params };
     return service({
         url: '/user/update-password',
         data,
@@ -54,7 +61,7 @@ export const saveUser = (data) => {
         url: '/user/update',
         data,
         method: 'post',
-    }); 
+    });
 }
 
 export const roleList = () => {
@@ -75,6 +82,21 @@ export const registerUser = (data) => {
 export const resetPassword = (data) => {
     return serviceJson({
         url: '/user/reset-password',
+        data,
+        method: 'post',
+    });
+}
+
+export const menuOrderList = () => {
+    return serviceJson({
+        url: '/menu-order/list',
+        method: 'get',
+    });
+}
+
+export const saveMenuOrder = (data) => {
+    return serviceJson({
+        url: '/menu-order/save',
         data,
         method: 'post',
     });

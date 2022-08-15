@@ -3,6 +3,7 @@ package com.jhl.legalcase.util.verifycode;
 import com.jhl.legalcase.LegalCaseConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,9 @@ public class VerifyCodeRest {
 
     @Autowired
     IVerifyCodeGen iVerifyCodeGen;
+
+    @Value("${legalCase.security.login.validateCode:false}")
+    private Boolean validateCodeRequired;
 
     @GetMapping("/generate")
     public void verifyCode(HttpServletRequest request, HttpServletResponse response) {
@@ -41,5 +45,10 @@ public class VerifyCodeRest {
         } catch (IOException e) {
             log.info("", e);
         }
+    }
+
+    @GetMapping("/required_flag")
+    public Boolean verifyCodeRequired() {
+        return validateCodeRequired;
     }
 }

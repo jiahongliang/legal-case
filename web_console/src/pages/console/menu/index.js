@@ -6,7 +6,6 @@ import {
     FileDoneOutlined, 
     SettingOutlined, 
     PartitionOutlined, 
-    ReadOutlined,
     FormOutlined,
     CopyOutlined,
     BookOutlined,
@@ -19,12 +18,14 @@ export const menus = [
     {
         key: '/console/users',
         label: '用户管理',
+        sort: 10,
         icon: <TeamOutlined />,
         role: 'ADMIN',
         children: [
             {
                 key: '/console/users/to-be-confirmed',
                 label: '确认用户',
+                sort: 10,
                 icon: <UserAddOutlined />,
                 url: '/console/users/to-be-confirmed',
                 role: 'ADMIN',
@@ -32,6 +33,7 @@ export const menus = [
             {
                 key: '/console/users/user-manage',
                 label: '用户管理',
+                sort: 20,
                 icon: <IdcardOutlined />,
                 url: '/console/users/user-manage',
                 role: 'ADMIN',
@@ -41,12 +43,14 @@ export const menus = [
     {
         key: '/console/base-config',
         label: '基础配置',
+        sort: 20,
         icon: <SettingOutlined />,
         role: 'ADMIN',
         children: [
             {
                 key: '/console/base-config/case-type',
                 label: '案件类型',
+                sort: 10,
                 icon: <PartitionOutlined />,
                 url: '/console/base-config/case-type',
                 role: 'ADMIN',
@@ -54,6 +58,7 @@ export const menus = [
             {
                 key: '/console/base-config/subject-manage',
                 label: '专项执法',
+                sort: 20,
                 icon: <BookOutlined />,
                 url: '/console/base-config/subject-manage',
                 role: 'ADMIN',
@@ -61,12 +66,14 @@ export const menus = [
             {
                 key: '/console/base-config/law-article',
                 label: '执法依据',
+                sort: 30,
                 icon: <ProjectOutlined />,
                 url: '/console/base-config/law-article',
                 role: 'ADMIN',
             }
         ]
     },
+    /*
     {
         key: '/console/biz-handle',
         label: '案件办理',
@@ -110,16 +117,18 @@ export const menus = [
                 role: 'USER',
             },
         ]
-    },
+    },*/
     {
         key: '/console/biz-info',
         label: '业务数据',
+        sort: 30,
         icon: <ContainerOutlined />,
         role: 'ADMIN',
         children: [
             {
                 key: '/console/biz-info/instance',
                 label: '案件管理',
+                sort: 10,
                 icon: <FileDoneOutlined />,
                 url: '/console/biz-info/instance',
                 role: 'ADMIN',
@@ -133,5 +142,37 @@ export const menus = [
                 role: 'ADMIN',
             }*/
         ]
+    },
+    {
+        key: '/console/biz-handle/new-instance',
+        label: '案件新增',
+        sort: 40,
+        icon: <FormOutlined />,
+        url: '/console/biz-handle/new-instance',
+        role: 'USER',
+    },
+    {
+        key: '/console/biz-handle/instance-list',
+        label: '案件办理',
+        sort: 50,
+        icon: <CopyOutlined />,
+        url: '/console/biz-handle/instance-list',
+        role: 'USER',
+    },
+    {
+        key: '/console/subject-data/subject-item',
+        label: '专项执法',
+        sort: 60,
+        icon: <GoldOutlined />,
+        url: '/console/subject-data/subject-item',
+        role: 'USER',
+    },
+    {
+        key: '/console/subject-data/law-article',
+        label: '执法依据',
+        sort: 70,
+        icon: <FileSearchOutlined />,
+        url: '/console/subject-data/law-article',
+        role: 'USER',
     },
 ];

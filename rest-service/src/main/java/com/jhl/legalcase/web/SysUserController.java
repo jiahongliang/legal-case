@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
 
 import static com.jhl.legalcase.LegalCaseConstants.*;

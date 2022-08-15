@@ -36,6 +36,8 @@ legalCase:
     user:
       defaultPassword: 123456
       defaultRole: USER
+    login:
+      validateCode: false
 p6spy:
   config:
     appender: com.p6spy.engine.spy.appender.Slf4JLogger

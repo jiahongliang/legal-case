@@ -9,6 +9,7 @@ const { TabPane } = Tabs;
 const SubjectItem = () => {
     const [treeData, setTreeData] = useState([]);
     const [currentNode, setCurrentNode] = useState(null);
+    const [rawTreeData, setRawTreeData] = useState([]);
 
     const [subjectItemData, setSubjectItemData] = useState([]);
     const [activedKeys, setActivedKeys] = useState('');
@@ -30,6 +31,7 @@ const SubjectItem = () => {
     const loadSubjectTreeData = () => {
         subjectTreeData().then(res => {
             if (res.rows && res.rows.length > 0) {
+                setRawTreeData(res.rows);
                 setTreeData(res.rows.map(s => subject2TreeNode(s, null)))
             } else {
                 setTreeData([]);
@@ -67,6 +69,11 @@ const SubjectItem = () => {
         setActivedKeys(key);
     }
 
+    const handleFilterText = (e) => {
+        let filterText = e.target.value.trim();
+        setTreeData(rawTreeData.filter(d => filterText.length === 0 || d.name.indexOf(filterText) >= 0).map(s => subject2TreeNode(s, null)));
+    }
+
     return (
         <>
             <PageHeader
@@ -76,11 +83,12 @@ const SubjectItem = () => {
                 avatar={{ icon: <BookTwoTone /> }}
             >
                 <Row gutter={16} className="case-form-row" justify="space-between">
-                    <Col span={8} className="case-form-area">
+                    <Col span={5} className="case-form-area">
                         <div className="panel-title">
                             <div className="panel-title-text">类别</div>
                         </div>
                         <div className="panel-content">
+                            <Input onChange={handleFilterText}></Input>
                             <Tree
                                 showLine={{ showLeafIcon: false }}
                                 showIcon={true}
@@ -90,7 +98,7 @@ const SubjectItem = () => {
                             />
                         </div>
                     </Col>
-                    <Col span={16} className="case-form-area">
+                    <Col span={19} className="case-form-area">
                         <div className="panel-title">
                             <div className="panel-title-text">项目数据</div>
                         </div>
