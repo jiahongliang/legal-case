@@ -46,11 +46,12 @@ public class SysUserController {
         result.getContent().forEach(o -> {
             o.setPassword(null);
         });
+        /*
         try {
             req.specification();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
         return WebResp.newInstance().rows(result.getContent()).pages(result.getTotalPages()).total(result.getTotalElements());
     }
 

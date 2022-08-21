@@ -27,4 +27,7 @@ public class LcLawArticle extends JpaAudit {
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "content", columnDefinition = "Text")
     private String content;
+
+    private Long attachmentId;
+    private String attachmentName;
 }

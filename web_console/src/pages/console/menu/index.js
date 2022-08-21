@@ -11,7 +11,8 @@ import {
     BookOutlined,
     GoldOutlined,
     ProjectOutlined,
-    FileSearchOutlined 
+    FileSearchOutlined,
+    HolderOutlined
 } from '@ant-design/icons';
 
 export const menus = [
@@ -36,6 +37,14 @@ export const menus = [
                 sort: 20,
                 icon: <IdcardOutlined />,
                 url: '/console/users/user-manage',
+                role: 'ADMIN',
+            },
+            {
+                key: '/console/users/login-log',
+                label: '登录日志',
+                sort: 30,
+                icon: <HolderOutlined />,
+                url: '/console/users/login-log',
                 role: 'ADMIN',
             }
         ]

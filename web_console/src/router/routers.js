@@ -10,6 +10,7 @@ export const CaseDefinition = lazy(() => import('../pages/console/base-config/Ca
 export const LawArticle = lazy(() => import('../pages/console/base-config/LawArticle'));
 export const ConfirmUser = lazy(() => import('../pages/console/users/ConfirmUser'));
 export const UserManage = lazy(() => import('../pages/console/users/UserManage'));
+export const LoginLog = lazy(() => import('../pages/console/users/LoginLog'));
 export const CaseInstance = lazy(() => import('../pages/console/biz-info/CaseExecution'));
 export const CaseStatistic = lazy(() => import('../pages/console/biz-info/CaseStatistic'));
 export const BizHandle = lazy(() => import('../pages/console/biz-handle/BizHandle'));
@@ -45,6 +46,10 @@ const GetRoutes = () => {
                 {
                     path: '/console/users/user-manage',
                     element: wrapper(UserManage)
+                },
+                {
+                    path: '/console/users/login-log',
+                    element: wrapper(LoginLog)
                 },
                 {
                     path: '/console/base-config/case-type',

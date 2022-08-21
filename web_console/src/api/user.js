@@ -101,3 +101,11 @@ export const saveMenuOrder = (data) => {
         method: 'post',
     });
 }
+
+export const loginLogList = (data) => {
+    return serviceJson({
+        url: '/login-log/list',
+        data,
+        method: 'post',
+    });
+}

@@ -142,9 +142,13 @@ const LawArticleData = () => {
                 
                         <div style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>{detail.title}</div>
                         <Input.TextArea readOnly bordered={false} style={{
-                            height: 'calc(100vh - 180px)',
+                            height: 'calc(100vh - 220px)',
                             marginTop: '20px'
                         }} value={detail.content}/>
+                        {
+                            detail.attachmentId ? (
+                                <div><span style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>附件: </span><a href={"/legal-case/attachment/get/" + detail.attachmentId} target={"_blank"}>{detail.attachmentName}</a></div>) : (<></>)
+                        }
             </Drawer>
         </div>
     );

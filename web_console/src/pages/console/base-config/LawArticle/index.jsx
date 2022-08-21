@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Form, Input, Button, Space, Table, Popconfirm, Drawer, Result, message, Row, Col } from 'antd';
+import { Form, Input, Button, Space, Table, Popconfirm, Drawer, Result, message, Row, Col, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import { lawArticleList, saveLawArticle, removeLawArticle } from "../../../../api/biz"
 import './index.css';
 
@@ -14,6 +15,8 @@ const LawArticle = () => {
 
     const [detailId, setDetailId] = useState(null);
     const [detailForm] = Form.useForm();
+    const [detailFileList, setDetailFileList] = useState(null);
+    const [attachment, setAttachment] = useState(null);
     const [detailVisible, setDetailVisible] = useState(false);
     const [saveResult,setSaveResult] = useState({
         code: null,
@@ -91,6 +94,11 @@ const LawArticle = () => {
         if(r != null) {
             detailForm.setFieldsValue(r);
             setDetailId(r.id);
+            if(r.attachmentId) {
+                var detailFile = {uid: r.attachmentId,name:r.attachmentName,status: 'done'};
+                setDetailFileList([detailFile]);
+                setAttachment({id: r.attachmentId,name: r.attachmentName});
+            }
         }
         setDetailVisible(true);
     }
@@ -99,6 +107,8 @@ const LawArticle = () => {
         setDetailVisible(false);
         detailForm.resetFields();
         setDetailId(null);
+        setDetailFileList(null);
+        setAttachment(null);
         setSaveResult({code:null,message:null});
     }
 
@@ -107,6 +117,8 @@ const LawArticle = () => {
         let params = {
             entity: {
                 id: detailId,
+                attachmentId: attachment ? attachment.id : null,
+                attachmentName: attachment ? attachment.name : null,
                 ...lawArticle
             }
         }
@@ -130,6 +142,15 @@ const LawArticle = () => {
             message.success(res.subMsg);
             loadData();
         });
+    }
+
+    const handleFileListChage = ({ file: newFile, fileList: newFileList }) => {
+        setDetailFileList(newFileList);
+        if(newFileList && newFileList.length > 0 && newFile.response && newFile.response.rows && newFile.response.rows.length > 0) {
+            setAttachment(newFile.response.rows[0]);
+        } else {
+            setAttachment(null);
+        }
     }
 
     return (
@@ -199,9 +220,18 @@ const LawArticle = () => {
 
                             <Form.Item name="content" label="正文" rules={[{ required: true, message: '正文必须输入' }]}>
                                 <Input.TextArea placeholder="请输入法律详情" style={{
-                                    height: 560,
+                                    height: "calc(100vh - 418px)"
                                 }} />
                             </Form.Item>
+
+                            <Upload
+                                action="/legal-case/attachment/upload"
+                                maxCount={1}
+                                fileList={detailFileList}
+                                onChange={handleFileListChage}
+                                >
+                                <Button icon={<UploadOutlined />}>上传附件</Button>
+                            </Upload>
                             
                             <Form.Item wrapperCol= {{ offset: 0, span: 24 }} style={{textAlign: "center"}}>
                                 <Button type="primary" htmlType="submit">

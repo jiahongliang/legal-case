@@ -54,6 +54,7 @@ public class LegalCaseAuthenticationProvider implements AuthenticationProvider {
         SysUser detailEntity = new SysUser();
         BeanUtils.copyProperties(user, detailEntity, "password", "status", "createdBy", "createdTime", "lastmodifiedBy", "lastmodifiedTime");
         token.setDetails(detailEntity);
+
         return token;
     }
 
