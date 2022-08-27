@@ -27,7 +27,7 @@ const SubjectManage = () => {
 
     useEffect(() => {
         loadSubjectItemData();
-    }, [currentNode]);
+    }, [currentNode,page]);
 
     const loadSubjectTreeData = () => {
         subjectTreeData().then(res => {
@@ -188,7 +188,6 @@ const SubjectManage = () => {
     const onTablePageChange = (page, pageSize, sorter, extra) => {
         setPage(page);
         setPageSize(pageSize);
-        loadSubjectItemData();
     }
 
     const handleAddSubjectItem = () => {

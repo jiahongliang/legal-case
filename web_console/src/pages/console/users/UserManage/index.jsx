@@ -147,6 +147,10 @@ const UserManagePage = () => {
         loadRoleData();
     }, []);
 
+    useEffect(() => {
+        loadData();
+    }, [page]);
+
     const onFinishSearchForm = () => {
         loadData();
     }
@@ -191,7 +195,6 @@ const UserManagePage = () => {
     const onTablePageChange = (page, pageSize, sorter, extra) => {
         setPage(page);
         setPageSize(pageSize);
-        loadData();
     }
 
     const showEditUserWindow = (r) => {

@@ -36,6 +36,10 @@ const BizHandle = () => {
         loadUserData();
     }, []);
 
+    useEffect(() => {
+        loadData();
+    }, [page]);
+
     const loadCaseTypeData = () => {
         let params = {
             entity:{},
@@ -87,7 +91,6 @@ const BizHandle = () => {
     const onTablePageChange = (page, pageSize) => {
         setPage(page);
         setPageSize(pageSize);
-        loadData();
     }
 
     const loadData = () => {

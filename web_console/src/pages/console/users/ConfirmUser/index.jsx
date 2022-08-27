@@ -75,6 +75,10 @@ const ToBeConfirmed = () => {
         loadData();
     }, []);
 
+    useEffect(() => {
+        loadData();
+    }, [page]);
+
     const loadData = () => {
         setDataLoading(true);
         let param = {
@@ -96,7 +100,6 @@ const ToBeConfirmed = () => {
     const onTablePageChange = (page, pageSize, sorter, extra) => {
         setPage(page);
         setPageSize(pageSize);
-        loadData();
     }
 
     const confirmUser = (r) => {

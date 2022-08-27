@@ -29,6 +29,10 @@ const CaseType = () => {
         loadData();
     }, []);
 
+    useEffect(() => {
+        loadData();
+    }, [page]);
+
     let columns = [
         
         {
@@ -73,7 +77,6 @@ const CaseType = () => {
     const onTablePageChange = (page, pageSize, sorter, extra) => {
         setPage(page);
         setPageSize(pageSize);
-        loadData();
     }
 
     const loadData = () => {

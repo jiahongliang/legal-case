@@ -19,6 +19,10 @@ const LawArticleData = () => {
         loadData();
     }, []);
 
+    useEffect(() => {
+        loadData();
+    }, [page]);
+
     let columns = [
         
         {
@@ -49,7 +53,6 @@ const LawArticleData = () => {
     const onTablePageChange = (page, pageSize, sorter, extra) => {
         setPage(page);
         setPageSize(pageSize);
-        loadData();
     }
 
     const loadData = () => {

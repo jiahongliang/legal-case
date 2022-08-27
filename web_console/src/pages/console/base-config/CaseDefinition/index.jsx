@@ -106,7 +106,10 @@ const CaseDefinition = () => {
     useEffect(() => {
         loadCaseTypeData();
     }, []);
-
+    
+    useEffect(() => {
+        loadData();
+    }, [page]);
 
     const loadCaseTypeData = () => {
         let params = {
@@ -159,7 +162,6 @@ const CaseDefinition = () => {
     const onTablePageChange = (page, pageSize, sorter, extra) => {
         setPage(page);
         setPageSize(pageSize);
-        loadData();
     }
 
     const onSelectionChange = (selectedRowKeys, selectedRows, info) => {

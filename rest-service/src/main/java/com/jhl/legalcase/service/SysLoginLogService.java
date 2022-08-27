@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
+import java.util.Enumeration;
 
 @Slf4j
 @Service
@@ -31,7 +32,7 @@ public class SysLoginLogService {
         AbstractAuthenticationToken token = (AbstractAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         final SysUser user = (SysUser) token.getDetails();
         final String sessionId = session.getId();
-        final String ip = request.getRemoteAddr();
+        final String ip = request.getHeader("x-real-ip");
         String userAgent = request.getHeader("user-agent");
         UserAgent ua = UserAgent.parseUserAgentString(userAgent);
         String browser = ua.getBrowser().getName() + "-" + ua.getBrowserVersion();

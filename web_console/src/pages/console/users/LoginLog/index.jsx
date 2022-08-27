@@ -68,6 +68,10 @@ const LoginLog = () => {
         loadData();
     }, []);
 
+    useEffect(() => {
+        loadData();
+    }, [page]);
+
     const onFinishSearchForm = () => {
         loadData();
     }
@@ -94,7 +98,6 @@ const LoginLog = () => {
     const onTablePageChange = (page, pageSize, sorter, extra) => {
         setPage(page);
         setPageSize(pageSize);
-        loadData();
     }
 
     return (
