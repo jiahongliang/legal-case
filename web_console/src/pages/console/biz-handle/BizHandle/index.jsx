@@ -145,11 +145,45 @@ const BizHandle = () => {
             
         },
         {
-            title: '环节数量',
+            title: '环节',
             onHeaderCell: function (column) {
                 column.align = "center"
             },
-            render: (_,record) => record.steps.length,
+            render: (_,record) => {
+                let total = 0;
+                let rest = 0;
+                if(record.steps) {
+                    total = record.steps.length;
+                }
+                rest = record.steps.filter(step => {
+                    if(step.caseTypeStepItems) {
+                        return step.caseTypeStepItems.filter(item => item.status === 1).length > 0;
+                    } else {
+                        return false;
+                    }
+                    
+                }).length;
+                return rest + "/" + total;
+            },
+            width: 80
+        },
+        {
+            title: '事项',
+            onHeaderCell: function (column) {
+                column.align = "center"
+            },
+            render: (_,record) => {
+                let totalCount = 0;
+                let restCount = 0;
+                record.steps.forEach(step => {
+                    if(step.caseTypeStepItems) {
+                        totalCount += step.caseTypeStepItems.length;
+                        restCount += step.caseTypeStepItems.filter(item => item.status === 1).length;
+                    }
+                    
+                });
+                return restCount + "/" + totalCount;
+            },
             width: 80
         },
         {

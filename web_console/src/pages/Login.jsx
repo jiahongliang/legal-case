@@ -58,7 +58,7 @@ const Login = () => {
                 <Card size="small"
                     bordered={true}
                     hoverable
-                    title="欢迎登录"
+                    title="内黄县公安局执法办案智能辅助平台"
                     headStyle={{ 'fontWeight': '600' }}>
                     <Form form={form} className="login-form">
                         <Form.Item name="userName" rules={[{ required: true, message: '请输入用户名' }]}>

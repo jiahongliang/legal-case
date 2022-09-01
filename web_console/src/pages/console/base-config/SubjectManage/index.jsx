@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { PageHeader, Tree, Button, Modal, Form, Input, Row, Col, message, Table, Space, Popconfirm} from "antd";
-import { BookTwoTone, BookOutlined } from '@ant-design/icons';
+import { PageHeader, Tree, Button, Modal, Form, Input, Row, Col, message, Table, Space, Popconfirm, Upload} from "antd";
+import { BookTwoTone, BookOutlined, UploadOutlined } from '@ant-design/icons';
 import { subjectTreeData, saveSubject, removeSubject, subjectItemList, saveSubjectItem, removeSubjectItem } from '../../../../api/biz'
 import './index.css'
 
@@ -12,6 +12,8 @@ const SubjectManage = () => {
 
     const [subjectForm] = Form.useForm();
     const [subjectExtFormData, setSubjectExtFormData] = useState({});
+    const [detailFileList, setDetailFileList] = useState(null);
+    const [attachment, setAttachment] = useState(null);
 
     const [subjectItemData, setSubjectItemData] = useState([]);
     const [subjectItemDataLoading, setSubjectItemDataLoading] = useState(false);
@@ -156,6 +158,14 @@ const SubjectManage = () => {
             }
         },
         {
+            title: '排序',
+            dataIndex: 'orderValue',
+            onHeaderCell: function (column) {
+                column.align = "center"
+            },
+            width: 100
+        },
+        {
             title: '操作',
             key: 'action',
             render: (_, record) => (
@@ -174,7 +184,12 @@ const SubjectManage = () => {
     const loadSubjectItemData = () => {
         setSubjectItemDataLoading(true);
         if (currentNode && currentNode.key) {
-            subjectItemList({ entity: { subjectId: currentNode.key } }).then(res => {
+            subjectItemList({ 
+                entity: { subjectId: currentNode.key },
+                pageNum: 0,
+                pageSize: 1000
+                ,orderBy:"orderValue" 
+            }).then(res => {
                 setSubjectItemData(res.rows);
                 setTotal(res.total)
                 setSubjectItemDataLoading(false);
@@ -193,7 +208,8 @@ const SubjectManage = () => {
     const handleAddSubjectItem = () => {
         if (currentNode && currentNode.key) {
             subjectItemForm.setFieldsValue({
-                subjectId: currentNode.key
+                subjectId: currentNode.key,
+                orderValue: '50'
             });
             setSubjectItemVisible(true);
         } else {
@@ -207,15 +223,27 @@ const SubjectManage = () => {
     }
 
     const showEditSubjectItemWindow = (record) => {
+        if(!record.orderValue) record.orderValue = '50'
         subjectItemForm.setFieldsValue(record);
+        if(record.attachmentId) {
+            var detailFile = {uid: record.attachmentId,name:record.attachmentName,status: 'done'};
+            setDetailFileList([detailFile]);
+            setAttachment({id: record.attachmentId,name: record.attachmentName});
+        }
         setSubjectItemVisible(true);
     }
 
     const handleSaveSubjectItem = () => {
         subjectItemForm.validateFields().then(entity => {
+
+            entity.attachmentId = attachment ? attachment.id : null;
+            entity.attachmentName = attachment ? attachment.name : null;
             saveSubjectItem({ entity }).then(res => {
                 loadSubjectItemData();
                 subjectItemForm.resetFields();
+
+                setDetailFileList(null);
+                setAttachment(null);
                 setSubjectItemVisible(false);
             });
         }).catch(err => { });
@@ -225,6 +253,15 @@ const SubjectManage = () => {
         removeSubjectItem({entity: record}).then(res => {
             loadSubjectItemData();
         });
+    }
+
+    const handleFileListChage = ({ file: newFile, fileList: newFileList }) => {
+        setDetailFileList(newFileList);
+        if(newFileList && newFileList.length > 0 && newFile.response && newFile.response.rows && newFile.response.rows.length > 0) {
+            setAttachment(newFile.response.rows[0]);
+        } else {
+            setAttachment(null);
+        }
     }
 
     return (
@@ -318,11 +355,22 @@ const SubjectManage = () => {
                     <Form.Item name="lawTitle" label="法律条款" rules={[{ required: true, message: '法律条款必须输入' }]}>
                         <Input placeholder="请输入法律条款" maxLength={50} />
                     </Form.Item>
+                    <Form.Item name="orderValue" label="排序值" rules={[{ required: true, message: '排序值必须输入' }]}>
+                        <Input placeholder="请输入法律条款" maxLength={50} />
+                    </Form.Item>
                     <Form.Item name="lawContent" label="法律详情" rules={[{ required: true, message: '法律详情必须输入' }]}>
                         <Input.TextArea placeholder="请输入法律详情" style={{
                             height: 260,
                         }} />
                     </Form.Item>
+                    <Upload
+                        action="/legal-case/attachment/upload"
+                        maxCount={1}
+                        fileList={detailFileList}
+                        onChange={handleFileListChage}
+                        >
+                        <Button icon={<UploadOutlined />}>上传附件</Button>
+                    </Upload>
                 </Form>
             </Modal>
         </>

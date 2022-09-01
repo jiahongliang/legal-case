@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { PageHeader, Tree, Button, Modal, Form, Input, Row, Col, message, Tabs, Space, Popconfirm} from "antd";
+import { PageHeader, Tree, Input, Row, Col, Tabs} from "antd";
 import { BookTwoTone, BookOutlined } from '@ant-design/icons';
-import { subjectTreeData, saveSubject, removeSubject, subjectItemList, saveSubjectItem, removeSubjectItem } from '../../../../api/biz'
+import { subjectTreeData, subjectItemList } from '../../../../api/biz'
 import './index.css';
 
 const { TabPane } = Tabs;
@@ -57,7 +57,7 @@ const SubjectItem = () => {
 
     const loadSubjectItemData = () => {
         if (currentNode && currentNode.key) {
-            subjectItemList({ entity: { subjectId: currentNode.key }, pageNum: 0, pageSize: 1000 }).then(res => {
+            subjectItemList({ entity: { subjectId: currentNode.key }, orderBy: "orderValue" , pageNum: 0, pageSize: 1000 }).then(res => {
                 setSubjectItemData(res.rows);
             });
         } else {
@@ -111,6 +111,10 @@ const SubjectItem = () => {
                                             <div className='panel-content-law-content'><Input.TextArea value={item.lawContent} style={{
                                                 height: '100%'
                                             }}></Input.TextArea></div>
+                                            {
+                            item.attachmentId ? (
+                                <div><span style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>附件: </span><a href={"/legal-case/attachment/get/" + item.attachmentId} target={"_blank"}>{item.attachmentName}</a></div>) : (<></>)
+                        }
                                         </TabPane>
                                     ))
                                 }
