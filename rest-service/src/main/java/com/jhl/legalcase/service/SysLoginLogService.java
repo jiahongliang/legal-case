@@ -3,6 +3,7 @@ package com.jhl.legalcase.service;
 import com.jhl.legalcase.entity.SysLoginLog;
 import com.jhl.legalcase.entity.SysUser;
 import com.jhl.legalcase.repository.SysLoginLogRepository;
+import com.jhl.legalcase.util.pinyin.PinyinUtil;
 import eu.bitwalker.useragentutils.UserAgent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
-import java.util.Enumeration;
 
 @Slf4j
 @Service
@@ -38,8 +38,12 @@ public class SysLoginLogService {
         String browser = ua.getBrowser().getName() + "-" + ua.getBrowserVersion();
         String system = ua.getOperatingSystem().toString();
         String deviceType = ua.getOperatingSystem().getDeviceType().getName();
+        String nameSearch = "";
+        if (user != null && user.getName() != null) {
+            nameSearch = user.getName() + "|" + PinyinUtil.toFirstChar(user.getName());
+        }
 
-        SysLoginLog entity = SysLoginLog.builder().sessionId(sessionId).userId(user.getId()).name(user.getName()).ip(ip).browser(browser).system(system).deviceType(deviceType).build();
+        SysLoginLog entity = SysLoginLog.builder().sessionId(sessionId).userId(user.getId()).name(user.getName()).nameSearch(nameSearch).ip(ip).browser(browser).system(system).deviceType(deviceType).build();
         loginLogRepository.save(entity);
     }
 

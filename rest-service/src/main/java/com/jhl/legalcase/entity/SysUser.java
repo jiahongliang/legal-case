@@ -2,8 +2,6 @@ package com.jhl.legalcase.entity;
 
 import com.jhl.legalcase.util.jpa.JpaAudit;
 import lombok.Data;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SelectBeforeUpdate;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -19,8 +17,10 @@ import javax.persistence.Table;
 public class SysUser extends JpaAudit {
 
     private String name;
+    private String nameSearch;
     private String gender;
     private String deptName;
+    private String deptNameSearch;
     private String mobile;
     private String password;
     private String role;

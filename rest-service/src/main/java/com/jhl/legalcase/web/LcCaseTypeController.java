@@ -7,6 +7,7 @@ import com.jhl.legalcase.repository.LcCaseTypeRepository;
 import com.jhl.legalcase.repository.LcCaseTypeStepItemRepository;
 import com.jhl.legalcase.repository.LcCaseTypeStepRepository;
 import com.jhl.legalcase.util.common.MyBeanUtils;
+import com.jhl.legalcase.util.pinyin.PinyinUtil;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.util.webmsg.WebResp;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -61,6 +61,9 @@ public class LcCaseTypeController {
         }
 
         MyBeanUtils.copyNonNullProperties(req.getEntity(), caseType);
+        if (caseType.getName() != null) {
+            caseType.setNameSearch(caseType.getName() + "|" + PinyinUtil.toFirstChar(caseType.getName()));
+        }
         caseTypeRepository.save(caseType);
 
         List<LcCaseTypeStep> cts = CollectionUtils.isEmpty(req.getEntity().getCaseTypeSteps()) ? new ArrayList<>() : req.getEntity().getCaseTypeSteps().stream().map(entity -> {
@@ -81,7 +84,7 @@ public class LcCaseTypeController {
                         }
                 );
         List<Long> itemIds = items.stream().filter(stepItem -> stepItem.getId() != null).map(stepItem -> stepItem.getId()).toList();
-        if(itemIds != null && itemIds.size() > 0) {
+        if (itemIds != null && itemIds.size() > 0) {
             caseTypeStepItemRepository.deleteAllByCaseTypeStepInAndIdNotIn(cts, itemIds);
         } else {
             caseTypeStepItemRepository.deleteAllByCaseTypeStepIn(cts);

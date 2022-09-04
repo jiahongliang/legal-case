@@ -6,12 +6,29 @@
 }
 
 .login-box {
-    width: 300px;
-    height: 260px;
+    width: 530px;
+    height: 630px;
     position: absolute;
-    top: 30vh;
-    right: 20vw;
-    opacity: 0.9;
+    left: calc(50vw - 265px);
+    top: calc(50vh - 320px);
+    border-radius: 10px 10px 10px 10px;
+    background-color: rgba(255, 255, 255, 0.7);
+    padding: 30px;
+    box-shadow:0px 0px 30px #030303;
+}
+
+.ant-card {
+    height: 100%;
+}
+
+.login-logo {
+   text-align: center;
+   font-family: Helvetica Neue,Helvetica,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Arial,sans-serif;
+   font-size: 28px;
+   font-weight: 600;
+   margin: 0 0 20px 0;
+   filter:drop-shadow(5px 5px 5px rgba(0, 0, 0, 0.6));
+   color: rgba(50, 50, 50, 0.9);
 }
 
 .login-form {

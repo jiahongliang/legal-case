@@ -12,6 +12,7 @@ const HandleExecution = (props) => {
     const [data, setData] = useState({});
     const [caseTypeData, setCaseTypeData] = useState([]);
     const [stepActiveKey, setStepActiveKey] = useState([]);
+    const [stepHistory, setStepHistory] = useState([]);
 
     useEffect(() => {
         // console.log(props)
@@ -38,6 +39,8 @@ const HandleExecution = (props) => {
     }
 
     const handleStepItemTagClose = (stepId, itemId) => {
+        stepHistory.push(data.steps);
+        setStepHistory(stepHistory);
         setData({
             ...data,
             steps: data.steps.map(step =>
@@ -48,16 +51,27 @@ const HandleExecution = (props) => {
         })
     }
 
+    const handleBackHistory = () => {
+        let steps = stepHistory.pop();
+        setStepHistory(stepHistory);
+        setData({
+            ...data,
+            steps
+        })
+    }
+
     return (
         <>
             <PageHeader
                 title="已办案件"
                 className="site-page-header"
                 subTitle="设置案件已完成事件"
-                extra={[
+                extra={[<>
+                    <Button disabled={stepHistory.length === 0} onClick={handleBackHistory}>撤销</Button>
                     <Popconfirm key="1" placement="left" title="确认保存吗？" onConfirm={handleSave} okText="确定" cancelText="取消" disabled={data.status === 2}>
                         <Button disabled={data.status === 2}>保存</Button>
                     </Popconfirm>
+                    </>
                 ]}
                 avatar={{ src: newCaseIcon }}
                 onBack={() => props.onExit()}

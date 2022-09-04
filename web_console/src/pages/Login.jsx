@@ -6,6 +6,7 @@ import { LockOutlined, UserOutlined, HolderOutlined } from '@ant-design/icons';
 import { login, fetchValidateCodeRequiredFlag } from "../api/user";
 import { LOGIN_USER_TOKEN } from '../util/Constants'
 import Base64 from 'base-64';
+import loginLogo from  '../assets/images/police_logo.png';
 import './Login.css';
 
 const Login = () => {
@@ -55,17 +56,14 @@ const Login = () => {
     return (
         <div className="login-container">
             <div className="login-box">
-                <Card size="small"
-                    bordered={true}
-                    hoverable
-                    title="内黄县公安局执法办案智能辅助平台"
-                    headStyle={{ 'fontWeight': '600' }}>
+                
+                        <div className="login-logo"><img src={loginLogo} style={{'width': '230px'}}/><br/>内黄县公安局执法办案智能辅助平台</div>
                     <Form form={form} className="login-form">
                         <Form.Item name="userName" rules={[{ required: true, message: '请输入用户名' }]}>
-                            <Input addonBefore={<UserOutlined />} maxLength={20} placeholder="请输入用户名" />
+                            <Input addonBefore={<UserOutlined />} maxLength={20} size="large" placeholder="请输入用户名" />
                         </Form.Item>
                         <Form.Item name="password" rules={[{ required: true, message: '请输入密码' }]}>
-                            <Input.Password addonBefore={<LockOutlined />} maxLength={20} placeholder="请输入密码" />
+                            <Input.Password addonBefore={<LockOutlined />} maxLength={20} size="large" placeholder="请输入密码" />
                         </Form.Item>
                         {
                             verifyCodeRequired ?
@@ -76,11 +74,10 @@ const Login = () => {
                                 </Form.Item>
                                 : <></>
                         }
-                            <Button type="primary" block onClick={handleLogin}> 登录 </Button>
-                            <Button block onClick={() => {navigate('/register');}} className="register-button"> 注册 </Button>
+                            <Button type="primary" block onClick={handleLogin} size="large"> 登录 </Button>
+                            <Button block onClick={() => {navigate('/register');}} className="register-button" size="large"> 注册 </Button>
                         <div className="ant-form-item-explain-error">{loginError}</div>
                     </Form>
-                </Card>
             </div>
         </div>
     );

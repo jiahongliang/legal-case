@@ -31,7 +31,7 @@ const LawArticleData = () => {
             onHeaderCell: function (column) {
                 column.align = "center"
             }
-        },
+        }/*,
         {
             title: '序号',
             dataIndex: 'orderValue',
@@ -47,7 +47,7 @@ const LawArticleData = () => {
                 column.align = "center"
             },
             width: 170
-        }
+        }*/
     ];
 
     const onTablePageChange = (page, pageSize, sorter, extra) => {
@@ -59,7 +59,9 @@ const LawArticleData = () => {
         setDataLoading(true);
         let formData = searchForm.getFieldsValue();
         let params = {
-            entity: formData,
+            entity: {
+                "titleSearch": formData.title
+            },
             pageNum: page - 1,
             pageSize,
             orderBy: "orderValue asc"

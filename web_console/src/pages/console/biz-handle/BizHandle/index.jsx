@@ -89,8 +89,8 @@ const BizHandle = () => {
         let param = {
             entity: {
                 typeId: searchData.typeId,
-                name: searchData.name,
-                suspects: searchData.suspects,
+                nameSearch: searchData.name,
+                // suspects: searchData.suspects,
                 createdBy: sessionStorage.getItem(LOGIN_USER_TOKEN) == null ? null : JSON.parse(sessionStorage.getItem(LOGIN_USER_TOKEN)).id
             },
             where: searchData.status && searchData.status.length > 0 ? [
@@ -253,9 +253,14 @@ const BizHandle = () => {
                     <Input maxLength={10} placeholder="请输入名称" size="small" />
                 </Form.Item>
 
+                {
+                    /**
+                     * 
                 <Form.Item name="suspects" label="对象">
                     <Input maxLength={10} placeholder="请输入对象" size="small" />
                 </Form.Item>
+                     */
+                }
 
                 <Form.Item name="status" label="状态">
                     <Checkbox.Group options={statusOptions} />

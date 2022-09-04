@@ -16,8 +16,16 @@ public interface SysUserRepository extends JpaRepositoryImplementation<SysUser, 
 
     /**
      * 根据手机号码，并排除id查询
+     *
      * @param mobile
      * @return
      */
     List<SysUser> findAllByMobileAndIdNot(String mobile, Long id);
+
+    /**
+     * 查找符合条件记录
+     *
+     * @return
+     */
+    List<SysUser> findAllByNameSearchIsNull();
 }

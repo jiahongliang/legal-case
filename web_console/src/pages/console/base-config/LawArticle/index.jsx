@@ -81,7 +81,9 @@ const LawArticle = () => {
         setDataLoading(true);
         let formData = searchForm.getFieldsValue();
         let params = {
-            entity: formData,
+            entity: {
+                "titleSearch": formData.title
+            },
             pageNum: page - 1,
             pageSize,
             orderBy: "orderValue asc"

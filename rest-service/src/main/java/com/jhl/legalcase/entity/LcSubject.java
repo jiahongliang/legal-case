@@ -23,6 +23,7 @@ import java.util.List;
 public class LcSubject extends JpaAudit {
 
     private String name;
+    private String nameSearch;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
     private List<LcSubject> children = new ArrayList<>();

@@ -48,6 +48,15 @@ export const caseExecutionList = (data) => {
     });
 }
 
+export const caseExecutionExcel = (data) => {
+    return serviceJson({
+        url: '/case-execution/export',
+        data,
+        method: 'post',
+        responseType: 'blob'
+    });
+}
+
 export const completeCaseExecution = (data) => {
     return serviceJson({
         url: '/case-execution/complete',

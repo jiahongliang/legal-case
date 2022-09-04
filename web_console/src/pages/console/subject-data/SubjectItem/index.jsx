@@ -71,7 +71,7 @@ const SubjectItem = () => {
 
     const handleFilterText = (e) => {
         let filterText = e.target.value.trim();
-        setTreeData(rawTreeData.filter(d => filterText.length === 0 || d.name.indexOf(filterText) >= 0).map(s => subject2TreeNode(s, null)));
+        setTreeData(rawTreeData.filter(d => filterText.length === 0 || d.nameSearch.indexOf(filterText) >= 0).map(s => subject2TreeNode(s, null)));
     }
 
     return (

@@ -24,6 +24,7 @@ public class LcCaseType extends JpaAudit {
 
     private String code;
     private String name;
+    private String nameSearch;
     private String memo;
 
     @OneToMany(cascade = CascadeType.ALL,

@@ -109,3 +109,12 @@ export const loginLogList = (data) => {
         method: 'post',
     });
 }
+
+export const loginLogExcel = (data) => {
+    return serviceJson({
+        url: '/login-log/export',
+        data,
+        method: 'post',
+        responseType: 'blob'
+    });
+}

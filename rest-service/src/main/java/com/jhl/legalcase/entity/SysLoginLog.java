@@ -10,6 +10,8 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * 登录日志
@@ -30,6 +32,8 @@ public class SysLoginLog extends JpaAudit {
 
     private String name;
 
+    private String nameSearch;
+
     private String ip;
 
     private String system;
@@ -41,4 +45,15 @@ public class SysLoginLog extends JpaAudit {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
+    public static Map<String, String> excelHeaders() {
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("name", "登录人");
+        map.put("ip", "IP地址");
+        map.put("deviceType", "设备类型");
+        map.put("browser", "浏览器");
+        map.put("system", "操作系统");
+        map.put("createdTime", "登录时间");
+        map.put("endTime", "退出时间");
+        return map;
+    }
 }

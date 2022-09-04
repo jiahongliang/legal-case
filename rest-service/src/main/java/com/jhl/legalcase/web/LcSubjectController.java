@@ -4,6 +4,7 @@ import com.jhl.legalcase.entity.LcSubject;
 import com.jhl.legalcase.entity.LcSubjectItem;
 import com.jhl.legalcase.repository.LcSubjectItemRepository;
 import com.jhl.legalcase.repository.LcSubjectRepository;
+import com.jhl.legalcase.util.pinyin.PinyinUtil;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.util.webmsg.WebResp;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
@@ -51,6 +53,9 @@ public class LcSubjectController {
             dest.setParent(subjectRepository.getReferenceById(req.getEntity().getParent().getId()));
         } else {
             dest.setParent(null);
+        }
+        if (StringUtils.hasLength(dest.getName())) {
+            dest.setNameSearch(dest.getName() + "|" + PinyinUtil.toFirstChar(dest.getName()));
         }
         subjectRepository.save(dest);
         return WebResp.newInstance().rows(Arrays.asList(dest));

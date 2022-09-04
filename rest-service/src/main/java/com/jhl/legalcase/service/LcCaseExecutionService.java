@@ -1,17 +1,11 @@
 package com.jhl.legalcase.service;
 
-import com.jhl.legalcase.entity.LcCaseExecution;
-import com.jhl.legalcase.entity.LcCaseExecutionStep;
-import com.jhl.legalcase.entity.LcCaseExecutionStepItem;
-import com.jhl.legalcase.entity.LcCaseExecutionSuspect;
-import com.jhl.legalcase.repository.LcCaseExecutionRepository;
-import com.jhl.legalcase.repository.LcCaseExecutionStepItemRepository;
-import com.jhl.legalcase.repository.LcCaseExecutionStepRepository;
-import com.jhl.legalcase.repository.LcCaseExecutionSuspectRepository;
+import com.jhl.legalcase.entity.*;
+import com.jhl.legalcase.repository.*;
+import com.jhl.legalcase.util.pinyin.PinyinUtil;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.web.vo.LcCaseExecutionStepItemVo;
 import com.jhl.legalcase.web.vo.LcCaseExecutionStepVo;
-import com.jhl.legalcase.web.vo.LcCaseExecutionSuspectVo;
 import com.jhl.legalcase.web.vo.LcCaseExecutionVo;
 import lombok.SneakyThrows;
 import org.springframework.beans.BeanUtils;
@@ -21,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_CREATED;
 import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_STEP_ITEM_CREATED;
@@ -37,10 +30,15 @@ public class LcCaseExecutionService {
     private LcCaseExecutionStepRepository caseExecutionStepRepository;
     @Autowired
     private LcCaseExecutionSuspectRepository caseExecutionSuspectRepository;
+    @Autowired
+    private LcCaseTypeRepository caseTypeRepository;
+    @Autowired
+    private SysUserRepository userRepository;
 
     public void saveCaseExcution(LcCaseExecutionVo caseExecutionVo) {
         LcCaseExecution caseExecution = LcCaseExecution.builder().typeId(caseExecutionVo.getTypeId())
                 .name(caseExecutionVo.getName())
+                .nameSearch(caseExecutionVo.getName() == null ? "" : caseExecutionVo.getName() + "|" + PinyinUtil.toFirstChar(caseExecutionVo.getName()))
                 .status(CASE_EXECUTION_CREATED)
                 .build();
         caseExecutionRepository.save(caseExecution);
@@ -75,10 +73,10 @@ public class LcCaseExecutionService {
                 .steps(steps.stream().map(obj -> {
                     LcCaseExecutionStepVo vo = LcCaseExecutionStepVo.builder().build();
                     BeanUtils.copyProperties(obj, vo);
-                    vo.setCaseTypeStepItems(stepItems.stream().filter(item -> item.getStepId().equals( obj.getId()))
+                    vo.setCaseTypeStepItems(stepItems.stream().filter(item -> item.getStepId().equals(obj.getId()))
                             .map(item -> {
                                 LcCaseExecutionStepItemVo itemVo = LcCaseExecutionStepItemVo.builder().build();
-                                BeanUtils.copyProperties(item,itemVo);
+                                BeanUtils.copyProperties(item, itemVo);
                                 return itemVo;
                             })
                             .toList());
@@ -87,9 +85,22 @@ public class LcCaseExecutionService {
                 .build();
 
         BeanUtils.copyProperties(caseExecution, executionVo);
+        if (executionVo.getTypeId() != null) {
+            LcCaseType caseType = caseTypeRepository.getReferenceById(executionVo.getTypeId());
+            if (caseType != null) {
+                executionVo.setTypeName(caseType.getName());
+            }
+        }
+        if (executionVo.getCreatedBy() != null) {
+            SysUser user = userRepository.getReferenceById(executionVo.getCreatedBy());
+            if (user != null) {
+                executionVo.setCreator(user.getName());
+            }
+        }
 
         return executionVo;
     }
+
     @SneakyThrows
     public LcCaseExecutionVo get(@NonNull Long id) {
         LcCaseExecution caseExecution = caseExecutionRepository.getReferenceById(id);

@@ -17,6 +17,7 @@ const CreateCase = () => {
     const [stepData, setStepData] = useState([]);
     const [stepFilterText, setStepFilterText] = useState('');
     const [selectedStepData, setSelectedStepData] = useState([]);
+    const [historyData, setHistoryData] = useState([]);
     const [stepActiveKey, setStepActiveKey] = useState([]);
     const [saveResult,setSaveResult] = useState({
         code: null,
@@ -60,21 +61,32 @@ const CreateCase = () => {
     const onCaseTypeChange = (event) => {
         let ct = caseTypeData.find(o => o.id === event.target.value)
         setStepData(ct.caseTypeSteps);
-        setSelectedStepData([])
+        setSelectedStepData([]);
+        setHistoryData([]);
         setStepActiveKey([]);
         caseForm.setFieldsValue({name: ct.name + moment().format('YYYYMMDDHHmm')});
     }
 
     const handleClickSourceStep = (stepId) => {
         let clickedStep = stepData.find(step => step.id === stepId);
-        setSelectedStepData([...selectedStepData, {...clickedStep,keyid: moment().format('X') + '' + selectedStepData.length}]);
+
+        historyData.push(selectedStepData);
+        setHistoryData(historyData);
+        let newStepData = [...selectedStepData, {...clickedStep,keyid: moment().format('X') + '' + selectedStepData.length}];
+        newStepData = newStepData.sort((v1,v2) => v1.orderValue - v2.orderValue);
+        setSelectedStepData(newStepData);
     }
 
     const handleRemoveSelectedStep = (keyid) => {
+        historyData.push(selectedStepData);
+        setHistoryData(historyData);
+
         setSelectedStepData(selectedStepData.filter(step => step.keyid !== keyid));
     }
 
     const handleSuspectChange = (keyId,value) => {
+        historyData.push(selectedStepData);
+        setHistoryData(historyData);
         setSelectedStepData(selectedStepData.map(step => step.keyid === keyId ? {...step, suspect: value} : step));
     }
     /*
@@ -100,6 +112,8 @@ const CreateCase = () => {
     }*/
 
     const handleStepItemTagClose = (stepKeyId,itemId) => {
+        historyData.push(selectedStepData);
+        setHistoryData(historyData);
         setSelectedStepData(
             selectedStepData.map(
                 step => step.keyid === stepKeyId ? 
@@ -152,6 +166,7 @@ const CreateCase = () => {
     const resetPage = () => {
         caseForm.resetFields();
         setSelectedStepData([]);
+        setHistoryData([]);
         setStepData([]);
         setStepActiveKey([]);
         setSaveResult({
@@ -164,16 +179,24 @@ const CreateCase = () => {
         setStepFilterText(e.target.value);
     }
 
+    const handleBackHistory = () => {
+        let data = historyData.pop();
+        setHistoryData(historyData);
+        setSelectedStepData(data);
+    }
+
     return (
         <>
             <PageHeader
                 title="案件新增"
                 className="site-page-header"
                 subTitle="选择类型并设置案件事项后，创建案件"
-                extra={[
-                <Popconfirm key="1" placement="bottom" title="确认保存吗" onConfirm={handleSave} okText="确定" cancelText="取消">
+                extra={[<>
+                <Button key='1' disabled={historyData.length === 0} onClick={handleBackHistory}>撤销</Button>
+                <Popconfirm key="2" placement="bottom" title="确认保存吗" onConfirm={handleSave} okText="确定" cancelText="取消">
                     <Button>设置完成并保存</Button>
                 </Popconfirm>
+                </>
                 ]}
                 avatar={{src: newCaseIcon}}
             >

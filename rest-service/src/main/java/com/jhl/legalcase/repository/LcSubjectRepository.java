@@ -15,4 +15,11 @@ public interface LcSubjectRepository extends JpaRepositoryImplementation<LcSubje
      * @return
      */
     List<LcSubject> findAllByParentIsNull();
+
+    /**
+     * 查找符合条件记录
+     *
+     * @return
+     */
+    List<LcSubject> findAllByNameSearchIsNull();
 }

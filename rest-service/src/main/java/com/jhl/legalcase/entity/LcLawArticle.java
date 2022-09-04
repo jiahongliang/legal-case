@@ -22,6 +22,7 @@ import javax.persistence.*;
 public class LcLawArticle extends JpaAudit {
     private Integer orderValue;
     private String title;
+    private String titleSearch;
 
     @Lob
     @Basic(fetch = FetchType.LAZY)

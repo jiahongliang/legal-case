@@ -19,5 +19,6 @@ import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_CREATED;
 public class LcCaseExecution extends JpaAudit {
     private Long typeId;
     private String name;
+    private String nameSearch;
     private Integer status;
 }

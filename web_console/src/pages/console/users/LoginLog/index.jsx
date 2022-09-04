@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Form, Input, Button, Table} from 'antd';
-import { loginLogList } from '../../../../api/user'
+import { loginLogList, loginLogExcel } from '../../../../api/user'
 import './index.css'
 
 const LoginLog = () => {
@@ -81,7 +81,7 @@ const LoginLog = () => {
         let formData = searchForm.getFieldsValue();
         let param = {
             entity: {
-                name: formData.name
+                nameSearch: formData.name
             },
             pageNum: page - 1,
             pageSize,
@@ -100,6 +100,34 @@ const LoginLog = () => {
         setPageSize(pageSize);
     }
 
+    const exportExcel = () => {
+        setDataLoading(true);
+        let formData = searchForm.getFieldsValue();
+        let param = {
+            entity: {
+                nameSearch: formData.name
+            },
+            pageNum: page - 1,
+            pageSize,
+            orderBy: "createdTime desc"
+        };
+        loginLogExcel(param).then(res => {console.log(res);
+            let blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8text/plain;charset=utf-8'});
+            // 获取heads中的filename文件名
+            let downloadElement = document.createElement("a");
+            // 创建下载的链接
+            let href = window.URL.createObjectURL(blob);
+            downloadElement.href = href;
+            // 下载后文件名
+            downloadElement.download = "登录日志";
+            document.body.appendChild(downloadElement);
+            // 点击下载
+            downloadElement.click();         // 下载完成移除元素
+            document.body.removeChild(downloadElement);
+        });
+        setDataLoading(false);
+    }
+
     return (
         <div className="user-manage-wrapper">
             <Form form={searchForm}
@@ -116,6 +144,12 @@ const LoginLog = () => {
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                     <Button type="primary" size="small" htmlType="submit">
                         查询
+                    </Button>
+                </Form.Item>
+
+                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Button  size="small" onClick={exportExcel}>
+                        导出
                     </Button>
                 </Form.Item>
             </Form>

@@ -3,10 +3,10 @@ package com.jhl.legalcase.web;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.jhl.legalcase.entity.SysUser;
-import com.jhl.legalcase.exception.MobileNotValidException;
 import com.jhl.legalcase.repository.SysUserRepository;
 import com.jhl.legalcase.service.SysUserService;
 import com.jhl.legalcase.util.common.MyBeanUtils;
+import com.jhl.legalcase.util.pinyin.PinyinUtil;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.util.webmsg.WebResp;
 import lombok.extern.slf4j.Slf4j;
@@ -15,13 +15,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 
 import static com.jhl.legalcase.LegalCaseConstants.*;
@@ -92,6 +91,12 @@ public class SysUserController {
         }
         SysUser user = sysUserRepository.getReferenceById(req.getEntity().getId());
         MyBeanUtils.copyNonNullProperties(req.getEntity(), user);
+        if (StringUtils.hasLength(user.getName())) {
+            user.setNameSearch(user.getName() + "|" + PinyinUtil.toFirstChar(user.getName()));
+        }
+        if (StringUtils.hasLength(user.getDeptName())) {
+            user.setDeptNameSearch(user.getDeptName() + "|" + PinyinUtil.toFirstChar(user.getDeptName()));
+        }
         sysUserRepository.save(user);
         return WebResp.newInstance().msg("操作成功");
     }
@@ -133,8 +138,14 @@ public class SysUserController {
     public WebResp<SysUser, Long> register(@RequestBody WebReq<SysUser, String> req) throws Exception {
         Assert.notNull(req.getEntity(), "数据输入不完整");
         Assert.notNull(req.getEntity().getMobile(), "手机号码不能为空");
-        if(userService.findByMobile(req.getEntity().getMobile()) != null) {
+        if (userService.findByMobile(req.getEntity().getMobile()) != null) {
             return WebResp.newInstance().subCode(10002).subMsg("手机号码已存在，请重新输入正确号码。");
+        }
+        if (StringUtils.hasLength(req.getEntity().getName())) {
+            req.getEntity().setNameSearch(req.getEntity().getName() + "|" + PinyinUtil.toFirstChar(req.getEntity().getName()));
+        }
+        if (StringUtils.hasLength(req.getEntity().getDeptName())) {
+            req.getEntity().setDeptNameSearch(req.getEntity().getDeptName() + "|" + PinyinUtil.toFirstChar(req.getEntity().getDeptName()));
         }
         userService.register(req.getEntity());
         return WebResp.newInstance().subMsg("操作成功,请等待管理员审核，审核完成后可使用手机号码登录系统。");

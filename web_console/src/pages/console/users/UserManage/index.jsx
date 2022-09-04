@@ -166,8 +166,8 @@ const UserManagePage = () => {
         let formData = searchForm.getFieldsValue();
         let param = {
             entity: {
-                name: formData.name,
-                deptName: formData.deptName
+                nameSearch: formData.name,
+                deptNameSearch: formData.deptName
             },
             where: formData.status && formData.status.length > 0 ? [
                 {

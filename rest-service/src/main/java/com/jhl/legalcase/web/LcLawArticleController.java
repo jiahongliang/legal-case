@@ -2,6 +2,7 @@ package com.jhl.legalcase.web;
 
 import com.jhl.legalcase.entity.LcLawArticle;
 import com.jhl.legalcase.repository.LcLawArticleRepository;
+import com.jhl.legalcase.util.pinyin.PinyinUtil;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.util.webmsg.WebResp;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +40,11 @@ public class LcLawArticleController {
     @Transactional
     public WebResp<LcLawArticle, Long> save(@RequestBody WebReq<LcLawArticle, String> req) {
         Assert.notNull(req.getEntity(), "数据输入不完整");
-        LcLawArticle article = lawArticleRepository.save(req.getEntity());
+        LcLawArticle entity = req.getEntity();
+        if (StringUtils.hasLength(entity.getTitle())) {
+            entity.setTitleSearch(entity.getTitle() + "|" + PinyinUtil.toFirstChar(entity.getTitle()));
+        }
+        LcLawArticle article = lawArticleRepository.save(entity);
         return WebResp.newInstance().rows(Arrays.asList(article));
     }
 

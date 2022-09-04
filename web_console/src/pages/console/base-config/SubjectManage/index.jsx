@@ -363,6 +363,7 @@ const SubjectManage = () => {
                             height: 260,
                         }} />
                     </Form.Item>
+                    
                     <Upload
                         action="/legal-case/attachment/upload"
                         maxCount={1}

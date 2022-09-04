@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Form, Input, Checkbox, Button, Select, Space,  Table } from 'antd'
 import HandleExecution from "./components/HandleExecution";
-import { caseTypeList, caseExecutionList } from "../../../../api/biz"
+import { caseTypeList, caseExecutionList, caseExecutionExcel } from "../../../../api/biz"
 import {userList} from "../../../../api/user"
 import './index.css'
 
@@ -100,7 +100,7 @@ const BizHandle = () => {
         let param = {
             entity: {
                 typeId: searchData.typeId,
-                name: searchData.name
+                nameSearch: searchData.name
             },
             where: searchData.status && searchData.status.length > 0 ? [
                 {
@@ -120,7 +120,7 @@ const BizHandle = () => {
 
         if(searchData.creator && searchData.creator.trim().length > 0) {
             // console.log('creator is inputed')
-            let createdBys = userData.filter(user => user.name.indexOf(searchData.creator) > -1).map(user => user.id + '').join();
+            let createdBys = userData.filter(user => user.nameSearch.indexOf(searchData.creator) > -1).map(user => user.id + '').join();
             if(createdBys.trim().length === 0) {
                 createdBys = '0';
             }
@@ -254,6 +254,63 @@ const BizHandle = () => {
         }
     ];
 
+    const exportExcel = () => {
+        
+        setDataLoading(true);
+        let searchData = searchForm.getFieldsValue();
+        // console.log('searchData',searchData);
+        let param = {
+            entity: {
+                typeId: searchData.typeId,
+                name: searchData.name
+            },
+            where: searchData.status && searchData.status.length > 0 ? [
+                {
+                    field: "status",
+                    opt: "in",
+                    value: searchData.status.join()
+                }
+            ] : [{
+                field: "status",
+                opt: "in",
+                value: "1,2"
+            }],
+            pageNum: page - 1,
+            pageSize,
+            orderBy: "createdTime desc"
+        };
+
+        if(searchData.creator && searchData.creator.trim().length > 0) {
+            // console.log('creator is inputed')
+            let createdBys = userData.filter(user => user.name.indexOf(searchData.creator) > -1).map(user => user.id + '').join();
+            if(createdBys.trim().length === 0) {
+                createdBys = '0';
+            }
+            param.where.push({
+                field: "createdBy",
+                opt: "in",
+                value: createdBys
+            });
+        }
+
+        caseExecutionExcel(param).then(res => {
+            let blob = new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8text/plain;charset=utf-8'});
+            // 获取heads中的filename文件名
+            let downloadElement = document.createElement("a");
+            // 创建下载的链接
+            let href = window.URL.createObjectURL(blob);
+            downloadElement.href = href;
+            // 下载后文件名
+            downloadElement.download = "案件管理";
+            document.body.appendChild(downloadElement);
+            // 点击下载
+            downloadElement.click();         // 下载完成移除元素
+            document.body.removeChild(downloadElement);
+        });
+
+        setDataLoading(false);
+    }
+
     return detailData == null ? (
         <>
             <Form form={searchForm} initialValues={{
@@ -288,6 +345,11 @@ const BizHandle = () => {
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                     <Button type="primary" size="small" htmlType="submit">
                         查询
+                    </Button>
+                </Form.Item>
+                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Button  size="small" onClick={exportExcel}>
+                        导出
                     </Button>
                 </Form.Item>
             </Form>
