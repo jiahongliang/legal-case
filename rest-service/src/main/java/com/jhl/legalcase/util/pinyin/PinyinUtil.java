@@ -32,7 +32,10 @@ public class PinyinUtil {
         for (int i = 0; i < newChar.length; i++) {
             if (newChar[i] > 128) {
                 try {
-                    pinyinStr += PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat)[0].charAt(0);
+                    String[] pinyins = PinyinHelper.toHanyuPinyinStringArray(newChar[i], defaultFormat);
+                    if (pinyins != null && pinyins.length > 0 && pinyins[0] != null && pinyins[0].length() > 0) {
+                        pinyinStr += pinyins[0].charAt(0);
+                    }
                 } catch (BadHanyuPinyinOutputFormatCombination e) {
                     e.printStackTrace();
                 }
