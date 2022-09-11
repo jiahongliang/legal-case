@@ -204,7 +204,7 @@ const CreateCase = () => {
                      saveResult.code == null ? (
                         <Form form={caseForm} layout="vertical">
                             <Row gutter={16} className="case-form-row" justify="space-between">
-                                <Col span={5} className="case-form-area">
+                                <Col span={8} className="case-form-area">
                                     <Form.Item name="typeId" label="类型">
                                         <Radio.Group onChange={onCaseTypeChange}>
                                             {
@@ -227,7 +227,7 @@ const CreateCase = () => {
                                         }
                                         </div>
                                 </Col>
-                                <Col span={19} className="case-form-area">
+                                <Col span={16} className="case-form-area">
                                     <span style={{fontWeight: 600}}>步骤及事项</span>
                                     <Collapse
                                         activeKey={stepActiveKey}

@@ -1,4 +1,4 @@
-.case-form-area {
+.base-config-subject .case-form-area {
     border: 1px solid #efefef;
     border-radius: 5px;
     padding: 10px;
@@ -7,27 +7,32 @@
     overflow: auto;
 }
 
-.panel-title {
+.base-config-subject .panel-title {
     padding: 10px;
     border-bottom: 1px solid #efefef;
     height: 45px;
 }
 
-.panel-title-text {
+.base-config-subject .panel-title-text {
     font-weight: 600;
     float: left;
 }
 
-.panel-title-toolbar {
+.base-config-subject .panel-title-toolbar {
     float: right;
 }
 
-.panel-title-toolbar-button {
+.base-config-subject .panel-title-toolbar-button {
     margin-left: 1px;
 }
 
-.panel-content {
+.base-config-subject .panel-content {
     margin-top: 10px;
     height: calc(100vh - 270px);
+    width: 99%;
     overflow: auto;
+}
+
+.base-config-subject .ant-table-container {
+    height: calc(100vh - 326px);
 }

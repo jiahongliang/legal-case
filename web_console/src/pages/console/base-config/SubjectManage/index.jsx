@@ -219,6 +219,7 @@ const SubjectManage = () => {
 
     const handleCancelSubjectItem = () => {
         subjectItemForm.resetFields();
+        setDetailFileList(null);
         setSubjectItemVisible(false);
     }
 
@@ -265,7 +266,7 @@ const SubjectManage = () => {
     }
 
     return (
-        <>
+        <div className='base-config-subject'>
             <PageHeader
                 title="专项执法管理"
                 className="site-page-header"
@@ -341,7 +342,7 @@ const SubjectManage = () => {
                 </Form>
             </Modal>
 
-            <Modal title="类别详情" visible={subjectItemVisible} onOk={handleSaveSubjectItem} onCancel={handleCancelSubjectItem} width={800}>
+            <Modal title="项目详情" visible={subjectItemVisible} onOk={handleSaveSubjectItem} onCancel={handleCancelSubjectItem} width={800}>
                 <Form form={subjectItemForm} layout="vertical">
                     <Form.Item name="id" label="主键" hidden={true}>
                         <Input />
@@ -374,7 +375,7 @@ const SubjectManage = () => {
                     </Upload>
                 </Form>
             </Modal>
-        </>
+        </div>
     );
 }
 

@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Form, Input, Button, Table, Drawer, Row, Col } from 'antd';
+import { useEffect, useState, useRef } from "react";
+import { Form, Input, Button, Table, Drawer, Row, Col, Space } from 'antd';
 import { lawArticleList } from "../../../../api/biz"
 import './index.css';
 
@@ -14,6 +14,7 @@ const LawArticleData = () => {
     
     const [detail,setDetail] = useState({});
     const [detailVisible, setDetailVisible] = useState(false);
+    const contentRef = useRef(null);
 
     useEffect(() => {
         loadData();
@@ -60,7 +61,8 @@ const LawArticleData = () => {
         let formData = searchForm.getFieldsValue();
         let params = {
             entity: {
-                "titleSearch": formData.title
+                "titleSearch": formData.title,
+                "content": formData.content
             },
             pageNum: page - 1,
             pageSize,
@@ -85,7 +87,6 @@ const LawArticleData = () => {
         setDetail({});
     }
 
-
     return (
         <div className="case-type-wrapper">
             <div className="toolbar-area">
@@ -97,6 +98,9 @@ const LawArticleData = () => {
                         >
                         <Form.Item name="title" label="标题">
                             <Input maxLength={10} placeholder="标题" size="small"/>
+                        </Form.Item>
+                        <Form.Item name="content" label="内容">
+                            <Input maxLength={20} placeholder="内容" style={{width: "300px"}} size="small"/>
                         </Form.Item>
                         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                             <Button type="primary" size="small" htmlType="submit">
@@ -142,14 +146,18 @@ const LawArticleData = () => {
                 }}
             ></Table>
             <Drawer title="详细信息" placement="right" width={1000} maskClosable={false} visible={detailVisible} extra={
-                <Button onClick={closeDrawer} size="medium">关闭</Button>
+                <div>
+                    <Space>
+                        <Button onClick={closeDrawer} size="medium">关 闭</Button>
+                    </Space>
+                </div>
             } onClose={closeDrawer}>
                 
                         <div style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>{detail.title}</div>
                         <Input.TextArea readOnly bordered={false} style={{
                             height: 'calc(100vh - 220px)',
                             marginTop: '20px'
-                        }} value={detail.content}/>
+                        }} value={detail.content} ref={contentRef}/>
                         {
                             detail.attachmentId ? (
                                 <div><span style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>附件: </span><a href={"/legal-case/attachment/get/" + detail.attachmentId} target={"_blank"}>{detail.attachmentName}</a></div>) : (<></>)

@@ -1,4 +1,4 @@
-.case-form-area {
+.subject-data-subject .case-form-area {
     border: 1px solid #efefef;
     border-radius: 5px;
     padding: 10px;
@@ -7,37 +7,36 @@
     overflow: auto;
 }
 
-.panel-title {
+.subject-data-subject .panel-title {
     padding: 10px;
     border-bottom: 1px solid #efefef;
     height: 45px;
 }
 
-.panel-title-text {
+.subject-data-subject .panel-title-text {
     font-weight: 600;
     float: left;
 }
 
-.panel-title-toolbar {
+.subject-data-subject .panel-title-toolbar {
     float: right;
 }
 
-.panel-title-toolbar-button {
+.subject-data-subject .panel-title-toolbar-button {
     margin-left: 1px;
 }
 
-.panel-content {
+.subject-data-subject .panel-content {
     margin-top: 10px;
     height: calc(100vh - 270px);
+    width: 99%;
     overflow: auto;
 }
 
-.panel-content-law-title {
-    font-weight: 600;
-    height: 40px;
-    line-height: 40px;
+.panel-content-law-content {
+    height: calc(100vh - 370px);
 }
 
-.panel-content-law-content {
-    height: calc(100vh - 350px);
+.subject-data-subject .ant-table-container {
+    height: calc(100vh - 326px);
 }

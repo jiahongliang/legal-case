@@ -14,7 +14,7 @@ spring:
     driver-class-name: com.p6spy.engine.spy.P6SpyDriver
     url: jdbc:p6spy:mysql://localhost:3306/law-case?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&useSSL=false
     username: root
-    password: mima
+    password: mima123456
   jpa:
     database: mysql
     database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
@@ -39,7 +39,7 @@ legalCase:
     login:
       validateCode: false
   attachment:
-    location: /Users/jiahongliang/temp/attachment
+    location: /Users/jiahongliang/Projects/temp/attachment
 p6spy:
   config:
     appender: com.p6spy.engine.spy.appender.Slf4JLogger
