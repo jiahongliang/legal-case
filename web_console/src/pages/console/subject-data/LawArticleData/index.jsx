@@ -97,10 +97,10 @@ const LawArticleData = () => {
                         onFinish={() => loadData()}
                         >
                         <Form.Item name="title" label="标题">
-                            <Input maxLength={10} placeholder="标题" size="small"/>
+                            <Input maxLength={10} placeholder="标题" allowClear={true} size="small"/>
                         </Form.Item>
                         <Form.Item name="content" label="内容">
-                            <Input maxLength={20} placeholder="内容" style={{width: "300px"}} size="small"/>
+                            <Input maxLength={20} placeholder="内容" style={{width: "300px"}} allowClear={true} size="small"/>
                         </Form.Item>
                         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                             <Button type="primary" size="small" htmlType="submit">

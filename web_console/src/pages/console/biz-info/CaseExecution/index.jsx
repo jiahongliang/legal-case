@@ -321,7 +321,7 @@ const BizHandle = () => {
                 onFinish={handleFinishSearchForm}
             >
                 <Form.Item name="typeId" label="类型">
-                    <Select style={{width: "160px"}} size="small">
+                    <Select style={{width: "160px"}} allowClear={true} size="small">
                         <Option value="">请选择</Option>
                         {
                             caseTypeData.map(caseType => (
@@ -331,11 +331,11 @@ const BizHandle = () => {
                     </Select>
                 </Form.Item>
                 <Form.Item name="name" label="名称">
-                    <Input maxLength={10} placeholder="请输入名称" size="small" />
+                    <Input maxLength={10} placeholder="请输入名称" allowClear={true} size="small" />
                 </Form.Item>
 
                 <Form.Item name="creator" label="负责人">
-                    <Input maxLength={10} placeholder="请输入负责人" size="small" />
+                    <Input maxLength={10} placeholder="请输入负责人" allowClear={true} size="small" />
                 </Form.Item>
 
                 <Form.Item name="status" label="状态">

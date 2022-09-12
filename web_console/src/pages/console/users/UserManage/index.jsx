@@ -287,11 +287,11 @@ const UserManagePage = () => {
                
 
                 <Form.Item name="name" label="姓名">
-                    <Input maxLength={10} placeholder="姓名" size="small"/>
+                    <Input maxLength={10} placeholder="姓名" allowClear={true} size="small"/>
                 </Form.Item>
 
                 <Form.Item name="deptName" label="部门">
-                    <Input maxLength={10} placeholder="部门名称" size="small"/>
+                    <Input maxLength={10} placeholder="部门名称" allowClear={true} size="small"/>
                 </Form.Item>
 
                 <Form.Item name="status" label="状态">

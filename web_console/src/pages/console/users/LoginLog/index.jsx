@@ -138,7 +138,7 @@ const LoginLog = () => {
                
 
                 <Form.Item name="name" label="姓名">
-                    <Input maxLength={10} placeholder="姓名" size="small"/>
+                    <Input maxLength={10} placeholder="姓名" allowClear={true} size="small"/>
                 </Form.Item>
 
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
