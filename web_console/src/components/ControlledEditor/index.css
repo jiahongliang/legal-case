@@ -1,0 +1,16 @@
+a {
+  color: black;
+}
+
+.rdw-editor-toolbar {
+  margin-bottom: -1px;
+}
+
+.rdw-option-wrapper {
+  height: 30px;
+  min-width: 35px;
+}
+
+.rdw-fontsize-dropdown {
+  min-width: 50px;
+}

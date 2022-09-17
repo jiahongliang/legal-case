@@ -19,3 +19,9 @@
     margin: 0 0 5px 0;
     border-radius: 2px;
 }
+
+.demo-editor {
+    height: calc(100vh - 528px);
+    overflow: auto;
+    border: 1px solid #F1F1F1;
+}

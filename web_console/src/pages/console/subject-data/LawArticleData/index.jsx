@@ -154,10 +154,14 @@ const LawArticleData = () => {
             } onClose={closeDrawer}>
                 
                         <div style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>{detail.title}</div>
-                        <Input.TextArea readOnly bordered={false} style={{
+                        <div style={{
                             height: 'calc(100vh - 220px)',
-                            marginTop: '20px'
-                        }} value={detail.content} ref={contentRef}/>
+                            marginTop: '20px',
+                            overflow: 'auto',
+                            border: '1px solid #F1F1F1'
+                        }}>
+                            <p dangerouslySetInnerHTML={{__html: detail.content}}></p>
+                        </div>
                         {
                             detail.attachmentId ? (
                                 <div><span style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>附件: </span><a href={"/legal-case/attachment/get/" + detail.attachmentId} target={"_blank"}>{detail.attachmentName}</a></div>) : (<></>)

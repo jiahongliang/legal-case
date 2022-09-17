@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import ControlledEditor from "../../../../components/ControlledEditor";
 import { PageHeader, Tree, Button, Modal, Form, Input, Row, Col, message, Table, Space, Popconfirm, Upload} from "antd";
 import { BookTwoTone, BookOutlined, UploadOutlined } from '@ant-design/icons';
 import { subjectTreeData, saveSubject, removeSubject, subjectItemList, saveSubjectItem, removeSubjectItem } from '../../../../api/biz'
@@ -14,6 +15,8 @@ const SubjectManage = () => {
     const [subjectExtFormData, setSubjectExtFormData] = useState({});
     const [detailFileList, setDetailFileList] = useState(null);
     const [attachment, setAttachment] = useState(null);
+    const [lawContent, setLawContent] = useState(null);
+    const [initLawContent, setInitLawContent] = useState(null);
 
     const [subjectItemData, setSubjectItemData] = useState([]);
     const [subjectItemDataLoading, setSubjectItemDataLoading] = useState(false);
@@ -212,6 +215,8 @@ const SubjectManage = () => {
                 orderValue: '50'
             });
             setSubjectItemVisible(true);
+            setInitLawContent(null);
+            setLawContent(null);
         } else {
             message.error('请首先选择主体类别！');
         }
@@ -219,6 +224,8 @@ const SubjectManage = () => {
 
     const handleCancelSubjectItem = () => {
         subjectItemForm.resetFields();
+        setLawContent(null);
+        setInitLawContent("");
         setDetailFileList(null);
         setSubjectItemVisible(false);
     }
@@ -226,6 +233,8 @@ const SubjectManage = () => {
     const showEditSubjectItemWindow = (record) => {
         if(!record.orderValue) record.orderValue = '50'
         subjectItemForm.setFieldsValue(record);
+        setLawContent(record.lawContent);
+        setInitLawContent(record.lawContent);
         if(record.attachmentId) {
             var detailFile = {uid: record.attachmentId,name:record.attachmentName,status: 'done'};
             setDetailFileList([detailFile]);
@@ -239,10 +248,11 @@ const SubjectManage = () => {
 
             entity.attachmentId = attachment ? attachment.id : null;
             entity.attachmentName = attachment ? attachment.name : null;
+            entity.lawContent = lawContent;
             saveSubjectItem({ entity }).then(res => {
                 loadSubjectItemData();
                 subjectItemForm.resetFields();
-
+                setLawContent(null);
                 setDetailFileList(null);
                 setAttachment(null);
                 setSubjectItemVisible(false);
@@ -263,6 +273,10 @@ const SubjectManage = () => {
         } else {
             setAttachment(null);
         }
+    }
+
+    const handleEditorContentChange = (content) => {
+        setLawContent(content);
     }
 
     return (
@@ -342,7 +356,7 @@ const SubjectManage = () => {
                 </Form>
             </Modal>
 
-            <Modal title="项目详情" visible={subjectItemVisible} onOk={handleSaveSubjectItem} onCancel={handleCancelSubjectItem} width={800}>
+            <Modal title="项目详情" visible={subjectItemVisible} onOk={handleSaveSubjectItem} onCancel={handleCancelSubjectItem} width={900}>
                 <Form form={subjectItemForm} layout="vertical">
                     <Form.Item name="id" label="主键" hidden={true}>
                         <Input />
@@ -360,9 +374,7 @@ const SubjectManage = () => {
                         <Input placeholder="请输入法律条款" maxLength={50} />
                     </Form.Item>
                     <Form.Item name="lawContent" label="法律详情" rules={[{ required: true, message: '法律详情必须输入' }]}>
-                        <Input.TextArea placeholder="请输入法律详情" style={{
-                            height: 260,
-                        }} />
+                        <ControlledEditor initContent={initLawContent} onEditorContentChange={handleEditorContentChange}/>
                     </Form.Item>
                     
                     <Upload

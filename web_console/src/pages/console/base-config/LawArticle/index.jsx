@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import ControlledEditor from "../../../../components/ControlledEditor";
 import { Form, Input, Button, Space, Table, Popconfirm, Drawer, Result, message, Row, Col, Upload } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { lawArticleList, saveLawArticle, removeLawArticle } from "../../../../api/biz"
@@ -15,6 +16,8 @@ const LawArticle = () => {
 
     const [detailId, setDetailId] = useState(null);
     const [detailForm] = Form.useForm();
+    const [detailContent, setDetailContent] = useState(null);
+    const [initContent, setInitContent] = useState(null);
     const [detailFileList, setDetailFileList] = useState(null);
     const [attachment, setAttachment] = useState(null);
     const [detailVisible, setDetailVisible] = useState(false);
@@ -99,6 +102,7 @@ const LawArticle = () => {
         if(r != null) {
             detailForm.setFieldsValue(r);
             setDetailId(r.id);
+            setInitContent(r.content);
             if(r.attachmentId) {
                 var detailFile = {uid: r.attachmentId,name:r.attachmentName,status: 'done'};
                 setDetailFileList([detailFile]);
@@ -112,19 +116,22 @@ const LawArticle = () => {
         setDetailVisible(false);
         detailForm.resetFields();
         setDetailId(null);
+        setDetailContent(null);
+        setInitContent(null);
         setDetailFileList(null);
         setAttachment(null);
         setSaveResult({code:null,message:null});
     }
 
     const saveForm = (lawArticle) => {
-        // console.log('formdata',lawArticle)
+        // console.log('formdata',lawArticle);return;
         let params = {
             entity: {
+                ...lawArticle,
+                content: detailContent,
                 id: detailId,
                 attachmentId: attachment ? attachment.id : null,
-                attachmentName: attachment ? attachment.name : null,
-                ...lawArticle
+                attachmentName: attachment ? attachment.name : null
             }
         }
         saveLawArticle(params).then(res => {
@@ -156,6 +163,10 @@ const LawArticle = () => {
         } else {
             setAttachment(null);
         }
+    }
+
+    const handleEditorContentChange = (content) => {
+        setDetailContent(content);
     }
 
     return (
@@ -224,9 +235,7 @@ const LawArticle = () => {
                             </Form.Item>
 
                             <Form.Item name="content" label="正文" rules={[{ required: true, message: '正文必须输入' }]}>
-                                <Input.TextArea placeholder="请输入法律详情" style={{
-                                    height: "calc(100vh - 418px)"
-                                }} />
+                                <ControlledEditor initContent={initContent} onEditorContentChange={handleEditorContentChange}/>
                             </Form.Item>
 
                             <Upload

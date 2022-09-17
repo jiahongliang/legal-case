@@ -36,3 +36,10 @@
 .base-config-subject .ant-table-container {
     height: calc(100vh - 326px);
 }
+
+
+.demo-editor {
+    height: calc(100vh - 728px);
+    overflow: auto;
+    border: 1px solid #F1F1F1;
+}

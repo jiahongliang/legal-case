@@ -241,7 +241,7 @@ const SubjectManage = () => {
                     detailData ? (
                         <>
                             <div className='panel-content-law-title'>{detailData.lawTitle}</div>
-                            <div className='panel-content-law-content'><Input.TextArea value={detailData.lawContent} style={{height: "100%"}}></Input.TextArea></div>
+                            <div className='panel-content-law-content'><p dangerouslySetInnerHTML={{__html: detailData.lawContent}}></p></div>
                             {
                                 detailData.attachmentId ? (
                                     <div><span style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>附件: </span><a href={"/legal-case/attachment/get/" + detailData.attachmentId} target={"_blank"}>{detailData.attachmentName}</a></div>) : (<></>)
