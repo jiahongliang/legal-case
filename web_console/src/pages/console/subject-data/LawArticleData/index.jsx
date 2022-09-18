@@ -156,11 +156,19 @@ const LawArticleData = () => {
                         <div style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>{detail.title}</div>
                         <div style={{
                             height: 'calc(100vh - 220px)',
-                            marginTop: '20px',
                             overflow: 'auto',
                             border: '1px solid #F1F1F1'
                         }}>
-                            <p dangerouslySetInnerHTML={{__html: detail.content}}></p>
+                            {
+                                 (detail.content && detail.content.substring(0,3) === '<p>') ? (
+                                    <p dangerouslySetInnerHTML={{__html: detail.content}}></p>
+                                ) :
+                                (
+                                    <Input.TextArea readOnly bordered={false} style={{
+                                            height: 'calc(100vh - 220px)'
+                                        }} value={detail.content} ref={contentRef}/>
+                                )
+                            }
                         </div>
                         {
                             detail.attachmentId ? (

@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 @Component
-public class LegalCasePinyinHandle implements CommandLineRunner {
+public class LegalCasePinyinHandle { //implements CommandLineRunner
     @Autowired
     LcSubjectRepository subjectRepository;
 
@@ -37,7 +37,7 @@ public class LegalCasePinyinHandle implements CommandLineRunner {
      * @param args incoming main method arguments
      * @throws Exception on error
      */
-    @Override
+   // @Override
     public void run(String... args) throws Exception {
         //1、检查用户表
         List<SysUser> users = userRepository.findAllByNameSearchIsNull();
