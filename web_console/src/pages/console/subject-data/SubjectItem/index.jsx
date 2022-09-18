@@ -243,7 +243,7 @@ const SubjectManage = () => {
                             <div className='panel-content-law-title'>{detailData.lawTitle}</div>
                             <div className='panel-content-law-content'>
                                 {
-                                    detailData && detailData.lawContent && detailData.lawContent.substring(0,3) === '<p>' ? 
+                                    detailData && detailData.lawContent && (detailData.lawContent.indexOf('</p>') > -1 || detailData.lawContent.indexOf('</span>') > -1) ? 
                                     (<p dangerouslySetInnerHTML={{__html: detailData.lawContent}}></p>) :
                                     (<Input.TextArea value={detailData.lawContent} style={{height: "100%"}}></Input.TextArea>) 
                                 }

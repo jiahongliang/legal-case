@@ -160,7 +160,7 @@ const LawArticleData = () => {
                             border: '1px solid #F1F1F1'
                         }}>
                             {
-                                 (detail.content && detail.content.substring(0,3) === '<p>') ? (
+                                 (detail.content && (detail.content.indexOf('</p>') > -1 || detail.content.indexOf('</span>') > -1)) ? (
                                     <p dangerouslySetInnerHTML={{__html: detail.content}}></p>
                                 ) :
                                 (
