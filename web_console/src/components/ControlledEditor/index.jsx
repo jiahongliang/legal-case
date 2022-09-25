@@ -31,13 +31,14 @@ class ControlledEditor extends Component {
 
   static getDerivedStateFromProps(props, state) {
     console.log('getDerivedStateFromProps',props,state)
-    if(!props.initContent) {
-      state.initContent = props.initContent;
-    }
-    if(props.initContent !== state.initContent) {
-      console.log('b')
-      const html = props.initContent;
-      state.initContent = props.initContent;
+    if(!props.value) {
+      state.initContent = null;
+      state.editorState = EditorState.createEmpty();
+    } 
+    if(props.value && props.value !== state.initContent) {
+      console.log('props.value' ,props.value)
+      const html = props.value;
+      state.initContent = props.value;
       if(!html) return null;
       const contentBlock = htmlToDraft(html);
       if(contentBlock) {
@@ -45,7 +46,7 @@ class ControlledEditor extends Component {
           const editorState = EditorState.createWithContent(contentState);
           state.editorState = editorState;
       }
-    }
+    } 
     return null;
   }
 

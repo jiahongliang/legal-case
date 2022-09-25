@@ -223,9 +223,10 @@ const SubjectManage = () => {
     }
 
     const handleCancelSubjectItem = () => {
+        console.log('关闭详细窗口...')
         subjectItemForm.resetFields();
         setLawContent(null);
-        setInitLawContent("");
+        setInitLawContent(null);
         setDetailFileList(null);
         setSubjectItemVisible(false);
     }
@@ -253,6 +254,7 @@ const SubjectManage = () => {
                 loadSubjectItemData();
                 subjectItemForm.resetFields();
                 setLawContent(null);
+                setInitLawContent(null);
                 setDetailFileList(null);
                 setAttachment(null);
                 setSubjectItemVisible(false);
