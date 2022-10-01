@@ -33,10 +33,25 @@
     overflow: auto;
 }
 
+.panel-content-law-title {
+    margin-bottom: 10px;
+}
+
 .panel-content-law-content {
     height: calc(100vh - 370px);
+    border: 1px solid #efefef;
+    padding: 5px;
+    overflow: auto;
 }
 
 .subject-data-subject .ant-table-container {
     height: calc(100vh - 326px);
+}
+
+pre {
+    white-space: pre-wrap;      /* css-3 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since1999 */
+    white-space:-pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /*Opera 7 */
+    word-wrap:break-word;       /* Internet Explorer 5.5+ */
 }

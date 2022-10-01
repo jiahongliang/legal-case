@@ -30,13 +30,12 @@ class ControlledEditor extends Component {
   }*/
 
   static getDerivedStateFromProps(props, state) {
-    console.log('getDerivedStateFromProps',props,state)
+    if(typeof(props.value) !== 'string') return null;
     if(!props.value) {
       state.initContent = null;
       state.editorState = EditorState.createEmpty();
     } 
     if(props.value && props.value !== state.initContent) {
-      console.log('props.value' ,props.value)
       const html = props.value;
       state.initContent = props.value;
       if(!html) return null;

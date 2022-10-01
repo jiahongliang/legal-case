@@ -3,6 +3,8 @@ import { Form, Input, Button, Table, Drawer, Row, Col, Space } from 'antd';
 import { lawArticleList } from "../../../../api/biz"
 import './index.css';
 
+const { Search } = Input;
+
 const LawArticleData = () => {
     const [searchForm] = Form.useForm();
 
@@ -87,6 +89,48 @@ const LawArticleData = () => {
         setDetail({});
     }
 
+    const onSearch = (value) => {
+        if(value && value.length > 0) {
+            contentRef.current.focus();
+            if(windowSearch(value)) {
+                let s = window.getSelection();
+                let {withinFlag,offsetTop} = searchResultProperties(s.anchorNode);
+                console.log(s);
+                console.log(withinFlag,offsetTop);
+                if(withinFlag) {
+                    //contentRef.current.scrollTo(0,2242);
+                }
+                //let top = s.anchorNode.parentElement.offsetTop + s.anchorNode.parentElement.parentElement.offsetTop + s.anchorNode.parentElement.parentElement.parentElement.offsetTop;
+                //contentRef.current.scrollTo(0,top + s.focusOffset);
+            }
+        }
+    }
+
+    const windowSearch = (v) => {
+        return window.find(v,true,false,true);
+    }
+
+    const searchResultProperties = (anchorNode) => {
+        let p = anchorNode.parentElement;
+        let resultTop = 0;
+        while(p) {
+            console.log('nodeName:',p.nodeName,"nodeId:",p.id);
+            if(p.nodeName === "BODY") {
+                break;
+            }
+            resultTop = resultTop + p.offsetTop
+            if(p.id && p.id === 'contentDiv') {
+                return {'withinFlag': true, 'offsetTop': resultTop};
+            }
+            p = p.parentElement;
+        }
+        return {'withinFlag':false,'offsetTop':0};
+    }
+
+    const handleScroll = (a,b,c,d) => {
+        console.log(a,b,c,d)
+    }
+
     return (
         <div className="case-type-wrapper">
             <div className="toolbar-area">
@@ -154,19 +198,19 @@ const LawArticleData = () => {
             } onClose={closeDrawer}>
                 
                         <div style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>{detail.title}</div>
+                        <div style={{fontStyle: 'italic', color: 'blue'}}>（提示：搜索定位请使用 Ctrl + F）</div>
                         <div style={{
                             height: 'calc(100vh - 220px)',
                             overflow: 'auto',
-                            border: '1px solid #F1F1F1'
-                        }}>
+                            border: '1px solid #EFEFEF',
+                            padding: '5px'
+                        }} ref={contentRef} id="contentDiv">
                             {
                                  (detail.content && (detail.content.indexOf('</p>') > -1 || detail.content.indexOf('</span>') > -1)) ? (
                                     <p dangerouslySetInnerHTML={{__html: detail.content}}></p>
                                 ) :
                                 (
-                                    <Input.TextArea readOnly bordered={false} style={{
-                                            height: 'calc(100vh - 220px)'
-                                        }} value={detail.content} ref={contentRef}/>
+                                    <pre>{detail.content}</pre>
                                 )
                             }
                         </div>

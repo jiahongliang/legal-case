@@ -5,9 +5,12 @@ import { BookTwoTone, BookOutlined, UploadOutlined } from '@ant-design/icons';
 import { subjectTreeData, saveSubject, removeSubject, subjectItemList, saveSubjectItem, removeSubjectItem } from '../../../../api/biz'
 import './index.css'
 
+const { Search } = Input;
+
 const SubjectManage = () => {
 
     const [treeData, setTreeData] = useState([]);
+    const [initTreeData, setInitTreeData] = useState([]);
     const [currentNode, setCurrentNode] = useState(null);
     const [subjectVisible, setSubjectVisible] = useState(false);
 
@@ -37,8 +40,11 @@ const SubjectManage = () => {
     const loadSubjectTreeData = () => {
         subjectTreeData().then(res => {
             if (res.rows && res.rows.length > 0) {
-                setTreeData(res.rows.map(s => subject2TreeNode(s, null)))
+                let data = res.rows.map(s => subject2TreeNode(s, null));
+                setInitTreeData(data);
+                setTreeData(data);
             } else {
+                setInitTreeData();
                 setTreeData([]);
             }
         });
@@ -47,6 +53,7 @@ const SubjectManage = () => {
     const subject2TreeNode = (subject, parent) => {
         return {
             title: subject.name,
+            titleSearch: subject.nameSearch,
             key: subject.id,
             parentKey: parent == null ? null : parent.id,
             parentName: parent == null ? null : parent.name,
@@ -223,7 +230,7 @@ const SubjectManage = () => {
     }
 
     const handleCancelSubjectItem = () => {
-        console.log('关闭详细窗口...')
+        //console.log('关闭详细窗口...')
         subjectItemForm.resetFields();
         setLawContent(null);
         setInitLawContent(null);
@@ -281,6 +288,16 @@ const SubjectManage = () => {
         setLawContent(content);
     }
 
+    const handleSearch = (value) => {
+        if(value && value.trim().length > 0) {
+            if(initTreeData && initTreeData.length > 0) {
+                setTreeData(initTreeData.filter(d => d.titleSearch && d.titleSearch.indexOf(value) > -1));
+            }
+        } else {
+            setTreeData(initTreeData);
+        }
+    }
+
     return (
         <div className='base-config-subject'>
             <PageHeader
@@ -303,6 +320,8 @@ const SubjectManage = () => {
                             </div>
                         </div>
                         <div className="panel-content">
+                        <Search placeholder="关键词搜索" onSearch={handleSearch} enterButton />
+
                             <Tree
                                 showLine={{ showLeafIcon: false }}
                                 showIcon={true}

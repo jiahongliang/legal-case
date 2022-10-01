@@ -5,9 +5,12 @@ import { BookTwoTone, BookOutlined } from '@ant-design/icons';
 import { subjectTreeData,subjectItemList } from '../../../../api/biz'
 import './index.css'
 
+const { Search } = Input;
+
 const SubjectManage = () => {
 
     const [treeData, setTreeData] = useState([]);
+    const [initTreeData, setInitTreeData] = useState([]);
     const [currentNode, setCurrentNode] = useState(null);
     const [detailData, setDetailData] = useState(null);
 
@@ -26,6 +29,7 @@ const SubjectManage = () => {
         right: 0,
     });
     const draggleRef = useRef(null);
+    const contentRef = useRef(null);
 
     const onStart = (_event, uiData) => {
         const { clientWidth, clientHeight } = window.document.documentElement;
@@ -54,8 +58,11 @@ const SubjectManage = () => {
     const loadSubjectTreeData = () => {
         subjectTreeData().then(res => {
             if (res.rows && res.rows.length > 0) {
-                setTreeData(res.rows.map(s => subject2TreeNode(s, null)))
+                let data = res.rows.map(s => subject2TreeNode(s, null));
+                setInitTreeData(data);
+                setTreeData(data)
             } else {
+                setInitTreeData([]);
                 setTreeData([]);
             }
         });
@@ -64,6 +71,7 @@ const SubjectManage = () => {
     const subject2TreeNode = (subject, parent) => {
         return {
             title: subject.name,
+            titleSearch: subject.nameSearch,
             key: subject.id,
             parentKey: parent == null ? null : parent.id,
             parentName: parent == null ? null : parent.name,
@@ -150,6 +158,31 @@ const SubjectManage = () => {
         setSubjectItemVisible(false);
     }
 
+    const onSearch = (value) => {
+        if(value && value.length > 0) {
+            contentRef.current.focus();
+            if(windowSearch(value)) {
+                let s = window.getSelection();
+                let top = s.anchorNode.parentElement.offsetTop;
+                contentRef.current.scrollTo(0,top + s.focusOffset - 190);
+            }
+        }
+    }
+
+    const windowSearch = (v) => {
+        return window.find(v,true,false,true);
+    }
+
+    const handleSearch = (value) => {
+        if(value && value.trim().length > 0) {
+            if(initTreeData && initTreeData.length > 0) {
+                setTreeData(initTreeData.filter(d => d.titleSearch && d.titleSearch.indexOf(value) > -1));
+            }
+        } else {
+            setTreeData(initTreeData);
+        }
+    }
+
     return (
         <div className='subject-data-subject'>
             <PageHeader
@@ -167,6 +200,7 @@ const SubjectManage = () => {
                             </div>
                         </div>
                         <div className="panel-content">
+                            <Search placeholder="关键词搜索" onSearch={handleSearch} enterButton />
                             <Tree
                                 showLine={{ showLeafIcon: false }}
                                 showIcon={true}
@@ -241,17 +275,19 @@ const SubjectManage = () => {
                     detailData ? (
                         <>
                             <div className='panel-content-law-title'>{detailData.lawTitle}</div>
-                            <div className='panel-content-law-content'>
+                            <div style={{fontStyle: 'italic',color:'blue'}}>（提示：搜索定位请使用 Ctrl + F）</div>
+                            <div className='panel-content-law-content' ref={contentRef}>
                                 {
                                     detailData && detailData.lawContent && (detailData.lawContent.indexOf('</p>') > -1 || detailData.lawContent.indexOf('</span>') > -1) ? 
                                     (<p dangerouslySetInnerHTML={{__html: detailData.lawContent}}></p>) :
-                                    (<Input.TextArea value={detailData.lawContent} style={{height: "100%"}}></Input.TextArea>) 
+                                    (<pre>{detailData.lawContent}</pre>) 
                                 }
                             </div>
                             {
                                 detailData.attachmentId ? (
                                     <div><span style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>附件: </span><a href={"/legal-case/attachment/get/" + detailData.attachmentId} target={"_blank"}>{detailData.attachmentName}</a></div>) : (<></>)
                             }
+                            
                         </>
                     ) : (
                         <></>
