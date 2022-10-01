@@ -221,7 +221,7 @@ const CreateCase = () => {
                                     <span style={{fontWeight: 600}}>可选步骤 <Input onChange={handleStepFilterText}></Input></span>
                                     <div className="case-type-source-step-area">
                                         {
-                                            stepData.filter(step => stepFilterText.length === 0 || step.name.indexOf(stepFilterText) >= 0).map(step => (
+                                            stepData.filter(step => stepFilterText.length === 0 || step.nameSearch.indexOf(stepFilterText) >= 0).map(step => (
                                                 <Button key={step.id} type="primary" style={{width: '95%'}} shape="round" block className="case-step-button" onClick={() => {handleClickSourceStep(step.id)}}>{step.name}</Button>
                                             ))
                                         }

@@ -235,7 +235,7 @@ const LawArticle = () => {
                             </Form.Item>
 
                             <Form.Item name="content" label="正文" rules={[{ required: true, message: '正文必须输入' }]}>
-                                <ControlledEditor initContent={initContent} onEditorContentChange={handleEditorContentChange}/>
+                                <ControlledEditor initContent={initContent} editorClassName="law-article-demo-editor" onEditorContentChange={handleEditorContentChange}/>
                             </Form.Item>
 
                             <Upload

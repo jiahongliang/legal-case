@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import { Form, Input, Button, Table} from 'antd';
+import { Form, Input, Button, Table, DatePicker} from 'antd';
 import { loginLogList, loginLogExcel } from '../../../../api/user'
 import './index.css'
+
+const { RangePicker } = DatePicker;
 
 const LoginLog = () => {
     const [searchForm] = Form.useForm();
@@ -79,10 +81,24 @@ const LoginLog = () => {
     const loadData = () => {
         setDataLoading(true);
         let formData = searchForm.getFieldsValue();
+        let createdTime = formData.createdTime;
+        let range = [];
+        if(createdTime && createdTime.length == 2) {
+            range.push(
+                {
+                    field: 'createdTime',
+                    from: createdTime[0].hour(0).minute(0).second(0).format('YYYY-MM-DD HH:mm:ss'),
+                    to: createdTime[1].hour(23).minute(59).second(59).format('YYYY-MM-DD HH:mm:ss')
+                }
+            )
+            console.log();
+        }
+        
         let param = {
             entity: {
                 nameSearch: formData.name
             },
+            range,
             pageNum: page - 1,
             pageSize,
             orderBy: "createdTime desc"
@@ -141,6 +157,10 @@ const LoginLog = () => {
                     <Input maxLength={10} placeholder="姓名" allowClear={true} size="small"/>
                 </Form.Item>
 
+                <Form.Item name="createdTime" label="登录日期">
+                    <RangePicker allowClear={true} size="small"/>
+                </Form.Item>
+
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                     <Button type="primary" size="small" htmlType="submit">
                         查询
@@ -162,6 +182,7 @@ const LoginLog = () => {
                     position: ["bottomRight"],
                     total: total,
                     showSizeChanger: true,
+                    pageSizeOptions:[10,20,50,100,500,1000],
                     showQuickJumper: true,
                     showTotal: (total) => `共${total}条`,
                     size: "small",

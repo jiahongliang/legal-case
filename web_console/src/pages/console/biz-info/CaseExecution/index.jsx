@@ -362,6 +362,7 @@ const BizHandle = () => {
                     position: ["bottomRight"],
                     total: total,
                     showSizeChanger: true,
+                    pageSizeOptions:[10,20,50,100,500,1000],
                     showQuickJumper: true,
                     showTotal: (total) => `共${total}条`,
                     size: "small",

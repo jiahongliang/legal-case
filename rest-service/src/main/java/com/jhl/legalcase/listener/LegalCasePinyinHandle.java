@@ -12,7 +12,7 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 
 @Component
-public class LegalCasePinyinHandle { //implements CommandLineRunner
+public class LegalCasePinyinHandle implements CommandLineRunner {
     @Autowired
     LcSubjectRepository subjectRepository;
 
@@ -30,6 +30,9 @@ public class LegalCasePinyinHandle { //implements CommandLineRunner
 
     @Autowired
     SysUserRepository userRepository;
+
+    @Autowired
+    private LcCaseTypeStepRepository caseTypeStepRepository;
 
     /**
      * Callback used to run the bean.
@@ -104,6 +107,18 @@ public class LegalCasePinyinHandle { //implements CommandLineRunner
             });
             subjectRepository.saveAll(subjects);
         }
+
+        //7、LcCaseTypeStep
+        List<LcCaseTypeStep> steps = caseTypeStepRepository.findAllByNameSearchIsNull();
+        if(!CollectionUtils.isEmpty(steps)) {
+            steps.forEach(step -> {
+                if(StringUtils.hasLength(step.getName())) {
+                    step.setNameSearch(step.getName() + "|" + PinyinUtil.toFirstChar(step.getName()));
+                }
+            });
+            caseTypeStepRepository.saveAll(steps);
+        }
+
         System.out.println("系统启动时运行，初始化拼音完毕...");
     }
 }

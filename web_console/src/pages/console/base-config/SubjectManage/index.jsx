@@ -395,7 +395,7 @@ const SubjectManage = () => {
                         <Input placeholder="请输入法律条款" maxLength={50} />
                     </Form.Item>
                     <Form.Item name="lawContent" label="法律详情" rules={[{ required: true, message: '法律详情必须输入' }]}>
-                        <ControlledEditor initContent={initLawContent} onEditorContentChange={handleEditorContentChange}/>
+                        <ControlledEditor initContent={initLawContent} editorClassName="subject-manage-demo-editor" onEditorContentChange={handleEditorContentChange}/>
                     </Form.Item>
                     
                     <Upload

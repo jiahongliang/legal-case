@@ -68,6 +68,7 @@ public class LcCaseTypeController {
 
         List<LcCaseTypeStep> cts = CollectionUtils.isEmpty(req.getEntity().getCaseTypeSteps()) ? new ArrayList<>() : req.getEntity().getCaseTypeSteps().stream().map(entity -> {
             entity.setCaseType(caseType);
+            entity.setNameSearch(entity.getName() + "|" + PinyinUtil.toFirstChar(entity.getName()));
             return entity;
         }).toList();
         caseTypeStepRepository.saveAll(cts);

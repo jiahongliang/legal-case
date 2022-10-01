@@ -68,7 +68,6 @@ class ControlledEditor extends Component {
           }}
           {...this.props}
         wrapperClassName="demo-wrapper"
-        editorClassName="demo-editor"
         onEditorStateChange={this.onEditorStateChange}
       />
     );

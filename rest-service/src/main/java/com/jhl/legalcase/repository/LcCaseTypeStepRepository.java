@@ -17,4 +17,11 @@ public interface LcCaseTypeStepRepository extends JpaRepositoryImplementation<Lc
      * @param ids
      */
     void deleteByCaseTypeAndIdNotIn(LcCaseType caseType, List<Long> ids);
+
+    /**
+     * 查询所有拼音为null的记录
+     *
+     * @return
+     */
+    List<LcCaseTypeStep> findAllByNameSearchIsNull();
 }

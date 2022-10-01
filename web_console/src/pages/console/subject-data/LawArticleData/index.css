@@ -11,6 +11,7 @@
 
 .ant-table-container {
     height: calc(100vh - 200px);
+    overflow: auto;
 }
 
 .search-form {

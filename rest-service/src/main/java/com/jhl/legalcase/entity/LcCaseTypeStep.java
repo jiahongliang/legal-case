@@ -19,6 +19,7 @@ import java.util.List;
 public class LcCaseTypeStep extends JpaAudit {
     private String code;
     private String name;
+    private String nameSearch;
     private Integer orderValue;
     private String items;
 

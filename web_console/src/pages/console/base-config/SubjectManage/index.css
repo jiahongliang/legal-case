@@ -35,11 +35,13 @@
 
 .base-config-subject .ant-table-container {
     height: calc(100vh - 326px);
+    overflow: auto;
 }
 
 
-.demo-editor {
+.subject-manage-demo-editor {
     height: calc(100vh - 728px);
+    min-height: 200px;
     overflow: auto;
     border: 1px solid #F1F1F1;
 }

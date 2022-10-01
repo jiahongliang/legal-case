@@ -11,6 +11,7 @@
 
 .ant-table-container {
     height: calc(100vh - 200px);
+    overflow: auto;
 }
 
 .search-form {
@@ -20,8 +21,9 @@
     border-radius: 2px;
 }
 
-.demo-editor {
+.law-article-demo-editor {
     height: calc(100vh - 528px);
+    min-height: 200px;
     overflow: auto;
     border: 1px solid #F1F1F1;
 }
