@@ -8,6 +8,7 @@ export const CaseType = lazy(() => import('../pages/console/base-config/CaseType
 export const SubjectManage = lazy(() => import('../pages/console/base-config/SubjectManage'));
 export const CaseDefinition = lazy(() => import('../pages/console/base-config/CaseDefinition'));
 export const LawArticle = lazy(() => import('../pages/console/base-config/LawArticle'));
+export const ServiceReminderManage = lazy(() => import('../pages/console/base-config/ServiceReminder'));
 export const ConfirmUser = lazy(() => import('../pages/console/users/ConfirmUser'));
 export const UserManage = lazy(() => import('../pages/console/users/UserManage'));
 export const LoginLog = lazy(() => import('../pages/console/users/LoginLog'));
@@ -16,6 +17,7 @@ export const CaseStatistic = lazy(() => import('../pages/console/biz-info/CaseSt
 export const BizHandle = lazy(() => import('../pages/console/biz-handle/BizHandle'));
 export const SubjectItem = lazy(() => import('../pages/console/subject-data/SubjectItem'));
 export const LawArticleData = lazy(() => import('../pages/console/subject-data/LawArticleData'));
+export const ServiceReminder = lazy(() => import('../pages/console/subject-data/ServiceReminder'));
 export const CreateCase = lazy(() => import('../pages/console/biz-handle/CreateCase'));
 export const UserRegister = lazy(() => import('../pages/register/UserRegister'));
 export const Login = lazy(() => import('../pages/Login.jsx'));
@@ -68,6 +70,10 @@ const GetRoutes = () => {
                     element: wrapper(LawArticle)
                 },
                 {
+                    path: '/console/base-config/service-reminder',
+                    element: wrapper(ServiceReminderManage)
+                },
+                {
                     path: '/console/biz-handle/instance-list',
                     element: wrapper(BizHandle)
                 },
@@ -90,6 +96,10 @@ const GetRoutes = () => {
                 {
                     path: '/console/biz-info/instance',
                     element: wrapper(CaseInstance)
+                },
+                {
+                    path: '/console/subject-data/service-reminder',
+                    element: wrapper(ServiceReminder)
                 }
             ]
         }

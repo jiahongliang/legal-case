@@ -1,4 +1,4 @@
-import { service, serviceJson } from "./axios";
+import { serviceJson } from "./axios";
 
 export const caseTypeList = (data) => {
     return serviceJson({
@@ -139,6 +139,31 @@ export const saveLawArticle = (data) => {
 export const removeLawArticle = (data) => {
     return serviceJson({
         url: '/law-article/remove',
+        data,
+        method: 'post',
+    });
+}
+
+
+export const serviceReminderList = (data) => {
+    return serviceJson({
+        url: '/service-reminder/list',
+        data,
+        method: 'post',
+    });
+}
+
+export const saveServiceReminder = (data) => {
+    return serviceJson({
+        url: '/service-reminder/save',
+        data,
+        method: 'post',
+    });
+}
+
+export const removeServiceReminder = (data) => {
+    return serviceJson({
+        url: '/service-reminder/remove',
         data,
         method: 'post',
     });

@@ -1,4 +1,4 @@
-import { useEffect, useState, createRef } from "react";
+import { useEffect, useState, createRef, React } from "react";
 import { PageHeader,Button,Form, Input,Row,Col, Radio,Tag, Collapse,Popconfirm, Modal, Result, Tooltip } from "antd";
 import {CloseOutlined} from '@ant-design/icons';
 import {caseTypeList, createCaseExecution} from '../../../../api/biz'
@@ -18,7 +18,7 @@ const CreateCase = () => {
     const [stepFilterText, setStepFilterText] = useState('');
     const [selectedStepData, setSelectedStepData] = useState([]);
     const [historyData, setHistoryData] = useState([]);
-    const [stepActiveKey, setStepActiveKey] = useState([]);
+    const [stepActiveKey, setStepActiveKey] = useState(['-1']);
     const [saveResult,setSaveResult] = useState({
         code: null,
         message: null
@@ -31,7 +31,7 @@ const CreateCase = () => {
     },[])
 
     useEffect(() => {
-       setStepActiveKey(selectedStepData.map(step => step.keyid));
+       setStepActiveKey([...selectedStepData.map(step => step.keyid),'-1']);
     },[selectedStepData])
 
     /*
@@ -63,7 +63,7 @@ const CreateCase = () => {
         setStepData(ct.caseTypeSteps);
         setSelectedStepData([]);
         setHistoryData([]);
-        setStepActiveKey([]);
+        setStepActiveKey(['-1']);
         caseForm.setFieldsValue({name: ct.name + moment().format('YYYYMMDDHHmm')});
     }
 
@@ -124,7 +124,7 @@ const CreateCase = () => {
     }
 
     const handleCollapseChange = (keys) => {
-        setStepActiveKey(keys);
+        setStepActiveKey([...keys,'-1']);
     }
 
     const handleSave = () => {
@@ -168,7 +168,7 @@ const CreateCase = () => {
         setSelectedStepData([]);
         setHistoryData([]);
         setStepData([]);
-        setStepActiveKey([]);
+        setStepActiveKey(['-1']);
         setSaveResult({
             code: null,
             message: null
@@ -191,12 +191,12 @@ const CreateCase = () => {
                 title="案件新增"
                 className="site-page-header"
                 subTitle="选择类型并设置案件事项后，创建案件"
-                extra={[<>
-                <Button key='1' disabled={historyData.length === 0} onClick={handleBackHistory}>撤销</Button>
-                <Popconfirm key="2" placement="bottom" title="确认保存吗" onConfirm={handleSave} okText="确定" cancelText="取消">
-                    <Button>设置完成并保存</Button>
-                </Popconfirm>
-                </>
+                extra={[<div key={1}>
+                    <Button disabled={historyData.length === 0} onClick={handleBackHistory}>撤销</Button>
+                    <Popconfirm placement="bottom" title="确认保存吗" onConfirm={handleSave} okText="确定" cancelText="取消">
+                        <Button >设置完成并保存</Button>
+                    </Popconfirm>
+                </div>
                 ]}
                 avatar={{src: newCaseIcon}}
             >
@@ -220,12 +220,12 @@ const CreateCase = () => {
                                     </Form.Item>
                                     <span style={{fontWeight: 600}}>可选步骤 <Input onChange={handleStepFilterText}></Input></span>
                                     <div className="case-type-source-step-area">
-                                        {
-                                            stepData.filter(step => stepFilterText.length === 0 || step.nameSearch.indexOf(stepFilterText) >= 0).map(step => (
-                                                <Button key={step.id} type="primary" style={{width: '95%'}} shape="round" block className="case-step-button" onClick={() => {handleClickSourceStep(step.id)}}>{step.name}</Button>
-                                            ))
-                                        }
-                                        </div>
+                                    {
+                                        stepData.filter(step => stepFilterText.length === 0 || step.nameSearch.indexOf(stepFilterText) >= 0).map(step => (
+                                            <Button key={step.id} type="primary" style={{width: '95%'}} shape="round" block className="case-step-button" onClick={() => {handleClickSourceStep(step.id)}}>{step.name}</Button>
+                                        ))
+                                    }
+                                    </div>
                                 </Col>
                                 <Col span={16} className="case-form-area">
                                     <span style={{fontWeight: 600}}>步骤及事项</span>
@@ -246,7 +246,7 @@ const CreateCase = () => {
                                                     {
                                                         (step.caseTypeStepItems && step.caseTypeStepItems.length > 0) ? 
                                                             step.caseTypeStepItems.map(item => (
-                                                                <Tooltip key={item.name}  placement="topLeft" title={item.lawTitle} color="gold" arrowPointAtCenter>
+                                                                <Tooltip key={item.id}  placement="topLeft" title={item.lawTitle} color="gold" arrowPointAtCenter>
                                                                     <Tag
                                                                         className="edit-tag"
                                                                         key={item.id}
@@ -262,6 +262,19 @@ const CreateCase = () => {
                                                 </Panel>
                                             ))
                                         }
+                                        <Panel header={
+                                                <div style={{width: '300px',display: 'flex'}}><div style={{wordBreak: 'keep-all',fontWeight: '600'}}>备注</div></div>
+                                            } key={'-1'} collapsible="header" >
+                                            <Tooltip placement="topLeft" title='备注' color="gold" arrowPointAtCenter>
+                                                <Tag
+                                                    className="edit-tag"
+                                                    closable={true}
+                                                    onClose={() => {}}
+                                                >
+                                                    自定义
+                                                </Tag>
+                                            </Tooltip>
+                                        </Panel>
                                     </Collapse>
                                 </Col>
                             </Row>

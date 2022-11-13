@@ -12,7 +12,8 @@ import {
     GoldOutlined,
     ProjectOutlined,
     FileSearchOutlined,
-    HolderOutlined
+    HolderOutlined,
+    TabletOutlined
 } from '@ant-design/icons';
 
 export const menus = [
@@ -78,6 +79,14 @@ export const menus = [
                 sort: 30,
                 icon: <ProjectOutlined />,
                 url: '/console/base-config/law-article',
+                role: 'ADMIN',
+            },
+            {
+                key: '/console/base-config/service-reminder',
+                label: '服务提醒',
+                sort: 40,
+                icon: <TabletOutlined />,
+                url: '/console/base-config/service-reminder',
                 role: 'ADMIN',
             }
         ]
@@ -182,6 +191,14 @@ export const menus = [
         sort: 70,
         icon: <FileSearchOutlined />,
         url: '/console/subject-data/law-article',
+        role: 'USER',
+    },
+    {
+        key: '/console/subject-data/service-reminder',
+        label: '服务提醒',
+        sort: 80,
+        icon: <TabletOutlined />,
+        url: '/console/subject-data/service-reminder',
         role: 'USER',
     },
 ];

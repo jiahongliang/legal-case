@@ -41,4 +41,7 @@ public class LegalCaseConstants {
     public static final Integer CASE_EXECUTION_STEP_ITEM_CREATED = 1;
     public static final Integer CASE_EXECUTION_STEP_ITEM_COMPLETED = 2;
 
+    public static final Integer CASE_EXECUTION_COMMENT_CREATED = 1;
+    public static final Integer CASE_EXECUTION_COMMENT_COMPLETED = 2;
+
 }

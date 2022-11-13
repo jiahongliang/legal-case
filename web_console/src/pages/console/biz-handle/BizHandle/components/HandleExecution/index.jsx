@@ -1,11 +1,9 @@
 import { useEffect, useState } from 'react';
-import { caseTypeList, createCaseExecution, handleCaseExecution } from '../../../../../../api/biz'
+import { handleCaseExecution } from '../../../../../../api/biz'
 import newCaseIcon from '../../../../../../assets/images/new-case.jpg';
-import { PageHeader, Button, Form, Input, Row, Col, Radio, Tag, Collapse, Popconfirm, Modal, Result, Tabs, Tooltip} from "antd";
-import { UserOutlined } from '@ant-design/icons';
+import { PageHeader, Button, Form,  Row, Col, Tag, Collapse, Popconfirm, Tooltip} from "antd";
 import './index.css'
 
-const { TabPane } = Tabs;
 const { Panel } = Collapse;
 
 const HandleExecution = (props) => {
@@ -66,12 +64,12 @@ const HandleExecution = (props) => {
                 title="已办案件"
                 className="site-page-header"
                 subTitle="设置案件已完成事件"
-                extra={[<>
+                extra={[<div key={1}>
                     <Button disabled={stepHistory.length === 0} onClick={handleBackHistory}>撤销</Button>
                     <Popconfirm key="1" placement="left" title="确认保存吗？" onConfirm={handleSave} okText="确定" cancelText="取消" disabled={data.status === 2}>
                         <Button disabled={data.status === 2}>保存</Button>
                     </Popconfirm>
-                    </>
+                    </div>
                 ]}
                 avatar={{ src: newCaseIcon }}
                 onBack={() => props.onExit()}

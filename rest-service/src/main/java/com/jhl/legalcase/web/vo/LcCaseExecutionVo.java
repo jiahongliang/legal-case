@@ -1,5 +1,6 @@
 package com.jhl.legalcase.web.vo;
 
+import com.jhl.legalcase.entity.LcCaseExecutionComment;
 import lombok.*;
 
 import java.util.LinkedHashMap;
@@ -19,6 +20,7 @@ public class LcCaseExecutionVo extends BaseVo {
     private String name;
     private String creator;
     private List<LcCaseExecutionStepVo> steps;
+    private List<LcCaseExecutionComment> comments;
     private Integer status = CASE_EXECUTION_CREATED;
 
     public static Map<String, String> excelHeaders() {

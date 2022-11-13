@@ -29,6 +29,8 @@ public class LcCaseExecutionService {
     @Autowired
     private LcCaseExecutionStepRepository caseExecutionStepRepository;
     @Autowired
+    private LcCaseExecutionCommentRepository caseExecutionCommentRepository;
+    @Autowired
     private LcCaseExecutionSuspectRepository caseExecutionSuspectRepository;
     @Autowired
     private LcCaseTypeRepository caseTypeRepository;
@@ -63,11 +65,14 @@ public class LcCaseExecutionService {
                 caseExecutionStepItemRepository.save(item);
             });
         });
+        caseExecutionVo.getComments().forEach(comment -> comment.setExecutionId(caseExecution.getId()));
+        caseExecutionCommentRepository.saveAll(caseExecutionVo.getComments());
     }
 
     public LcCaseExecutionVo get(@NonNull LcCaseExecution caseExecution) {
         List<LcCaseExecutionStep> steps = getSteps(caseExecution.getId());
         List<LcCaseExecutionStepItem> stepItems = getStepItems(caseExecution.getId());
+        List<LcCaseExecutionComment> comments = caseExecutionCommentRepository.findAllByExecutionId(caseExecution.getId());
 
         LcCaseExecutionVo executionVo = LcCaseExecutionVo.builder()
                 .steps(steps.stream().map(obj -> {
@@ -82,6 +87,7 @@ public class LcCaseExecutionService {
                             .toList());
                     return vo;
                 }).toList())
+                .comments(comments)
                 .build();
 
         BeanUtils.copyProperties(caseExecution, executionVo);
