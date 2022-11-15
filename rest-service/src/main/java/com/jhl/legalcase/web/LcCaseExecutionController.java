@@ -4,6 +4,7 @@ import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.jhl.legalcase.entity.LcCaseExecution;
 import com.jhl.legalcase.entity.LcCaseExecutionStepItem;
+import com.jhl.legalcase.repository.LcCaseExecutionCommentRepository;
 import com.jhl.legalcase.repository.LcCaseExecutionRepository;
 import com.jhl.legalcase.repository.LcCaseExecutionStepItemRepository;
 import com.jhl.legalcase.service.LcCaseExecutionService;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,6 +45,8 @@ public class LcCaseExecutionController {
     private LcCaseExecutionStepItemRepository caseExecutionStepItemRepository;
     @Autowired
     private LcCaseExecutionService caseExecutionService;
+    @Autowired
+    LcCaseExecutionCommentRepository lcCaseExecutionCommentRepository;
 
     @PostMapping("/list")
     public WebResp<LcCaseExecutionVo, Long> list(@RequestBody WebReq<LcCaseExecution, Long> req) throws ClassNotFoundException {
@@ -102,6 +106,9 @@ public class LcCaseExecutionController {
             return build;
         }).toList();
         caseExecutionStepItemRepository.saveAll(lcCaseExecutionStepItems);
+        if(!CollectionUtils.isEmpty(req.getEntity().getComments())) {
+            lcCaseExecutionCommentRepository.saveAll(req.getEntity().getComments());
+        }
         return WebResp.newInstance();
     }
 }

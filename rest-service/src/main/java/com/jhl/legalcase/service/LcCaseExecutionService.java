@@ -65,7 +65,12 @@ public class LcCaseExecutionService {
                 caseExecutionStepItemRepository.save(item);
             });
         });
-        caseExecutionVo.getComments().forEach(comment -> comment.setExecutionId(caseExecution.getId()));
+        caseExecutionVo.getComments().forEach(comment -> {
+            if (comment.getId() < 0) {
+                comment.setId(null);
+            }
+            comment.setExecutionId(caseExecution.getId());
+        });
         caseExecutionCommentRepository.saveAll(caseExecutionVo.getComments());
     }
 

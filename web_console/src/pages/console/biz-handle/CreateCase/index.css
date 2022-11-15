@@ -41,3 +41,8 @@
 .ant-form-item-label {
     font-weight: 600;
 }
+
+.site-tag-plus {
+    background: #fff;
+    border-style: dashed;
+  }

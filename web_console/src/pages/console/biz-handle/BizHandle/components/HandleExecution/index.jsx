@@ -9,22 +9,22 @@ const { Panel } = Collapse;
 const HandleExecution = (props) => {
     const [data, setData] = useState({});
     const [caseTypeData, setCaseTypeData] = useState([]);
-    const [stepActiveKey, setStepActiveKey] = useState([]);
+    const [stepActiveKey, setStepActiveKey] = useState([-1]);
     const [stepHistory, setStepHistory] = useState([]);
 
     useEffect(() => {
         // console.log(props)
         setData(props.data);
         setCaseTypeData(props.caseTypeData);
-        setStepActiveKey(props.data.steps ? props.data.steps.map(step => step.id) : [])
+        setStepActiveKey(props.data.steps ? [...props.data.steps.map(step => step.id), -1] : [-1])
     }, []);
 
     useEffect(() => {
-        // console.log(data)
+         console.log('data',data)
     }, [data]);
 
     const handleCollapseChange = (keys) => {
-        setStepActiveKey(keys);
+        setStepActiveKey([...keys, -1]);
     }
 
     const handleSave = () => { 
@@ -56,6 +56,14 @@ const HandleExecution = (props) => {
             ...data,
             steps
         })
+    }
+
+    const handleCloseComment = (id) => {
+        data.comments.forEach(comment => {
+            if(comment.id && comment.id === id) {
+                comment.status = '2';
+            }
+        });
     }
 
     return (
@@ -124,6 +132,21 @@ const HandleExecution = (props) => {
                                         </Panel>
                                     )) : []
                                 }
+                                <Panel header={<b>备注</b>} key={-1} collapsible="header">
+                                    {
+                                        data.comments?.filter(comment => comment.status === 1).map((item,index) => {
+                                            return (
+                                                <Tag key={item.id}
+                                                    className="edit-tag"
+                                                    closable={true}
+                                                    onClose={() => handleCloseComment(item.id)}
+                                                >
+                                                    {item.name}
+                                                </Tag>
+                                            )
+                                        })
+                                    }
+                                </Panel>
                             </Collapse>
                         </Col>
                 </Row>

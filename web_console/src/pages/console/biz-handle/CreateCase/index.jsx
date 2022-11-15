@@ -1,6 +1,6 @@
-import { useEffect, useState, createRef, React } from "react";
+import { useEffect, useState, useRef, createRef, React } from "react";
 import { PageHeader,Button,Form, Input,Row,Col, Radio,Tag, Collapse,Popconfirm, Modal, Result, Tooltip } from "antd";
-import {CloseOutlined} from '@ant-design/icons';
+import {CloseOutlined, PlusOutlined} from '@ant-design/icons';
 import {caseTypeList, createCaseExecution} from '../../../../api/biz'
 import moment from 'moment'
 import newCaseIcon from '../../../../assets/images/new-case.jpg';
@@ -11,7 +11,13 @@ const { Panel } = Collapse;
 const CreateCase = () => {
     const [caseForm] = Form.useForm();
     //const [suspectInputVisible, setSuspectInputVisible] = useState(false);
-    //const [suspectsData, setSuspectsData] = useState([]);
+    const [commentsData, setCommentsData] = useState([]);
+    const [commentInputVisible, setCommentInputVisible] = useState(false);
+    const [commentInputValue, setCommentInputValue] = useState('');
+    const commentInputRef = useRef(null);
+    const commentEditInputRef = useRef(null);
+    const commentIdRef = useRef(0);
+
     const suspectInputRef = createRef(); 
     //const [suspectInputValue, setSuspectInputValue] = useState('');
     const [stepData, setStepData] = useState([]);
@@ -29,6 +35,46 @@ const CreateCase = () => {
     useEffect(() => {
         loadCaseTypeData();
     },[])
+
+    useEffect(() => {
+        if(commentInputVisible) {
+            commentInputRef.current?.focus();
+        }
+    },[commentInputVisible]);
+
+    useEffect(() => {
+        commentEditInputRef.current?.focus();
+    }, [commentInputValue]);
+
+    const handleCloseComment = (id) => {
+        commentsData.forEach(comment => {
+            if(comment.id && comment.id === id) {
+                comment.status = '2';
+            }
+        });
+    }
+
+    const showCommentInput = () => {
+        setCommentInputVisible(true);
+    }
+
+    const handleCommentInputChange = (e) => {
+        setCommentInputValue(e.target.value);
+    }
+
+    const handleCommentInputConfirm = () => {
+        if(commentInputValue) {
+            commentIdRef.current--;
+            setCommentsData([...commentsData,{
+                id: commentIdRef.current,
+                name: commentInputValue,
+                status: 1
+            }]);
+        }
+        console.log("commentsData",commentsData);
+        setCommentInputValue('');
+        setCommentInputVisible(false);
+    }
 
     useEffect(() => {
        setStepActiveKey([...selectedStepData.map(step => step.keyid),'-1']);
@@ -150,7 +196,8 @@ const CreateCase = () => {
             entity:{
                 name,
                 typeId,
-                steps: selectedStepData.filter(sd => sd.caseTypeStepItems && sd.caseTypeStepItems.length > 0)
+                steps: selectedStepData.filter(sd => sd.caseTypeStepItems && sd.caseTypeStepItems.length > 0),
+                comments: commentsData
             }
         }
 
@@ -169,6 +216,7 @@ const CreateCase = () => {
         setHistoryData([]);
         setStepData([]);
         setStepActiveKey(['-1']);
+        setCommentsData([]);
         setSaveResult({
             code: null,
             message: null
@@ -265,15 +313,39 @@ const CreateCase = () => {
                                         <Panel header={
                                                 <div style={{width: '300px',display: 'flex'}}><div style={{wordBreak: 'keep-all',fontWeight: '600'}}>备注</div></div>
                                             } key={'-1'} collapsible="header" >
-                                            <Tooltip placement="topLeft" title='备注' color="gold" arrowPointAtCenter>
-                                                <Tag
-                                                    className="edit-tag"
-                                                    closable={true}
-                                                    onClose={() => {}}
-                                                >
-                                                    自定义
-                                                </Tag>
-                                            </Tooltip>
+                                                {
+                                                    commentsData.filter(comment => comment.status === 1).map((item,index) => {
+                                                        return (
+                                                            <Tag key={item.id}
+                                                                className="edit-tag"
+                                                                closable={true}
+                                                                onClose={() => handleCloseComment(item.id)}
+                                                            >
+                                                                {item.name}
+                                                            </Tag>
+                                                        )
+                                                    })
+                                                }
+                                                
+
+                                                {commentInputVisible && (
+                                                    <Input
+                                                    ref={commentInputRef}
+                                                    type="text"
+                                                    size="small"
+                                                    className="tag-input"
+                                                    value={commentInputValue}
+                                                    onChange={handleCommentInputChange}
+                                                    onBlur={handleCommentInputConfirm}
+                                                    onPressEnter={handleCommentInputConfirm}
+                                                    />
+                                                )}
+
+                                                {!commentInputVisible && (
+                                                    <Tag className="site-tag-plus" onClick={showCommentInput}>
+                                                        <PlusOutlined /> 新增
+                                                    </Tag>
+                                                )}
                                         </Panel>
                                     </Collapse>
                                 </Col>
