@@ -3,7 +3,9 @@ package com.jhl.legalcase.web;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.jhl.legalcase.entity.LcCaseExecution;
+import com.jhl.legalcase.entity.LcCaseExecutionComment;
 import com.jhl.legalcase.entity.LcCaseExecutionStepItem;
+import com.jhl.legalcase.entity.SysUser;
 import com.jhl.legalcase.repository.LcCaseExecutionCommentRepository;
 import com.jhl.legalcase.repository.LcCaseExecutionRepository;
 import com.jhl.legalcase.repository.LcCaseExecutionStepItemRepository;
@@ -11,24 +13,26 @@ import com.jhl.legalcase.service.LcCaseExecutionService;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.util.webmsg.WebResp;
 import com.jhl.legalcase.web.vo.LcCaseExecutionStepItemVo;
+import com.jhl.legalcase.web.vo.LcCaseExecutionStepVo;
 import com.jhl.legalcase.web.vo.LcCaseExecutionVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -106,9 +110,108 @@ public class LcCaseExecutionController {
             return build;
         }).toList();
         caseExecutionStepItemRepository.saveAll(lcCaseExecutionStepItems);
-        if(!CollectionUtils.isEmpty(req.getEntity().getComments())) {
+        if (!CollectionUtils.isEmpty(req.getEntity().getComments())) {
             lcCaseExecutionCommentRepository.saveAll(req.getEntity().getComments());
         }
         return WebResp.newInstance();
+    }
+
+    @GetMapping("/export-one/{id}")
+    public void export(HttpServletResponse response, @PathVariable Long id) throws ClassNotFoundException, IOException {
+        LcCaseExecution execution = caseExecutionRepository.getReferenceById(id);
+        LcCaseExecutionVo executionVo = caseExecutionService.get(execution);
+
+        AbstractAuthenticationToken token = (AbstractAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        final SysUser user = (SysUser) token.getDetails();
+
+        ExcelWriter writer = ExcelUtil.getWriter(true);
+
+        CellStyle headCellStyle1 = writer.getHeadCellStyle();
+        headCellStyle1.setAlignment(HorizontalAlignment.CENTER);
+        Font head1Font = writer.createFont();
+        head1Font.setFontHeightInPoints((short) 14);
+        headCellStyle1.setFont(head1Font);
+        headCellStyle1.setFillBackgroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        writer.merge(0, 0, 0, 3, "案件审核登记表", headCellStyle1);
+        writer.setRowHeight(0, 30);
+        writer.passCurrentRow();
+
+
+        CellStyle cellStyle = writer.getCellStyle();
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setBorderRight(BorderStyle.THIN);
+        writer.merge(1, 1, 1, 3, "", cellStyle);
+        writer.writeRow(Arrays.asList("案件名称", executionVo.getName()));
+        writer.setRowStyleIfHasData(1, cellStyle);
+        writer.setRowHeight(1, 25);
+
+
+        writer.writeRow(Arrays.asList("办案单位", user.getDeptName(), "办案民警", user.getName()));
+        writer.setRowHeight(2, 25);
+
+
+        writer.writeRow(Arrays.asList("环节", "嫌疑人", "事项", "备注"));
+        CellStyle cellStyle1 = writer.createCellStyle();
+        cellStyle1.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle1.setBorderTop(BorderStyle.THIN);
+        cellStyle1.setBorderBottom(BorderStyle.THIN);
+        cellStyle1.setBorderLeft(BorderStyle.THIN);
+        cellStyle1.setBorderRight(BorderStyle.THIN);
+        Font font = writer.createFont();
+        font.setFontHeightInPoints((short) 11);
+        font.setBold(true);
+        cellStyle1.setFont(font);
+        writer.setRowStyleIfHasData(3, cellStyle1);
+        writer.setRowHeight(3, 25);
+
+        int rowIndex = 4;
+        for (LcCaseExecutionStepVo step : executionVo.getSteps()) {
+            int stepStartIndex = rowIndex;
+            for (LcCaseExecutionStepItemVo item : step.getCaseTypeStepItems()) {
+                writer.writeRow(Arrays.asList(step.getName(), step.getSuspect(), item.getName(), item.getLawTitle()));
+                writer.setRowHeight(rowIndex, 25);
+                rowIndex++;
+            }
+            if (rowIndex - 1 > stepStartIndex) {
+                writer.merge(stepStartIndex, rowIndex - 1, 0, 0, step.getName(), cellStyle);
+                writer.merge(stepStartIndex, rowIndex - 1, 1, 1, step.getSuspect(), cellStyle);
+            }
+        }
+
+        int commentStartRowIndex = rowIndex;
+        for (LcCaseExecutionComment comment : executionVo.getComments()) {
+            writer.merge(rowIndex, rowIndex, 1, 3, comment.getName(), cellStyle);
+            writer.setRowHeight(rowIndex, 25);
+            writer.passCurrentRow();
+            rowIndex++;
+        }
+
+        if (rowIndex > commentStartRowIndex) {
+            writer.merge(commentStartRowIndex, rowIndex - 1, 0, 0, "备注", cellStyle);
+            writer.setRowHeight(rowIndex, 25);
+        } else {
+            writer.merge(rowIndex, rowIndex, 1, 3, "-", cellStyle);
+            writer.writeRow(Arrays.asList("备注", "-"));
+            writer.setRowStyleIfHasData(rowIndex, cellStyle);
+            writer.setRowHeight(rowIndex, 25);
+        }
+
+        writer.setColumnWidth(0, 15);
+        writer.setColumnWidth(1, 30);
+        writer.setColumnWidth(2, 15);
+        writer.setColumnWidth(3, 30);
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
+        String fileName = URLEncoder.encode("案件审核登记表", "UTF-8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+
+        ServletOutputStream out = response.getOutputStream();
+        writer.flush(out, true);
+        out.close();
+        writer.close();
     }
 }

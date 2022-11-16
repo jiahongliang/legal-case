@@ -66,6 +66,10 @@ const HandleExecution = (props) => {
         });
     }
 
+    const handleDownload = () => {
+        window.open("/legal-case/case-execution/export-one/" + data.id);
+    }
+
     return (
         <>
             <PageHeader
@@ -77,6 +81,7 @@ const HandleExecution = (props) => {
                     <Popconfirm key="1" placement="left" title="确认保存吗？" onConfirm={handleSave} okText="确定" cancelText="取消" disabled={data.status === 2}>
                         <Button disabled={data.status === 2}>保存</Button>
                     </Popconfirm>
+                    <Button onClick={handleDownload}>导出</Button>
                     </div>
                 ]}
                 avatar={{ src: newCaseIcon }}
