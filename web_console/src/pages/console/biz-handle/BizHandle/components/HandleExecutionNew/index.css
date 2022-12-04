@@ -1,0 +1,63 @@
+.case-execution-handle-area {
+    border: 1px solid #efefef;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0px 0px 6px rgba(0,0,0,0.2);
+    height: calc(100vh - 190px);
+    overflow: auto;
+}
+
+.case-execution-handle-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.case-form-step-data {
+    height: calc(100vh - 300px);
+    overflow: auto;
+}
+
+.case-form-area {
+    border: 1px solid #efefef;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0px 0px 6px rgba(0,0,0,0.2);
+    height: calc(100vh - 190px);
+    overflow: auto;
+}
+
+.case-form-step-data {
+    height: calc(100vh - 245px);
+    overflow: auto;
+    border: 1px solid #EFEFEF;
+    overflow: auto;
+}
+
+.site-tag-plus {
+    background: #fff;
+    border-style: dashed;
+  }
+
+.edit-tag {
+    user-select: none;
+}
+.tag-input {
+    width: 78px;
+    margin-right: 8px;
+    vertical-align: top;
+}
+
+.case-step-button {
+    margin: 3px;
+}
+
+.case-type-source-step-area {
+    height: calc(100vh - 419px);
+    overflow: auto;
+    border: 1px solid #efefef;
+    margin-top: 10px;
+}
+
+.ant-form-item-label {
+    font-weight: 600;
+}

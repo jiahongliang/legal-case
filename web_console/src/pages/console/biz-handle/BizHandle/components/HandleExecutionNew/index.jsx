@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { handleCaseExecution, downloadCase } from '../../../../../../api/biz'
 import newCaseIcon from '../../../../../../assets/images/new-case.jpg';
-import { PageHeader, Button, Form,  Row, Col, Tag, Collapse, Popconfirm, Tooltip, message} from "antd";
+import { PageHeader, Button, Form,  Row, Col, Tag, Collapse, Popconfirm, Tooltip, Input, message} from "antd";
+import moment from 'moment'
 import './index.css'
 
 const { Panel } = Collapse;
@@ -11,23 +12,79 @@ const HandleExecution = (props) => {
     const [caseTypeData, setCaseTypeData] = useState([]);
     const [stepActiveKey, setStepActiveKey] = useState([-1]);
     const [stepHistory, setStepHistory] = useState([]);
+    const [stepData, setStepData] = useState([]);
+    const [stepFilterText, setStepFilterText] = useState('');
 
     useEffect(() => {
-        // console.log(props)
-        setData(props.data);
+        let ct = props.caseTypeData.find(o => o.id === props.data.typeId);
+        /*props.data.steps = props.data.steps ? [
+            props.data.steps.map(step => {
+                let o = ct.caseTypeSteps.find(s => s.name === step.name);
+                return {...step, orderValue: o ? o.orderValue : 0}
+            })
+        ] : [];*/
+        setData({...props.data, steps: props.data.steps ? [
+            ...props.data.steps.map(step => {
+                let o = ct.caseTypeSteps.find(s => s.name === step.name);
+                return {...step, orderValue: o ? o.orderValue : 0}
+            }).sort((v1,v2) => {
+                let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
+                let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+                return s1.localeCompare(s2);
+            })
+        ] : []});
         setCaseTypeData(props.caseTypeData);
-        setStepActiveKey(props.data.steps ? [...props.data.steps.map(step => step.id), -1] : [-1])
+        setStepActiveKey(props.data.steps ? [...props.data.steps.map(step => step.id), -1] : [-1]);
+        setStepData(ct.caseTypeSteps);
     }, []);
 
     useEffect(() => {
          console.log('data',data)
+         setStepActiveKey(data.steps ? [...data.steps.map(step => step.keyid ? step.keyid : step.id), -1] : [-1]);
     }, [data]);
+
+    const handleStepFilterText = (e) => {
+        setStepFilterText(e.target.value);
+    }
+
+    const handleClickSourceStep = (stepId) => {
+       
+        let clickedStep = stepData.find(step => step.id === stepId);
+        clickedStep.id = null;
+        console.log('clickedStep',clickedStep);
+        stepHistory.push(data.steps);
+        setStepHistory(stepHistory);
+
+        let newStepData = [...data.steps, {...clickedStep,keyid: moment().format('X') + '' + data.steps.length}];
+        console.log('newStepData:',newStepData)
+        newStepData = newStepData.sort((v1,v2) => {
+            let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
+            let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+            return s1.localeCompare(s2);
+        });
+
+        setData({
+            ...data,
+            steps: newStepData
+        })
+ /*
+        
+        let newStepData = [...selectedStepData, {...clickedStep,keyid: moment().format('X') + '' + selectedStepData.length}];
+        newStepData = newStepData.sort((v1,v2) => {
+            let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
+            let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+            return s1.localeCompare(s2);
+        });
+        setSelectedStepData(newStepData);
+        */
+    }
 
     const handleCollapseChange = (keys) => {
         setStepActiveKey([...keys, -1]);
     }
 
     const handleSave = () => { 
+        console.log('saving:',data)
         let param = {
             entity: data
         }
@@ -42,8 +99,8 @@ const HandleExecution = (props) => {
         setData({
             ...data,
             steps: data.steps.map(step =>
-                step.id === stepId ? ({
-                    ...step, caseTypeStepItems: step.caseTypeStepItems.map(item => itemId === item.id ? ({ ...item, status: 2 }) : item)
+                (step.id + '') === (stepId + '') ? ({
+                    ...step, caseTypeStepItems: step.caseTypeStepItems.map(item => itemId === (item.keyid ? item.keyid : item.id) ? ({ ...item, status: 2 }) : item)
                 }) : step
             )
         })
@@ -64,6 +121,34 @@ const HandleExecution = (props) => {
                 comment.status = '2';
             }
         });
+    }
+
+    const handleSuspectChange = (keyId,value) => {
+        console.log('suspect value:',value)
+        stepHistory.push(data.steps);
+        setStepHistory(stepHistory);
+        setData({
+            ...data,
+            steps: data.steps.map(step =>{
+                let x = step.keyid ? step.keyid : step.id;
+                x = x + '';
+                return x === keyId ? ({...step, suspect: value}) : step 
+            }
+                
+            ).sort((v1,v2) => {
+                let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
+                let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+                return s1.localeCompare(s2);
+            })
+        })
+
+        /*historyData.push(selectedStepData);
+        setHistoryData(historyData);
+        setSelectedStepData(selectedStepData.map(step => step.keyid === keyId ? {...step, suspect: value} : step).sort((v1,v2) => {
+            let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
+            let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+            return s1.localeCompare(s2);
+        }));*/
     }
 
     const handleDownload = () => {
@@ -124,7 +209,7 @@ const HandleExecution = (props) => {
             >
             <Form layout="vertical">
                 <Row gutter={16} className="case-form-row" justify="space-between">
-                        <Col span={5} className="case-form-area">
+                        <Col span={8} className="case-form-area">
                             <Form.Item label="类型">
                                 {caseTypeData && caseTypeData.length > 0 ? caseTypeData.find(ctd => ctd.id === data.typeId).name : ""}
                             </Form.Item>
@@ -133,15 +218,16 @@ const HandleExecution = (props) => {
                                 {data.name}
                             </Form.Item>
                             
-                            <Form.Item label="创建时间">
-                                {data.createdTime}
-                            </Form.Item>
-
-                            <Form.Item label="最后修改时间">
-                                {data.lastmodifiedTime}
-                            </Form.Item>
+                            <span style={{fontWeight: 600}}>可选步骤 <Input onChange={handleStepFilterText}></Input></span>
+                            <div className="case-type-source-step-area">
+                            {
+                                stepData.filter(step => stepFilterText.length === 0 || step.nameSearch.indexOf(stepFilterText) >= 0).map(step => (
+                                    <Button key={step.id} type="primary" style={{width: '95%'}} shape="round" block className="case-step-button" onClick={() => {handleClickSourceStep(step.id)}}>{step.name}</Button>
+                                ))
+                            }
+                            </div>
                         </Col>
-                        <Col span={19} className="case-form-area">
+                        <Col span={16} className="case-form-area">
                             <span style={{fontWeight: 600}}>步骤及事项</span>
                             <Collapse
                                 activeKey={stepActiveKey}
@@ -152,16 +238,17 @@ const HandleExecution = (props) => {
                             >
                                 {
                                     data.steps ? data.steps.map(step => (
-                                        <Panel header={<>{step.name}-{step.suspect}</>} key={step.id} collapsible="header">
+                                        <Panel header={<div style={{width: '300px',display: 'flex'}}><div style={{wordBreak: 'keep-all'}}>{step.name}</div><Input style={{float: "right",marginLeft: '5px'}} size="small" placeholder="对象名称" defaultValue={step.suspect ? step.suspect : ''} onBlur={(event) => handleSuspectChange(step.keyid ? step.keyid : step.id,event.target.value)} onClick={(event) => {event.stopPropagation()}}></Input></div>}
+                                         key={step.keyid ? step.keyid : step.id} collapsible="header">
                                             {
                                                 (step.caseTypeStepItems && step.caseTypeStepItems.length > 0) ? 
-                                                    step.caseTypeStepItems.map(item => item.status === 1 ? (
+                                                    step.caseTypeStepItems.map(item => (!item.status || item.status === 1) ? (
                                                         <Tooltip key={item.name}  placement="topLeft" title={item.lawTitle} color="gold" arrowPointAtCenter>
                                                             <Tag
                                                                 className="edit-tag"
                                                                 key={item.id}
                                                                 closable={data.status === 1 ? true : false}
-                                                                onClose={() => handleStepItemTagClose(step.id,item.id)}
+                                                                onClose={() => handleStepItemTagClose(step.id,step.keyid ? step.keyid : step.id)}
                                                             >
                                                                 {item.name}
                                                             </Tag>

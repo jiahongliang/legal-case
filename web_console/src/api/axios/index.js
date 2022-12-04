@@ -31,6 +31,12 @@ export let serviceUpload = axios.create({
     },
 });
 
+export let http = axios.create({
+    headers: {
+        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+    },
+});
+
 function interceptors(service) {
     const browserHistory = createBrowserHistory();
     service.interceptors.request.use(
@@ -126,3 +132,4 @@ function errorLog(err) {
 interceptors(service);
 interceptors(serviceJson);
 interceptors(serviceUpload);
+interceptors(http);

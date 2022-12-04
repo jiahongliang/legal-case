@@ -36,7 +36,7 @@ public class SysLoginLog extends JpaAudit {
 
     private String ip;
 
-    private String system;
+    private String systemName;
 
     private String browser;
 

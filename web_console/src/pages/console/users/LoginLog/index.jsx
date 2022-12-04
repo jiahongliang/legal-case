@@ -45,7 +45,7 @@ const LoginLog = () => {
         },
         {
             title: '操作系统',
-            dataIndex: 'system',
+            dataIndex: 'systemName',
             onHeaderCell: function (column) {
                 column.align = "center"
             }

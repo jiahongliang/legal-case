@@ -36,14 +36,14 @@ public class SysLoginLogService {
         String userAgent = request.getHeader("user-agent");
         UserAgent ua = UserAgent.parseUserAgentString(userAgent);
         String browser = ua.getBrowser().getName() + "-" + ua.getBrowserVersion();
-        String system = ua.getOperatingSystem().toString();
+        String systemName = ua.getOperatingSystem().toString();
         String deviceType = ua.getOperatingSystem().getDeviceType().getName();
         String nameSearch = "";
         if (user != null && user.getName() != null) {
             nameSearch = user.getName() + "|" + PinyinUtil.toFirstChar(user.getName());
         }
 
-        SysLoginLog entity = SysLoginLog.builder().sessionId(sessionId).userId(user.getId()).name(user.getName()).nameSearch(nameSearch).ip(ip).browser(browser).system(system).deviceType(deviceType).build();
+        SysLoginLog entity = SysLoginLog.builder().sessionId(sessionId).userId(user.getId()).name(user.getName()).nameSearch(nameSearch).ip(ip).browser(browser).systemName(systemName).deviceType(deviceType).build();
         loginLogRepository.save(entity);
     }
 

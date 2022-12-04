@@ -11,7 +11,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-@Component
+//@Component
 public class LegalCasePinyinHandle implements CommandLineRunner {
     @Autowired
     LcSubjectRepository subjectRepository;

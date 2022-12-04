@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from 'react-router';
 import { Form, Input, Checkbox, Button, Select, Space, Popconfirm, Table } from 'antd'
-import HandleExecution from "./components/HandleExecution";
-import { caseTypeList, caseExecutionList, completeCaseExecution} from "../../../../api/biz"
+import HandleExecution from "./components/HandleExecutionNew";
+import { caseTypeList, caseExecutionList, completeCaseExecution, removeCaseExecution} from "../../../../api/biz"
 import {LOGIN_USER_TOKEN} from '../../../../util/Constants'
 import './index.css'
 
@@ -28,6 +29,8 @@ const BizHandle = () => {
     const [caseTypeData, setCaseTypeData] = useState([]);
 
     const [detailData, setDetailData] = useState(null)
+
+    let navigate = useNavigate();
 
     useEffect(() => {
         loadCaseTypeData();
@@ -221,14 +224,30 @@ const BizHandle = () => {
                             <Popconfirm placement="left" title="确定完成该案件吗？" onConfirm={() => handleFinishExecution(record)} okText="确认" cancelText="取消">
                                 <Button size="small">完成</Button>
                             </Popconfirm>
-                        ) : "" 
+                        ) : (<Button size="small" disabled={true}>完成</Button>)
                     }
+                    <Popconfirm placement="left" title="确定删除该案件吗？" onConfirm={() => handleRemove(record)} okText="确认" cancelText="取消">
+                        <Button size="small">删除</Button>
+                    </Popconfirm>
                 </Space>
             ),
             align: "center",
             width: 100
         }
     ];
+
+    const createNewInstance = () => {
+        navigate("/console/biz-handle/new-instance");
+    }
+
+    const handleRemove = (data) => {
+        let param = {
+            entity: data
+        }
+        removeCaseExecution(param).then(res => {
+            loadData();
+        });
+    }
 
     return detailData == null ? (
         <>
@@ -269,6 +288,11 @@ const BizHandle = () => {
                 <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                     <Button type="primary" size="small" htmlType="submit">
                         查询
+                    </Button>
+                </Form.Item>
+                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Button size="small" onClick={createNewInstance}>
+                        新增
                     </Button>
                 </Form.Item>
             </Form>

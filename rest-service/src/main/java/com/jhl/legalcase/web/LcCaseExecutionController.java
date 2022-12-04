@@ -2,13 +2,11 @@ package com.jhl.legalcase.web;
 
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
-import com.jhl.legalcase.entity.LcCaseExecution;
-import com.jhl.legalcase.entity.LcCaseExecutionComment;
-import com.jhl.legalcase.entity.LcCaseExecutionStepItem;
-import com.jhl.legalcase.entity.SysUser;
+import com.jhl.legalcase.entity.*;
 import com.jhl.legalcase.repository.LcCaseExecutionCommentRepository;
 import com.jhl.legalcase.repository.LcCaseExecutionRepository;
 import com.jhl.legalcase.repository.LcCaseExecutionStepItemRepository;
+import com.jhl.legalcase.repository.LcCaseExecutionStepRepository;
 import com.jhl.legalcase.service.LcCaseExecutionService;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.util.webmsg.WebResp;
@@ -37,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_STEP_ITEM_COMPLETED;
+import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_STEP_ITEM_CREATED;
 
 @Slf4j
 @RestController
@@ -47,6 +46,8 @@ public class LcCaseExecutionController {
     private LcCaseExecutionRepository caseExecutionRepository;
     @Autowired
     private LcCaseExecutionStepItemRepository caseExecutionStepItemRepository;
+    @Autowired
+    private LcCaseExecutionStepRepository lcCaseExecutionStepRepository;
     @Autowired
     private LcCaseExecutionService caseExecutionService;
     @Autowired
@@ -100,10 +101,36 @@ public class LcCaseExecutionController {
     }
 
     @Transactional
+    @PostMapping("/remove")
+    public WebResp<LcCaseExecutionVo, Long> remove(@RequestBody WebReq<LcCaseExecutionVo, Long> req) throws ClassNotFoundException {
+        Assert.notNull(req.getEntity(), "参数不能为空");
+        caseExecutionService.removeCaseExcution(req.getEntity());
+        return WebResp.newInstance();
+    }
+
+    @Transactional
     @PostMapping("/handle")
     public WebResp<LcCaseExecutionVo, Long> handle(@RequestBody WebReq<LcCaseExecutionVo, Long> req) throws ClassNotFoundException {
         Assert.notNull(req.getEntity(), "参数不能为空");
-        List<LcCaseExecutionStepItemVo> collect = req.getEntity().getSteps().stream().collect(() -> new ArrayList<>(), (list, step) -> list.addAll(step.getCaseTypeStepItems()), (one, two) -> one.addAll(two));
+        List<LcCaseExecutionStepItemVo> collect = req.getEntity().getSteps().stream().collect(() ->
+                        new ArrayList<>(),
+                (list, step) -> {
+                    LcCaseExecutionStep lcCaseExecutionStep = LcCaseExecutionStep.builder()
+                            .executionId(req.getEntity().getId())
+                            .name(step.getName())
+                            .suspect(step.getSuspect())
+                            .id(step.getId()).build();
+                    if (lcCaseExecutionStep.getId() == null) {
+                        lcCaseExecutionStepRepository.save(lcCaseExecutionStep);
+                    }
+                    list.addAll(step.getCaseTypeStepItems().stream().map(item -> {
+                        item.setStepId(lcCaseExecutionStep.getId());
+                        item.setExecutionId(req.getEntity().getId());
+                        return item;
+                    }).toList());
+                },
+                (one, two) -> one.addAll(two)
+        );
         List<LcCaseExecutionStepItem> lcCaseExecutionStepItems = collect.stream().map(item -> {
             LcCaseExecutionStepItem build = LcCaseExecutionStepItem.builder().build();
             BeanUtils.copyProperties(item, build);
@@ -126,34 +153,20 @@ public class LcCaseExecutionController {
 
         ExcelWriter writer = ExcelUtil.getWriter(true);
 
+        int rowIndex = 0;
+
         CellStyle headCellStyle1 = writer.getHeadCellStyle();
         headCellStyle1.setAlignment(HorizontalAlignment.CENTER);
         Font head1Font = writer.createFont();
         head1Font.setFontHeightInPoints((short) 14);
         headCellStyle1.setFont(head1Font);
         headCellStyle1.setFillBackgroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        writer.merge(0, 0, 0, 3, "案件审核登记表", headCellStyle1);
-        writer.setRowHeight(0, 30);
+        writer.merge(rowIndex, 0, rowIndex, 3, "案件审核登记表", headCellStyle1);
+        writer.setRowHeight(rowIndex, 30);
         writer.passCurrentRow();
 
+        rowIndex++;
 
-        CellStyle cellStyle = writer.getCellStyle();
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        cellStyle.setBorderTop(BorderStyle.THIN);
-        cellStyle.setBorderBottom(BorderStyle.THIN);
-        cellStyle.setBorderLeft(BorderStyle.THIN);
-        cellStyle.setBorderRight(BorderStyle.THIN);
-        writer.merge(1, 1, 1, 3, "", cellStyle);
-        writer.writeRow(Arrays.asList("案件名称", executionVo.getName()));
-        writer.setRowStyleIfHasData(1, cellStyle);
-        writer.setRowHeight(1, 25);
-
-
-        writer.writeRow(Arrays.asList("办案单位", user.getDeptName(), "办案民警", user.getName()));
-        writer.setRowHeight(2, 25);
-
-
-        writer.writeRow(Arrays.asList("环节", "嫌疑人", "事项", "备注"));
         CellStyle cellStyle1 = writer.createCellStyle();
         cellStyle1.setAlignment(HorizontalAlignment.CENTER);
         cellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
@@ -165,11 +178,36 @@ public class LcCaseExecutionController {
         font.setFontHeightInPoints((short) 11);
         font.setBold(true);
         cellStyle1.setFont(font);
-        writer.setRowStyleIfHasData(3, cellStyle1);
-        writer.setRowHeight(3, 25);
+        writer.merge(rowIndex, rowIndex, 1, 2, "", cellStyle1);
+        writer.writeRow(Arrays.asList("办案单位", "案件名称", "", "办案人"));
+        writer.setRowStyleIfHasData(rowIndex, cellStyle1);
+        writer.setRowHeight(rowIndex, 25);
 
-        int rowIndex = 4;
+        rowIndex++;
+
+        CellStyle cellStyle = writer.getCellStyle();
+        cellStyle.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle.setBorderTop(BorderStyle.THIN);
+        cellStyle.setBorderBottom(BorderStyle.THIN);
+        cellStyle.setBorderLeft(BorderStyle.THIN);
+        cellStyle.setBorderRight(BorderStyle.THIN);
+        writer.merge(rowIndex, rowIndex, 1, 2, "", cellStyle);
+        writer.writeRow(Arrays.asList(user.getDeptName(), executionVo.getName(), "", user.getName()));
+        writer.setRowStyleIfHasData(rowIndex, cellStyle);
+        writer.setRowHeight(rowIndex, 25);
+
+        rowIndex++;
+
+        writer.writeRow(Arrays.asList("环节", "嫌疑人", "事项", "备注"));
+        writer.setRowStyleIfHasData(rowIndex, cellStyle1);
+        writer.setRowHeight(rowIndex, 25);
+
+        rowIndex++;
+
         for (LcCaseExecutionStepVo step : executionVo.getSteps()) {
+            if (!CollectionUtils.isEmpty(step.getCaseTypeStepItems())) {
+                step.setCaseTypeStepItems(step.getCaseTypeStepItems().stream().filter(item -> CASE_EXECUTION_STEP_ITEM_CREATED.equals(item.getStatus())).toList());
+            }
             int stepStartIndex = rowIndex;
             for (LcCaseExecutionStepItemVo item : step.getCaseTypeStepItems()) {
                 writer.writeRow(Arrays.asList(step.getName(), step.getSuspect(), item.getName(), item.getLawTitle()));
@@ -201,9 +239,9 @@ public class LcCaseExecutionController {
         }
 
         writer.setColumnWidth(0, 15);
-        writer.setColumnWidth(1, 30);
-        writer.setColumnWidth(2, 15);
-        writer.setColumnWidth(3, 30);
+        writer.setColumnWidth(1, 10);
+        writer.setColumnWidth(2, 35);
+        writer.setColumnWidth(3, 35);
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
         String fileName = URLEncoder.encode("案件审核登记表", "UTF-8");

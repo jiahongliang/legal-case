@@ -44,7 +44,7 @@ public class SysLoginLogController {
                         "ip", log.getIp() == null ? "" : log.getIp(),
                         "deviceType", log.getDeviceType() == null ? "" : log.getDeviceType(),
                         "browser", log.getBrowser() == null ? "" : log.getBrowser(),
-                        "system", log.getSystem() == null ? "" : log.getSystem(),
+                        "system", log.getSystemName() == null ? "" : log.getSystemName(),
                         "createdTime", log.getCreatedTime() == null ? "" : log.getCreatedTime(),
                         "endTime", log.getEndTime() == null ? "" : log.getEndTime())
         ).collect(Collectors.toList());

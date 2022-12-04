@@ -1,4 +1,4 @@
-import { serviceJson } from "./axios";
+import { serviceJson, http } from "./axios";
 
 export const caseTypeList = (data) => {
     return serviceJson({
@@ -60,6 +60,14 @@ export const caseExecutionExcel = (data) => {
 export const completeCaseExecution = (data) => {
     return serviceJson({
         url: '/case-execution/complete',
+        data,
+        method: 'post',
+    });
+}
+
+export const removeCaseExecution = (data) => {
+    return serviceJson({
+        url: '/case-execution/remove',
         data,
         method: 'post',
     });
@@ -166,5 +174,14 @@ export const removeServiceReminder = (data) => {
         url: '/service-reminder/remove',
         data,
         method: 'post',
+    });
+}
+
+export const downloadCase = (data) => {
+    return http({
+        url: '/case-execution/export-one/' + data,
+        data,
+        method: 'get',
+        responseType: 'blob',
     });
 }

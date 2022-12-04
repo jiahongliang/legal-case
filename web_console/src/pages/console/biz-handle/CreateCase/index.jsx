@@ -5,6 +5,7 @@ import {caseTypeList, createCaseExecution} from '../../../../api/biz'
 import moment from 'moment'
 import newCaseIcon from '../../../../assets/images/new-case.jpg';
 import './index.css';
+import { useNavigate } from 'react-router';
 
 const { Panel } = Collapse;
 
@@ -31,6 +32,8 @@ const CreateCase = () => {
     });
 
     const [caseTypeData,setCaseTypeData] = useState([]);
+
+    let navigate = useNavigate();
 
     useEffect(() => {
         loadCaseTypeData();
@@ -119,7 +122,11 @@ const CreateCase = () => {
         historyData.push(selectedStepData);
         setHistoryData(historyData);
         let newStepData = [...selectedStepData, {...clickedStep,keyid: moment().format('X') + '' + selectedStepData.length}];
-        newStepData = newStepData.sort((v1,v2) => v1.orderValue - v2.orderValue);
+        newStepData = newStepData.sort((v1,v2) => {
+            let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
+            let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+            return s1.localeCompare(s2);
+        });
         setSelectedStepData(newStepData);
     }
 
@@ -133,7 +140,11 @@ const CreateCase = () => {
     const handleSuspectChange = (keyId,value) => {
         historyData.push(selectedStepData);
         setHistoryData(historyData);
-        setSelectedStepData(selectedStepData.map(step => step.keyid === keyId ? {...step, suspect: value} : step));
+        setSelectedStepData(selectedStepData.map(step => step.keyid === keyId ? {...step, suspect: value} : step).sort((v1,v2) => {
+            let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
+            let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+            return s1.localeCompare(s2);
+        }));
     }
     /*
     const showSuspectInput = () => {
@@ -233,6 +244,10 @@ const CreateCase = () => {
         setSelectedStepData(data);
     }
 
+    const exitCreateCase = () => {
+        navigate("/console/biz-handle/instance-list");
+    }
+
     return (
         <>
             <PageHeader
@@ -247,6 +262,7 @@ const CreateCase = () => {
                 </div>
                 ]}
                 avatar={{src: newCaseIcon}}
+                onBack={exitCreateCase}
             >
                 {
                      saveResult.code == null ? (
@@ -287,7 +303,7 @@ const CreateCase = () => {
                                         {
                                             selectedStepData.map(step => (
                                                 <Panel header={<div style={{width: '300px',display: 'flex'}}><div style={{wordBreak: 'keep-all'}}>{step.name}</div>
-                                                    <Input style={{float: "right",marginLeft: '5px'}} size="small" placeholder="对象名称" onChange={(event) => handleSuspectChange(step.keyid,event.target.value)} onClick={(event) => {event.stopPropagation()}}></Input></div>
+                                                    <Input style={{float: "right",marginLeft: '5px'}} size="small" placeholder="对象名称" onBlur={(event) => handleSuspectChange(step.keyid,event.target.value)} onClick={(event) => {event.stopPropagation()}}></Input></div>
                                                 } key={step.keyid} collapsible="header" extra={
                                                 <><CloseOutlined  onClick={() => handleRemoveSelectedStep(step.keyid)}/></>
                                                 }>
@@ -356,7 +372,7 @@ const CreateCase = () => {
                         <Result status={saveResult.code} 
                             title={saveResult.message} 
                             extra={[<Button key={"btn_" + saveResult.code} 
-                            onClick={resetPage}>关闭</Button>]}>
+                            onClick={exitCreateCase}>关闭</Button>]}>
                         </Result>
                      )
                 }

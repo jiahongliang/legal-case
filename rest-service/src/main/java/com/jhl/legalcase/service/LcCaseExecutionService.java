@@ -74,6 +74,15 @@ public class LcCaseExecutionService {
         caseExecutionCommentRepository.saveAll(caseExecutionVo.getComments());
     }
 
+
+    public void removeCaseExcution(LcCaseExecutionVo vo) {
+        caseExecutionCommentRepository.deleteAllByExecutionId(vo.getId());
+        caseExecutionStepItemRepository.deleteAllByExecutionId(vo.getId());
+        caseExecutionStepRepository.deleteAllByExecutionId(vo.getId());
+        caseExecutionSuspectRepository.deleteAllByExecutionId(vo.getId());
+        caseExecutionRepository.deleteById(vo.getId());
+    }
+
     public LcCaseExecutionVo get(@NonNull LcCaseExecution caseExecution) {
         List<LcCaseExecutionStep> steps = getSteps(caseExecution.getId());
         List<LcCaseExecutionStepItem> stepItems = getStepItems(caseExecution.getId());
