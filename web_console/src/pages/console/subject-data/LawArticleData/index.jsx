@@ -1,9 +1,11 @@
 import { useEffect, useState, useRef } from "react";
-import { Form, Input, Button, Table, Drawer, Row, Col, Space } from 'antd';
-import { lawArticleList } from "../../../../api/biz"
+import { Form, Input, Button, Table, Drawer, Row, Col, Space, Divider, Select } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { lawArticleList, lawArticleClassificationList, addLawArticleClassification } from "../../../../api/biz"
 import './index.css';
 
 const { Search } = Input;
+let index = 0;
 
 const LawArticleData = () => {
     const [searchForm] = Form.useForm();
@@ -13,13 +15,18 @@ const LawArticleData = () => {
     const [total, setTotal] = useState(null);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    
-    const [detail,setDetail] = useState({});
+
+    const [detail, setDetail] = useState({});
     const [detailVisible, setDetailVisible] = useState(false);
     const contentRef = useRef(null);
 
+    const [classifications, setClassifications] = useState([]);
+    const [classification, setClassification] = useState('');
+    const inputRef = useRef(null);
+
     useEffect(() => {
         loadData();
+        loadClassificationData();
     }, []);
 
     useEffect(() => {
@@ -27,7 +34,7 @@ const LawArticleData = () => {
     }, [page]);
 
     let columns = [
-        
+
         {
             title: '名称',
             dataIndex: 'title',
@@ -77,8 +84,32 @@ const LawArticleData = () => {
         setDataLoading(false);
     }
 
+    const loadClassificationData = () => {
+        lawArticleClassificationList().then(res => {
+            setClassifications(res.rows);
+        })
+    }
+
+    const loadDataByClassification = (classificationValue) => {
+        setDataLoading(true);
+        let formData = searchForm.getFieldsValue();
+        let params = {
+            entity: {
+                "titleSearch": classificationValue,
+            },
+            pageNum: page - 1,
+            pageSize,
+            orderBy: "orderValue asc"
+        }
+        lawArticleList(params).then(res => {
+            setData(res.rows);
+            setTotal(res.total)
+        });
+        setDataLoading(false);
+    }
+
     const showDrawer = (r) => {
-        if(r != null) {
+        if (r != null) {
             setDetail(r);
         }
         setDetailVisible(true);
@@ -90,14 +121,14 @@ const LawArticleData = () => {
     }
 
     const onSearch = (value) => {
-        if(value && value.length > 0) {
+        if (value && value.length > 0) {
             contentRef.current.focus();
-            if(windowSearch(value)) {
+            if (windowSearch(value)) {
                 let s = window.getSelection();
-                let {withinFlag,offsetTop} = searchResultProperties(s.anchorNode);
+                let { withinFlag, offsetTop } = searchResultProperties(s.anchorNode);
                 console.log(s);
-                console.log(withinFlag,offsetTop);
-                if(withinFlag) {
+                console.log(withinFlag, offsetTop);
+                if (withinFlag) {
                     //contentRef.current.scrollTo(0,2242);
                 }
                 //let top = s.anchorNode.parentElement.offsetTop + s.anchorNode.parentElement.parentElement.offsetTop + s.anchorNode.parentElement.parentElement.parentElement.offsetTop;
@@ -107,54 +138,109 @@ const LawArticleData = () => {
     }
 
     const windowSearch = (v) => {
-        return window.find(v,true,false,true);
+        return window.find(v, true, false, true);
     }
 
     const searchResultProperties = (anchorNode) => {
         let p = anchorNode.parentElement;
         let resultTop = 0;
-        while(p) {
-            console.log('nodeName:',p.nodeName,"nodeId:",p.id);
-            if(p.nodeName === "BODY") {
+        while (p) {
+            console.log('nodeName:', p.nodeName, "nodeId:", p.id);
+            if (p.nodeName === "BODY") {
                 break;
             }
             resultTop = resultTop + p.offsetTop
-            if(p.id && p.id === 'contentDiv') {
-                return {'withinFlag': true, 'offsetTop': resultTop};
+            if (p.id && p.id === 'contentDiv') {
+                return { 'withinFlag': true, 'offsetTop': resultTop };
             }
             p = p.parentElement;
         }
-        return {'withinFlag':false,'offsetTop':0};
+        return { 'withinFlag': false, 'offsetTop': 0 };
     }
 
-    const handleScroll = (a,b,c,d) => {
-        console.log(a,b,c,d)
-    }
+    const onClassificationChange = (event) => {
+        setClassification(event.target.value);
+    };
 
+    const addItem = (e) => {
+        e.preventDefault();
+        //setClassifications([...classifications, classification || `New item ${index++}`]);
+        addLawArticleClassification(classification).then(res => {
+            setClassifications(res.rows);
+        });
+        setClassification('');
+        setTimeout(() => {
+            inputRef.current?.focus();
+        }, 0);
+    };
+
+    const handleClassificationChange = (value) => {
+        if(value && value.length > 0) {
+            loadDataByClassification(value);
+        } else {
+            loadData();
+        }
+    }
     return (
         <div className="case-type-wrapper">
             <div className="toolbar-area">
                 <Row>
-                    <Col span={20}>
-                    <Form form={searchForm} 
-                        layout="inline"
-                        onFinish={() => loadData()}
+                    <Col span={17}>
+                        <Form form={searchForm}
+                            layout="inline"
+                            onFinish={() => loadData()}
                         >
-                        <Form.Item name="title" label="标题">
-                            <Input maxLength={10} placeholder="标题" allowClear={true} size="small"/>
-                        </Form.Item>
-                        <Form.Item name="content" label="内容">
-                            <Input maxLength={20} placeholder="内容" style={{width: "300px"}} allowClear={true} size="small"/>
-                        </Form.Item>
-                        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                            <Button type="primary" size="small" htmlType="submit">
-                                查询
-                            </Button>
-                        </Form.Item>
-                    </Form>
+                            <Form.Item name="title" label="标题">
+                                <Input maxLength={10} placeholder="标题" allowClear={true} size="small" />
+                            </Form.Item>
+                            <Form.Item name="content" label="内容">
+                                <Input maxLength={20} placeholder="内容" style={{ width: "300px" }} allowClear={true} size="small" />
+                            </Form.Item>
+                            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                                <Button type="primary" size="small" htmlType="submit">
+                                    查询
+                                </Button>
+                            </Form.Item>
+                        </Form>
                     </Col>
-                    <Col span={4}>
-                        &nbsp;
+                    <Col span={7}>
+                        <Select
+                            style={{
+                                width: 300,
+                            }}
+                            allowClear={true}
+                            placeholder="请选择类别"
+                            dropdownRender={(menu) => (
+                                <>
+                                    {menu}
+                                    <Divider
+                                        style={{
+                                            margin: '8px 0',
+                                        }}
+                                    />
+                                    <Space
+                                        style={{
+                                            padding: '0 8px 4px',
+                                        }}
+                                    >
+                                        <Input
+                                            placeholder="输入名称"
+                                            ref={inputRef}
+                                            value={classification}
+                                            onChange={onClassificationChange}
+                                        />
+                                        <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                                            新增
+                                        </Button>
+                                    </Space>
+                                </>
+                            )}
+                            options={classifications.map((item) => ({
+                                label: item.name,
+                                value: item.name,
+                            }))}
+                            onChange={(value) => handleClassificationChange(value)}
+                        />
                     </Col>
                 </Row>
             </div>
@@ -196,28 +282,28 @@ const LawArticleData = () => {
                     </Space>
                 </div>
             } onClose={closeDrawer}>
-                
-                        <div style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>{detail.title}</div>
-                        <div style={{fontStyle: 'italic', color: 'blue'}}>（提示：搜索定位请使用 Ctrl + F）</div>
-                        <div style={{
-                            height: 'calc(100vh - 220px)',
-                            overflow: 'auto',
-                            border: '1px solid #EFEFEF',
-                            padding: '5px'
-                        }} ref={contentRef} id="contentDiv">
-                            {
-                                 (detail.content && (detail.content.indexOf('</p>') > -1 || detail.content.indexOf('</span>') > -1)) ? (
-                                    <p dangerouslySetInnerHTML={{__html: detail.content}}></p>
-                                ) :
-                                (
-                                    <pre>{detail.content}</pre>
-                                )
-                            }
-                        </div>
-                        {
-                            detail.attachmentId ? (
-                                <div><span style={{fontWeight:'600',height:'40px',lineHeight:'40px'}}>附件: </span><a href={"/legal-case/attachment/get/" + detail.attachmentId} target={"_blank"}>{detail.attachmentName}</a></div>) : (<></>)
-                        }
+
+                <div style={{ fontWeight: '600', height: '40px', lineHeight: '40px' }}>{detail.title}</div>
+                <div style={{ fontStyle: 'italic', color: 'blue' }}>（提示：搜索定位请使用 Ctrl + F）</div>
+                <div style={{
+                    height: 'calc(100vh - 220px)',
+                    overflow: 'auto',
+                    border: '1px solid #EFEFEF',
+                    padding: '5px'
+                }} ref={contentRef} id="contentDiv">
+                    {
+                        (detail.content && (detail.content.indexOf('</p>') > -1 || detail.content.indexOf('</span>') > -1)) ? (
+                            <p dangerouslySetInnerHTML={{ __html: detail.content }}></p>
+                        ) :
+                            (
+                                <pre>{detail.content}</pre>
+                            )
+                    }
+                </div>
+                {
+                    detail.attachmentId ? (
+                        <div><span style={{ fontWeight: '600', height: '40px', lineHeight: '40px' }}>附件: </span><a href={"/legal-case/attachment/get/" + detail.attachmentId} target={"_blank"}>{detail.attachmentName}</a></div>) : (<></>)
+                }
             </Drawer>
         </div>
     );

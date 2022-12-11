@@ -24,4 +24,6 @@ public interface LcCaseTypeStepRepository extends JpaRepositoryImplementation<Lc
      * @return
      */
     List<LcCaseTypeStep> findAllByNameSearchIsNull();
+
+    List<LcCaseTypeStep> findAllByCaseType(LcCaseType caseType);
 }

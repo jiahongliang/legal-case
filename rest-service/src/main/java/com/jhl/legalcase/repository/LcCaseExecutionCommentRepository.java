@@ -13,4 +13,8 @@ public interface LcCaseExecutionCommentRepository extends JpaRepositoryImplement
     @Modifying
     @Transactional
     void deleteAllByExecutionId(Long executionId);
+
+    @Modifying
+    @Transactional
+    void deleteAllByIdNotInAndExecutionId(List exclusiveIdList, Long executionId);
 }

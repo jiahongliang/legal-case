@@ -128,6 +128,20 @@ export const removeSubjectItem = (data) => {
     });
 }
 
+export const lawArticleClassificationList = () => {
+    return serviceJson({
+        url: '/law-article/classification-list',
+        method: 'get',
+    });
+}
+
+export const addLawArticleClassification = (data) => {
+    return serviceJson({
+        url: '/law-article/add-classification/' + data,
+        method: 'get',
+    });
+}
+
 export const lawArticleList = (data) => {
     return serviceJson({
         url: '/law-article/list',

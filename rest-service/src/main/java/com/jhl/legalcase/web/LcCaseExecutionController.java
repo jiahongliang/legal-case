@@ -3,10 +3,7 @@ package com.jhl.legalcase.web;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
 import com.jhl.legalcase.entity.*;
-import com.jhl.legalcase.repository.LcCaseExecutionCommentRepository;
-import com.jhl.legalcase.repository.LcCaseExecutionRepository;
-import com.jhl.legalcase.repository.LcCaseExecutionStepItemRepository;
-import com.jhl.legalcase.repository.LcCaseExecutionStepRepository;
+import com.jhl.legalcase.repository.*;
 import com.jhl.legalcase.service.LcCaseExecutionService;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.util.webmsg.WebResp;
@@ -33,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_STEP_ITEM_COMPLETED;
 import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_STEP_ITEM_CREATED;
@@ -52,6 +50,10 @@ public class LcCaseExecutionController {
     private LcCaseExecutionService caseExecutionService;
     @Autowired
     LcCaseExecutionCommentRepository lcCaseExecutionCommentRepository;
+    @Autowired
+    LcCaseTypeStepRepository lcCaseTypeStepRepository;
+    @Autowired
+    LcCaseTypeRepository lcCaseTypeRepository;
 
     @PostMapping("/list")
     public WebResp<LcCaseExecutionVo, Long> list(@RequestBody WebReq<LcCaseExecution, Long> req) throws ClassNotFoundException {
@@ -112,6 +114,9 @@ public class LcCaseExecutionController {
     @PostMapping("/handle")
     public WebResp<LcCaseExecutionVo, Long> handle(@RequestBody WebReq<LcCaseExecutionVo, Long> req) throws ClassNotFoundException {
         Assert.notNull(req.getEntity(), "参数不能为空");
+        List<Long> stepIds = req.getEntity().getSteps().stream().filter(step -> step.getId() != null).map(step -> step.getId()).collect(Collectors.toList());
+        lcCaseExecutionStepRepository.deleteAllByIdNotInAndExecutionId(stepIds, req.getEntity().getId());
+        caseExecutionStepItemRepository.deleteAllByStepIdNotInAndExecutionId(stepIds, req.getEntity().getId());
         List<LcCaseExecutionStepItemVo> collect = req.getEntity().getSteps().stream().collect(() ->
                         new ArrayList<>(),
                 (list, step) -> {
@@ -120,9 +125,7 @@ public class LcCaseExecutionController {
                             .name(step.getName())
                             .suspect(step.getSuspect())
                             .id(step.getId()).build();
-                    if (lcCaseExecutionStep.getId() == null) {
-                        lcCaseExecutionStepRepository.save(lcCaseExecutionStep);
-                    }
+                    lcCaseExecutionStepRepository.save(lcCaseExecutionStep);
                     list.addAll(step.getCaseTypeStepItems().stream().map(item -> {
                         item.setStepId(lcCaseExecutionStep.getId());
                         item.setExecutionId(req.getEntity().getId());
@@ -138,7 +141,18 @@ public class LcCaseExecutionController {
         }).toList();
         caseExecutionStepItemRepository.saveAll(lcCaseExecutionStepItems);
         if (!CollectionUtils.isEmpty(req.getEntity().getComments())) {
-            lcCaseExecutionCommentRepository.saveAll(req.getEntity().getComments());
+            //List<Long> existsIds = req.getEntity().getComments().stream().filter(c -> c.getId() != null && c.getId() > 0).map(c -> c.getId()).collect(Collectors.toList());
+            //lcCaseExecutionCommentRepository.deleteAllByIdNotInAndExecutionId(existsIds, req.getEntity().getId());
+            List<LcCaseExecutionComment> comments = req.getEntity().getComments().stream().map(c -> {
+                if (c.getId() != null && c.getId() < 0) {
+                    c.setId(null);
+                }
+                c.setExecutionId(req.getEntity().getId());
+                return c;
+            }).collect(Collectors.toList());
+            lcCaseExecutionCommentRepository.saveAll(comments);
+        } else {
+            lcCaseExecutionCommentRepository.deleteAllByExecutionId(req.getEntity().getId());
         }
         return WebResp.newInstance();
     }
@@ -204,7 +218,15 @@ public class LcCaseExecutionController {
 
         rowIndex++;
 
-        for (LcCaseExecutionStepVo step : executionVo.getSteps()) {
+        LcCaseType caseType = lcCaseTypeRepository.getReferenceById(execution.getTypeId());
+        List<LcCaseTypeStep> caseTypeStepList = lcCaseTypeStepRepository.findAllByCaseType(caseType);
+        Map<String, Integer> caseTypeStepMap = caseTypeStepList.stream().collect(Collectors.toMap(LcCaseTypeStep::getName, LcCaseTypeStep::getOrderValue));
+        List<LcCaseExecutionStepVo> stepVos = executionVo.getSteps().stream().sorted((a, b) -> {
+            String x = caseTypeStepMap.get(a.getName()) == null ? a.getSuspect() : (caseTypeStepMap.get(a.getName()).toString() + a.getSuspect());
+            String y = caseTypeStepMap.get(b.getName()) == null ? b.getSuspect() : (caseTypeStepMap.get(b.getName()).toString() + b.getSuspect());
+            return x.compareTo(y);
+        }).collect(Collectors.toList());
+        for (LcCaseExecutionStepVo step : stepVos) {
             if (!CollectionUtils.isEmpty(step.getCaseTypeStepItems())) {
                 step.setCaseTypeStepItems(step.getCaseTypeStepItems().stream().filter(item -> CASE_EXECUTION_STEP_ITEM_CREATED.equals(item.getStatus())).toList());
             }

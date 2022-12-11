@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { handleCaseExecution, downloadCase } from '../../../../../../api/biz'
 import newCaseIcon from '../../../../../../assets/images/new-case.jpg';
 import { PageHeader, Button, Form,  Row, Col, Tag, Collapse, Popconfirm, Tooltip, Input, message} from "antd";
+import {CloseOutlined, PlusOutlined} from '@ant-design/icons';
 import moment from 'moment'
 import './index.css'
 
@@ -14,6 +15,11 @@ const HandleExecution = (props) => {
     const [stepHistory, setStepHistory] = useState([]);
     const [stepData, setStepData] = useState([]);
     const [stepFilterText, setStepFilterText] = useState('');
+
+    const [commentInputVisible, setCommentInputVisible] = useState(false);
+    const [commentInputValue, setCommentInputValue] = useState('');
+    const commentInputRef = useRef(null);
+    const commentIdRef = useRef(0);
 
     useEffect(() => {
         let ct = props.caseTypeData.find(o => o.id === props.data.typeId);
@@ -55,7 +61,9 @@ const HandleExecution = (props) => {
         stepHistory.push(data.steps);
         setStepHistory(stepHistory);
 
-        let newStepData = [...data.steps, {...clickedStep,keyid: moment().format('X') + '' + data.steps.length}];
+        let newStepData = [...data.steps, {...clickedStep,
+            keyid: moment().format('X') + '' + data.steps.length,
+            caseTypeStepItems: clickedStep.caseTypeStepItems.map(item => ({...item, keyid: moment().format('X') + '' + item.id, id: null}))}];
         console.log('newStepData:',newStepData)
         newStepData = newStepData.sort((v1,v2) => {
             let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
@@ -94,13 +102,15 @@ const HandleExecution = (props) => {
     }
 
     const handleStepItemTagClose = (stepId, itemId) => {
+        console.log('stepId type:',typeof(stepId),'stepId:',stepId);
+        console.log('itemId type:',typeof(itemId),'itemId:',itemId);
         stepHistory.push(data.steps);
         setStepHistory(stepHistory);
         setData({
             ...data,
             steps: data.steps.map(step =>
                 (step.id + '') === (stepId + '') ? ({
-                    ...step, caseTypeStepItems: step.caseTypeStepItems.map(item => itemId === (item.keyid ? item.keyid : item.id) ? ({ ...item, status: 2 }) : item)
+                    ...step, caseTypeStepItems: step.caseTypeStepItems.map(item => (itemId + '') === (item.keyid ? (item.keyid + '') : (item.id + '')) ? ({ ...item, status: 2 }) : item)
                 }) : step
             )
         })
@@ -108,6 +118,7 @@ const HandleExecution = (props) => {
 
     const handleBackHistory = () => {
         let steps = stepHistory.pop();
+        console.log('poped steps:',steps);
         setStepHistory(stepHistory);
         setData({
             ...data,
@@ -124,23 +135,19 @@ const HandleExecution = (props) => {
     }
 
     const handleSuspectChange = (keyId,value) => {
-        console.log('suspect value:',value)
-        stepHistory.push(data.steps);
-        setStepHistory(stepHistory);
-        setData({
-            ...data,
-            steps: data.steps.map(step =>{
-                let x = step.keyid ? step.keyid : step.id;
-                x = x + '';
-                return x === keyId ? ({...step, suspect: value}) : step 
-            }
-                
-            ).sort((v1,v2) => {
-                let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
-                let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
-                return s1.localeCompare(s2);
+        //console.log('keyid type:',typeof(keyId),'keyid value:',keyId);
+        //console.log('suspect value:',value)
+        //if(suspectInputFlag.current) {
+            stepHistory.push(data.steps);
+            setStepHistory(stepHistory);
+            setData({
+                ...data,
+                steps: data.steps.map(step =>{
+                    let x = step.keyid ? step.keyid : step.id;
+                    return x === keyId ? ({...step, suspect: value}) : step 
+                })
             })
-        })
+        //} 
 
         /*historyData.push(selectedStepData);
         setHistoryData(historyData);
@@ -150,6 +157,63 @@ const HandleExecution = (props) => {
             return s1.localeCompare(s2);
         }));*/
     }
+
+    const handleSuspectBlur = () => {
+        stepHistory.push(data.steps);
+        setStepHistory(stepHistory);
+        setData({
+            ...data,
+            steps: data.steps.sort((v1,v2) => {
+                let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
+                let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+                return s1.localeCompare(s2);
+            })
+        })
+    }
+
+    const handleRemoveSelectedStep = (stepId) => {
+        stepHistory.push(data.steps);
+        setStepHistory(stepHistory);
+
+        setData({
+            ...data,
+            steps: data.steps.filter(step =>{
+                let x = step.keyid ? step.keyid : step.id;
+                return x !== stepId  
+            })
+        })
+    }
+
+    const showCommentInput = () => {
+        setCommentInputVisible(true);
+    }
+
+    const handleCommentInputChange = (e) => {
+        setCommentInputValue(e.target.value);
+    }
+
+    const handleCommentInputConfirm = () => {
+        if(commentInputValue) {
+            commentIdRef.current--;
+
+            setData({
+                ...data,
+                comments: [...data.comments,{
+                    id: commentIdRef.current,
+                    name: commentInputValue,
+                    status: 1
+                }]
+            })
+        }
+        setCommentInputValue('');
+        setCommentInputVisible(false);
+    }
+
+    useEffect(() => {
+        if(commentInputVisible) {
+            commentInputRef.current?.focus();
+        }
+    },[commentInputVisible]);
 
     const handleDownload = () => {
         downloadCase(data.id).then(res => {
@@ -238,17 +302,23 @@ const HandleExecution = (props) => {
                             >
                                 {
                                     data.steps ? data.steps.map(step => (
-                                        <Panel header={<div style={{width: '300px',display: 'flex'}}><div style={{wordBreak: 'keep-all'}}>{step.name}</div><Input style={{float: "right",marginLeft: '5px'}} size="small" placeholder="对象名称" defaultValue={step.suspect ? step.suspect : ''} onBlur={(event) => handleSuspectChange(step.keyid ? step.keyid : step.id,event.target.value)} onClick={(event) => {event.stopPropagation()}}></Input></div>}
-                                         key={step.keyid ? step.keyid : step.id} collapsible="header">
+                                        <Panel header={<div style={{width: '300px',display: 'flex'}}><div style={{wordBreak: 'keep-all'}}>{step.name}</div>
+                                        <Input style={{float: "right",marginLeft: '5px'}} size="small" placeholder="对象名称" value={step.suspect ? step.suspect : ''}
+                                        onBlur={(event) => handleSuspectBlur()}
+                                        onChange={(event) => handleSuspectChange(step.keyid ? step.keyid : step.id,event.target.value)} 
+                                        onClick={(event) => {event.stopPropagation()}}></Input></div>}
+                                         key={step.keyid ? step.keyid : step.id} collapsible="header" extra={
+                                            <><CloseOutlined  onClick={() => handleRemoveSelectedStep(step.keyid ? step.keyid : step.id)}/></>
+                                            }>
                                             {
                                                 (step.caseTypeStepItems && step.caseTypeStepItems.length > 0) ? 
                                                     step.caseTypeStepItems.map(item => (!item.status || item.status === 1) ? (
                                                         <Tooltip key={item.name}  placement="topLeft" title={item.lawTitle} color="gold" arrowPointAtCenter>
                                                             <Tag
                                                                 className="edit-tag"
-                                                                key={item.id}
+                                                                key={item.keyid ? item.keyid : item.id}
                                                                 closable={data.status === 1 ? true : false}
-                                                                onClose={() => handleStepItemTagClose(step.id,step.keyid ? step.keyid : step.id)}
+                                                                onClose={() => handleStepItemTagClose(step.keyid ? step.keyid : step.id, item.keyid ? item.keyid : item.id)}
                                                             >
                                                                 {item.name}
                                                             </Tag>
@@ -273,6 +343,25 @@ const HandleExecution = (props) => {
                                             )
                                         })
                                     }
+
+                                    {commentInputVisible && (
+                                        <Input
+                                        ref={commentInputRef}
+                                        type="text"
+                                        size="small"
+                                        className="tag-input"
+                                        value={commentInputValue}
+                                        onChange={handleCommentInputChange}
+                                        onBlur={handleCommentInputConfirm}
+                                        onPressEnter={handleCommentInputConfirm}
+                                        />
+                                    )}
+
+                                    {!commentInputVisible && (
+                                        <Tag className="site-tag-plus" onClick={showCommentInput}>
+                                            <PlusOutlined /> 新增
+                                        </Tag>
+                                    )}
                                 </Panel>
                             </Collapse>
                         </Col>
