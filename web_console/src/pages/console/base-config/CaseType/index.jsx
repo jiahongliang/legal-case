@@ -146,6 +146,7 @@ const CaseType = () => {
 
     const onStepDataChange = (newStepData) => {
         setStepData(newStepData);
+        console.log('newStepData',newStepData)
     }
 
     return (

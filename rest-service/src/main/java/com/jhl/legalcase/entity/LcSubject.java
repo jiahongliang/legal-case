@@ -24,8 +24,10 @@ public class LcSubject extends JpaAudit {
 
     private String name;
     private String nameSearch;
+    private Integer orderValue;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "parent")
+    @OrderBy("orderValue asc")
     private List<LcSubject> children = new ArrayList<>();
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)

@@ -21,6 +21,7 @@ public class LcCaseTypeStep extends JpaAudit {
     private String name;
     private String nameSearch;
     private Integer orderValue;
+    private Integer indexValue;
     private String items;
 
     @JsonIgnore

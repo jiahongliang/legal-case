@@ -123,8 +123,8 @@ const CreateCase = () => {
         setHistoryData(historyData);
         let newStepData = [...selectedStepData, {...clickedStep,keyid: moment().format('X') + '' + selectedStepData.length}];
         newStepData = newStepData.sort((v1,v2) => {
-            let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
-            let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+            let s1 = ('' + v1.orderValue).padStart(6,'0') + (v1.suspect ? v1.suspect : '') + '';
+            let s2 = ('' + v2.orderValue).padStart(6,'0') + (v2.suspect ? v2.suspect : '') + '';
             return s1.localeCompare(s2);
         });
         setSelectedStepData(newStepData);
@@ -141,8 +141,8 @@ const CreateCase = () => {
         historyData.push(selectedStepData);
         setHistoryData(historyData);
         setSelectedStepData(selectedStepData.map(step => step.keyid === keyId ? {...step, suspect: value} : step).sort((v1,v2) => {
-            let s1 = '' + v1.orderValue + (v1.suspect ? v1.suspect : '') + '';
-            let s2 = '' + v2.orderValue + (v2.suspect ? v2.suspect : '') + '';
+            let s1 = ('' + v1.orderValue).padStart(6,'0') + (v1.suspect ? v1.suspect : '') + '';
+            let s2 = ('' + v2.orderValue).padStart(6,'0') + (v2.suspect ? v2.suspect : '') + '';
             return s1.localeCompare(s2);
         }));
     }

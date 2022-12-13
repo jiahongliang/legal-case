@@ -51,8 +51,18 @@ public class LcLawArticleController {
         return WebResp.newInstance().rows(all);
     }
 
+    @GetMapping("/remove-classification/{name}")
+    public WebResp<LcLawArticleClassification, Long> removeClassification(@PathVariable("name") String name) throws ClassNotFoundException {
+        lcLawArticleClassificationRepository.deleteAllByName(name);
+        List<LcLawArticleClassification> all = lcLawArticleClassificationRepository.findAll();
+        return WebResp.newInstance().rows(all);
+    }
+
     @PostMapping("/list")
     public WebResp<LcLawArticle, Long> itemList(@RequestBody WebReq<LcLawArticle, Long> req) throws ClassNotFoundException {
+        if(req.getEntity() != null && req.getEntity().getTitle() != null) {
+            req.getEntity().setTitle("【" + req.getEntity().getTitle() + "】");
+        }
         Page<LcLawArticle> result = lawArticleRepository.findAll(req.specification(), req.pageable());
         return WebResp.newInstance().rows(result.getContent()).pages(result.getTotalPages()).total(result.getTotalElements());
     }

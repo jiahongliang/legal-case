@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Form, Input, Button, Table, Drawer, Row, Col, Space, Divider, Select } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import { lawArticleList, lawArticleClassificationList, addLawArticleClassification } from "../../../../api/biz"
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons';
+import { lawArticleList, lawArticleClassificationList, addLawArticleClassification, removeLawArticleClassification } from "../../../../api/biz"
 import './index.css';
 
 const { Search } = Input;
@@ -22,6 +22,7 @@ const LawArticleData = () => {
 
     const [classifications, setClassifications] = useState([]);
     const [classification, setClassification] = useState('');
+    const [selectedClassification, setSelectedClassification] = useState(null);
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -31,7 +32,7 @@ const LawArticleData = () => {
 
     useEffect(() => {
         loadData();
-    }, [page]);
+    }, [page, selectedClassification]);
 
     let columns = [
 
@@ -70,6 +71,7 @@ const LawArticleData = () => {
         let formData = searchForm.getFieldsValue();
         let params = {
             entity: {
+                "title": selectedClassification,
                 "titleSearch": formData.title,
                 "content": formData.content
             },
@@ -164,22 +166,32 @@ const LawArticleData = () => {
 
     const addItem = (e) => {
         e.preventDefault();
-        //setClassifications([...classifications, classification || `New item ${index++}`]);
-        addLawArticleClassification(classification).then(res => {
-            setClassifications(res.rows);
-        });
-        setClassification('');
-        setTimeout(() => {
-            inputRef.current?.focus();
-        }, 0);
+        if (classification && classification.length > 0) {
+            addLawArticleClassification(classification).then(res => {
+                setClassifications(res.rows);
+            });
+            setClassification('');
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 0);
+        }
     };
 
-    const handleClassificationChange = (value) => {
-        if(value && value.length > 0) {
-            loadDataByClassification(value);
-        } else {
-            loadData();
+    const removeItem = (e) => {
+        e.preventDefault();
+        if (classification && classification.length > 0) {
+            removeLawArticleClassification(classification).then(res => {
+                setClassifications(res.rows);
+            });
+            setClassification('');
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 0);
         }
+    }
+
+    const handleClassificationChange = (value) => {
+        setSelectedClassification(value)
     }
     return (
         <div className="case-type-wrapper">
@@ -213,26 +225,7 @@ const LawArticleData = () => {
                             dropdownRender={(menu) => (
                                 <>
                                     {menu}
-                                    <Divider
-                                        style={{
-                                            margin: '8px 0',
-                                        }}
-                                    />
-                                    <Space
-                                        style={{
-                                            padding: '0 8px 4px',
-                                        }}
-                                    >
-                                        <Input
-                                            placeholder="输入名称"
-                                            ref={inputRef}
-                                            value={classification}
-                                            onChange={onClassificationChange}
-                                        />
-                                        <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
-                                            新增
-                                        </Button>
-                                    </Space>
+                                    
                                 </>
                             )}
                             options={classifications.map((item) => ({

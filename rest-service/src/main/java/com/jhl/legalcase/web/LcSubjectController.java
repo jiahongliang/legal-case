@@ -34,7 +34,7 @@ public class LcSubjectController {
 
     @GetMapping("/tree")
     public WebResp<LcSubject, Long> list() throws ClassNotFoundException {
-        List<LcSubject> lst = subjectRepository.findAllByParentIsNull();
+        List<LcSubject> lst = subjectRepository.findAllByParentIsNullOrderByOrderValue();
         return WebResp.newInstance().rows(lst).pages(0).total(lst.size());
     }
 

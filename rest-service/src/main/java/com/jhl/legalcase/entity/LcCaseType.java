@@ -4,10 +4,7 @@ import com.jhl.legalcase.util.jpa.JpaAudit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,5 +26,6 @@ public class LcCaseType extends JpaAudit {
 
     @OneToMany(cascade = CascadeType.ALL,
             mappedBy = "caseType")
+    @OrderBy("orderValue asc")
     private List<LcCaseTypeStep> caseTypeSteps = new ArrayList<>();
 }

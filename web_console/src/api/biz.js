@@ -142,6 +142,13 @@ export const addLawArticleClassification = (data) => {
     });
 }
 
+export const removeLawArticleClassification = (data) => {
+    return serviceJson({
+        url: '/law-article/remove-classification/' + data,
+        method: 'get',
+    });
+}
+
 export const lawArticleList = (data) => {
     return serviceJson({
         url: '/law-article/list',

@@ -21,7 +21,7 @@ const CaseStep = (props) => {
             // console.log('props.data...')
             stepIndex.current = 1;
             if(props.data && props.data.length > 0) {
-                setStepData(props.data.map(step => ({...step,orderValue: '' + stepIndex.current ++})));
+                setStepData(props.data.map(step => ({...step,indexValue: '' + stepIndex.current ++})));
                 setActiveKey('1');
             } else {
                 setStepData([]);
@@ -54,29 +54,30 @@ const CaseStep = (props) => {
 
     const addStep = () => {
         const newStep = {
-            orderValue: '' + stepIndex.current++,
+            indexValue: '' + stepIndex.current++,
+            orderValue: 100,
             name: '办案环节',
             caseTypeStepItems: []
         }
         setStepData([...stepData,newStep])
-        setActiveKey(newStep.orderValue)
+        setActiveKey(newStep.indexValue)
     }
 
     const removeStep = (targetKey) => {
         let newActiveKey = activeKey;
         let lastIndex = -1;
         stepData.forEach((pane, i) => {
-          if (pane.orderValue === targetKey) {
+          if (pane.indexValue === targetKey) {
             lastIndex = i - 1;
           }
         });
-        const newPanes = stepData.filter((pane) => pane.orderValue !== targetKey);//.map((panel,i) => ({orderValue:i + '', name: panel.name}));
+        const newPanes = stepData.filter((pane) => pane.indexValue !== targetKey);
     
         if (newPanes.length && newActiveKey === targetKey) {
           if (lastIndex >= 0) {
-            newActiveKey = newPanes[lastIndex].orderValue;
+            newActiveKey = newPanes[lastIndex].indexValue;
           } else {
-            newActiveKey = newPanes[0].orderValue;
+            newActiveKey = newPanes[0].indexValue;
           }
         }
     
@@ -86,7 +87,7 @@ const CaseStep = (props) => {
 
       const changeItems = (newItems) => {
         setStepData(stepData.map((step) => (
-            step.orderValue === activeKey ? 
+            step.indexValue === activeKey ? 
             {
             ...step, caseTypeStepItems: newItems
             } : step
@@ -97,8 +98,19 @@ const CaseStep = (props) => {
         let stepName = e.target.value;
         if(stepData && stepData.length > 0) {
             setStepData(stepData.map((step) => (
-                step.orderValue === activeKey ? {
+                step.indexValue === activeKey ? {
                     ...step, name: stepName
+                } : step
+            )));
+        }
+      }
+
+      const onOrderValueChange = (e) => {
+        let orderValue = e.target.value;
+        if(stepData && stepData.length > 0) {
+            setStepData(stepData.map((step) => (
+                step.indexValue === activeKey ? {
+                    ...step, orderValue: orderValue
                 } : step
             )));
         }
@@ -108,14 +120,19 @@ const CaseStep = (props) => {
         e.target.select();
       }
 
+      const handleOrderValueFocus = (e) => {
+        e.target.select();
+      }
+
     return (
         <div className="case-definition-step-wrapper">
             <Tabs activeKey={activeKey} type="editable-card" tabPosition="left" size="small" onChange={onChangeStep} onEdit={onEditStep}>
                 {
                     stepData.map((panel) => (
-                        <TabPane tab={panel.name} key={panel.orderValue}>
+                        <TabPane tab={panel.name} key={panel.indexValue}>
                             <div className="case-definition-step-panel">
                                 <Input addonBefore="环节名称" defaultValue={panel.name} size="medium" onChange={onStepNameChange} onFocus={handlePanelNameFocus} onPressEnter={(e) => {e.preventDefault()}}/>
+                                <Input addonBefore="排序值" defaultValue={panel.orderValue} size="medium" onChange={onOrderValueChange} onFocus={handleOrderValueFocus} onPressEnter={(e) => {e.preventDefault()}}/>
                                 <Divider ></Divider>
                                 <StepItems items={panel.caseTypeStepItems} onChange={changeItems}></StepItems>
                             </div>

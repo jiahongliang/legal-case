@@ -59,7 +59,8 @@ const SubjectManage = () => {
             parentName: parent == null ? null : parent.name,
             children: (subject.children && subject.children.length > 0) ? (
                 subject.children.map(child => subject2TreeNode(child, subject))
-            ) : []
+            ) : [],
+            orderValue: subject.orderValue
         }
     }
 
@@ -73,7 +74,8 @@ const SubjectManage = () => {
             id: null
         });
         subjectForm.setFieldsValue({
-            parentName: currentNode ? currentNode.parentName : null
+            parentName: currentNode ? currentNode.parentName : null,
+            orderValue: 100
         });
         setSubjectVisible(true);
     }
@@ -84,7 +86,8 @@ const SubjectManage = () => {
             id: null
         });
         subjectForm.setFieldsValue({
-            parentName: currentNode ? currentNode.title : null
+            parentName: currentNode ? currentNode.title : null,
+            orderValue: 100
         });
         setSubjectVisible(true);
     }
@@ -97,7 +100,8 @@ const SubjectManage = () => {
             });
             subjectForm.setFieldsValue({
                 parentName: currentNode.parentName,
-                name: currentNode.title
+                name: currentNode.title,
+                orderValue: currentNode.orderValue
             });
             setSubjectVisible(true);
         } else {
@@ -110,7 +114,8 @@ const SubjectManage = () => {
         setSubjectExtFormData({});
         subjectForm.setFieldsValue({
             parentName: null,
-            name: null
+            name: null,
+            orderValue: null
         });
     }
 
@@ -121,7 +126,8 @@ const SubjectManage = () => {
                 name: formData.name,
                 parent: {
                     id: subjectExtFormData.parentId
-                }
+                },
+                orderValue: formData.orderValue
             }
             saveSubject({ entity }).then(res => {
                 loadSubjectTreeData();
@@ -129,7 +135,8 @@ const SubjectManage = () => {
                 setSubjectExtFormData({});
                 subjectForm.setFieldsValue({
                     parentName: null,
-                    name: null
+                    name: null,
+                    orderValue: null
                 });
                 setSubjectVisible(false);
             });
@@ -372,6 +379,9 @@ const SubjectManage = () => {
                         <Input placeholder="父类别名称" maxLength={50} disabled />
                     </Form.Item>
                     <Form.Item name="name" label="名称" rules={[{ required: true, message: '名称必须输入' }]}>
+                        <Input placeholder="请输入类别名称" maxLength={50} />
+                    </Form.Item>
+                    <Form.Item name="orderValue" label="序号" rules={[{ required: true, message: '名称必须输入' }]}>
                         <Input placeholder="请输入类别名称" maxLength={50} />
                     </Form.Item>
                 </Form>

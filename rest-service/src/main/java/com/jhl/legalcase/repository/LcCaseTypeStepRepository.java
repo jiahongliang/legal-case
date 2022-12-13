@@ -2,7 +2,10 @@ package com.jhl.legalcase.repository;
 
 import com.jhl.legalcase.entity.LcCaseType;
 import com.jhl.legalcase.entity.LcCaseTypeStep;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.support.JpaRepositoryImplementation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,4 +29,9 @@ public interface LcCaseTypeStepRepository extends JpaRepositoryImplementation<Lc
     List<LcCaseTypeStep> findAllByNameSearchIsNull();
 
     List<LcCaseTypeStep> findAllByCaseType(LcCaseType caseType);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update lc_case_type_step set index_value = order_value where index_value is null",nativeQuery = true)
+    void initializeIndexValue();
 }
