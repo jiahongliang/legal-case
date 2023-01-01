@@ -26,10 +26,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_STEP_ITEM_COMPLETED;
@@ -88,8 +85,16 @@ public class LcCaseExecutionController {
     @PostMapping("/create")
     public WebResp<LcCaseExecutionVo, Long> create(@RequestBody WebReq<LcCaseExecutionVo, Long> req) throws ClassNotFoundException {
         Assert.notNull(req.getEntity(), "录入数据不能为空");
-        caseExecutionService.saveCaseExcution(req.getEntity());
-        return WebResp.newInstance();
+        LcCaseExecutionVo entity = req.getEntity();
+        if (entity.getId() != null) {
+            caseExecutionService.removeCaseExcution(entity);
+            entity.setId(null);
+        }
+        Long id = caseExecutionService.saveCaseExcution(entity);
+
+        LcCaseExecution execution = caseExecutionRepository.getReferenceById(id);
+        LcCaseExecutionVo executionVo = caseExecutionService.get(execution);
+        return WebResp.newInstance().rows(Arrays.asList(executionVo)).ext(id);
     }
 
     @Transactional
@@ -154,7 +159,10 @@ public class LcCaseExecutionController {
         } else {
             lcCaseExecutionCommentRepository.deleteAllByExecutionId(req.getEntity().getId());
         }
-        return WebResp.newInstance();
+
+        LcCaseExecution execution = caseExecutionRepository.getReferenceById(req.getEntity().getId());
+        LcCaseExecutionVo executionVo = caseExecutionService.get(execution);
+        return WebResp.newInstance().rows(Arrays.asList(executionVo));
     }
 
     @GetMapping("/export-one/{id}")
@@ -169,14 +177,19 @@ public class LcCaseExecutionController {
 
         int rowIndex = 0;
 
-        CellStyle headCellStyle1 = writer.getHeadCellStyle();
+        CellStyle headCellStyle1 = writer.createCellStyle();//.getHeadCellStyle();
         headCellStyle1.setAlignment(HorizontalAlignment.CENTER);
+        headCellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
+        /*headCellStyle1.setBorderTop(BorderStyle.THIN);
+        headCellStyle1.setBorderBottom(BorderStyle.THIN);
+        headCellStyle1.setBorderLeft(BorderStyle.THIN);
+        headCellStyle1.setBorderRight(BorderStyle.THIN);*/
         Font head1Font = writer.createFont();
-        head1Font.setFontHeightInPoints((short) 14);
+        head1Font.setFontHeightInPoints((short) 26);
         headCellStyle1.setFont(head1Font);
-        headCellStyle1.setFillBackgroundColor(IndexedColors.GREY_25_PERCENT.getIndex());
-        writer.merge(rowIndex, 0, rowIndex, 3, "案件审核登记表", headCellStyle1);
-        writer.setRowHeight(rowIndex, 30);
+        //headCellStyle1.setFillBackgroundColor(IndexedColors.WHITE1.getIndex());
+        writer.merge(rowIndex, 0, 0, 4, "案件审核登记表", headCellStyle1);
+        writer.setRowHeight(rowIndex, 40);
         writer.passCurrentRow();
 
         rowIndex++;
@@ -189,11 +202,12 @@ public class LcCaseExecutionController {
         cellStyle1.setBorderLeft(BorderStyle.THIN);
         cellStyle1.setBorderRight(BorderStyle.THIN);
         Font font = writer.createFont();
-        font.setFontHeightInPoints((short) 11);
+        font.setFontHeightInPoints((short) 14);
         font.setBold(true);
         cellStyle1.setFont(font);
-        writer.merge(rowIndex, rowIndex, 1, 2, "", cellStyle1);
-        writer.writeRow(Arrays.asList("办案单位", "案件名称", "", "办案人"));
+        writer.merge(rowIndex, rowIndex, 0, 1, "", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 3, 4, "", cellStyle1);
+        writer.writeRow(Arrays.asList("办案单位", "", "审核人", "案件名称"));
         writer.setRowStyleIfHasData(rowIndex, cellStyle1);
         writer.setRowHeight(rowIndex, 25);
 
@@ -205,22 +219,57 @@ public class LcCaseExecutionController {
         cellStyle.setBorderBottom(BorderStyle.THIN);
         cellStyle.setBorderLeft(BorderStyle.THIN);
         cellStyle.setBorderRight(BorderStyle.THIN);
-        writer.merge(rowIndex, rowIndex, 1, 2, "", cellStyle);
-        writer.writeRow(Arrays.asList(user.getDeptName(), executionVo.getName(), "", user.getName()));
+        Font font1 = writer.createFont();
+        font1.setFontHeightInPoints((short) 14);
+        font1.setBold(false);
+        cellStyle.setFont(font1);
+        writer.merge(rowIndex, rowIndex, 0, 1, "", cellStyle);
+        writer.merge(rowIndex, rowIndex, 3, 4, "", cellStyle);
+        writer.writeRow(Arrays.asList(user.getDeptName(), "", user.getName(), executionVo.getName()));
         writer.setRowStyleIfHasData(rowIndex, cellStyle);
         writer.setRowHeight(rowIndex, 25);
 
         rowIndex++;
 
-        writer.writeRow(Arrays.asList("环节", "嫌疑人", "事项", "备注"));
-        writer.setRowStyleIfHasData(rowIndex, cellStyle1);
+        CellStyle cellStyle2 = writer.createCellStyle();
+        cellStyle2.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle2.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle2.setBorderTop(BorderStyle.THIN);
+        cellStyle2.setBorderBottom(BorderStyle.THIN);
+        cellStyle2.setBorderLeft(BorderStyle.THIN);
+        cellStyle2.setBorderRight(BorderStyle.THIN);
+        Font font2 = writer.createFont();
+        font2.setFontHeightInPoints((short) 12);
+        font2.setBold(true);
+        cellStyle2.setFont(font2);
+
+        writer.writeRow(Arrays.asList("环节", "对象", "事项", "依据", "备注"));
+        writer.setRowStyleIfHasData(rowIndex, cellStyle2);
         writer.setRowHeight(rowIndex, 25);
 
         rowIndex++;
 
+        CellStyle cellStyle3 = writer.createCellStyle();
+        cellStyle3.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle3.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle3.setBorderTop(BorderStyle.THIN);
+        cellStyle3.setBorderBottom(BorderStyle.THIN);
+        cellStyle3.setBorderLeft(BorderStyle.THIN);
+        cellStyle3.setBorderRight(BorderStyle.THIN);
+        Font font3 = writer.createFont();
+        font3.setFontHeightInPoints((short) 12);
+        font3.setBold(false);
+        cellStyle3.setFont(font3);
+
         LcCaseType caseType = lcCaseTypeRepository.getReferenceById(execution.getTypeId());
         List<LcCaseTypeStep> caseTypeStepList = lcCaseTypeStepRepository.findAllByCaseType(caseType);
-        Map<String, Integer> caseTypeStepMap = caseTypeStepList.stream().collect(Collectors.toMap(LcCaseTypeStep::getName, LcCaseTypeStep::getOrderValue));
+        //Map<String, Integer> caseTypeStepMap = caseTypeStepList.stream().collect(Collectors.toMap(LcCaseTypeStep::getName, LcCaseTypeStep::getOrderValue));
+        Map<String, Integer> caseTypeStepMap = new HashMap<>();
+        for (LcCaseTypeStep step : caseTypeStepList) {
+            if (caseTypeStepMap.get(step.getName()) == null) {
+                caseTypeStepMap.put(step.getName(), step.getOrderValue());
+            }
+        }
         List<LcCaseExecutionStepVo> stepVos = executionVo.getSteps().stream().sorted((a, b) -> {
             String x = caseTypeStepMap.get(a.getName()) == null ? a.getSuspect() : (caseTypeStepMap.get(a.getName()).toString() + a.getSuspect());
             String y = caseTypeStepMap.get(b.getName()) == null ? b.getSuspect() : (caseTypeStepMap.get(b.getName()).toString() + b.getSuspect());
@@ -232,31 +281,40 @@ public class LcCaseExecutionController {
             }
             int stepStartIndex = rowIndex;
             for (LcCaseExecutionStepItemVo item : step.getCaseTypeStepItems()) {
-                writer.writeRow(Arrays.asList(step.getName(), step.getSuspect(), item.getName(), item.getLawTitle()));
+                writer.writeRow(Arrays.asList(step.getName(), step.getSuspect(), item.getName(), item.getLawTitle(), ""));
                 writer.setRowHeight(rowIndex, 25);
+                writer.setRowStyleIfHasData(rowIndex,cellStyle3);
                 rowIndex++;
             }
             if (rowIndex - 1 > stepStartIndex) {
-                writer.merge(stepStartIndex, rowIndex - 1, 0, 0, step.getName(), cellStyle);
-                writer.merge(stepStartIndex, rowIndex - 1, 1, 1, step.getSuspect(), cellStyle);
+                writer.merge(stepStartIndex, rowIndex - 1, 0, 0, step.getName(), cellStyle3);
+                writer.merge(stepStartIndex, rowIndex - 1, 1, 1, step.getSuspect(), cellStyle3);
             }
         }
 
         int commentStartRowIndex = rowIndex;
-        for (LcCaseExecutionComment comment : executionVo.getComments()) {
-            writer.merge(rowIndex, rowIndex, 1, 3, comment.getName(), cellStyle);
+        List<LcCaseExecutionComment> comments = executionVo.getComments().stream().filter(comment -> comment.getStatus() == null || comment.getStatus().equals(1)).toList();
+        if (CollectionUtils.isEmpty(comments)) {
+            writer.merge(rowIndex, rowIndex, 1, 3, "-", cellStyle3);
+            writer.writeRow(Arrays.asList("备注", "-",""));
+            writer.setRowStyleIfHasData(rowIndex, cellStyle3);
             writer.setRowHeight(rowIndex, 25);
-            writer.passCurrentRow();
             rowIndex++;
-        }
-
-        if (rowIndex > commentStartRowIndex) {
-            writer.merge(commentStartRowIndex, rowIndex - 1, 0, 0, "备注", cellStyle);
+        } else if (comments.size() == 1) {
+            writer.merge(rowIndex, rowIndex, 1, 3, "-", cellStyle3);
+            writer.writeRow(Arrays.asList("备注", comments.get(0).getName(),""));
+            writer.setRowStyleIfHasData(rowIndex, cellStyle3);
             writer.setRowHeight(rowIndex, 25);
+            rowIndex++;
         } else {
-            writer.merge(rowIndex, rowIndex, 1, 3, "-", cellStyle);
-            writer.writeRow(Arrays.asList("备注", "-"));
-            writer.setRowStyleIfHasData(rowIndex, cellStyle);
+            for (LcCaseExecutionComment comment : comments) {
+                writer.merge(rowIndex, rowIndex, 1, 3, comment.getName(), cellStyle3);
+                writer.setRowHeight(rowIndex, 25);
+                writer.setRowStyleIfHasData(rowIndex, cellStyle3);
+                writer.passCurrentRow();
+                rowIndex++;
+            }
+            writer.merge(commentStartRowIndex, rowIndex - 1, 0, 0, "备注", cellStyle3);
             writer.setRowHeight(rowIndex, 25);
         }
 

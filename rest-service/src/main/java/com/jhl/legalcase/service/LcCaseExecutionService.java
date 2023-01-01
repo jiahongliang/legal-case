@@ -37,7 +37,7 @@ public class LcCaseExecutionService {
     @Autowired
     private SysUserRepository userRepository;
 
-    public void saveCaseExcution(LcCaseExecutionVo caseExecutionVo) {
+    public Long saveCaseExcution(LcCaseExecutionVo caseExecutionVo) {
         LcCaseExecution caseExecution = LcCaseExecution.builder().typeId(caseExecutionVo.getTypeId())
                 .name(caseExecutionVo.getName())
                 .nameSearch(caseExecutionVo.getName() == null ? "" : caseExecutionVo.getName() + "|" + PinyinUtil.toFirstChar(caseExecutionVo.getName()))
@@ -72,6 +72,7 @@ public class LcCaseExecutionService {
             comment.setExecutionId(caseExecution.getId());
         });
         caseExecutionCommentRepository.saveAll(caseExecutionVo.getComments());
+        return caseExecution.getId();
     }
 
 

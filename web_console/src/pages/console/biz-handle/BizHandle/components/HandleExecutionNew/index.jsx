@@ -217,15 +217,23 @@ const HandleExecution = (props) => {
     },[commentInputVisible]);
 
     const handleDownload = () => {
-        downloadCase(data.id).then(res => {
-            console.log(res);
-            if(res.data.type && res.data.type === 'application/json') {
-                message.error("下载中出现错误，请检查数据格式。");
+        let param = {
+            entity: data
+        }
+        handleCaseExecution(param).then(res => {
+            if(res && res.rows) {
+                setData(res.rows[0]);
             }
-            else {
-                downloadFile(res);
-            }
-        })
+            downloadCase(data.id).then(res => {
+                console.log(res);
+                if(res.data.type && res.data.type === 'application/json') {
+                    message.error("下载中出现错误，请检查数据格式。");
+                }
+                else {
+                    downloadFile(res);
+                }
+            })
+        });
         //window.open("/legal-case/case-execution/export-one/" + data.id);
     }
 
