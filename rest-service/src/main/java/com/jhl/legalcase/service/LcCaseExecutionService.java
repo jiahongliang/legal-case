@@ -60,7 +60,7 @@ public class LcCaseExecutionService {
                         .stepId(step.getId())
                         .name(stepItem.getName())
                         .lawTitle(stepItem.getLawTitle())
-                        .status(CASE_EXECUTION_STEP_ITEM_CREATED)
+                        .status(stepItem.getStatus() == null ? CASE_EXECUTION_STEP_ITEM_CREATED : stepItem.getStatus())
                         .build();
                 caseExecutionStepItemRepository.save(item);
             });

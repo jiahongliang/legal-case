@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, createRef, React } from "react";
-import { PageHeader, Button, Form, Input, Row, Col, Radio, Tag, Collapse, Popconfirm, Modal, Result, Tooltip, message } from "antd";
+import { PageHeader, Button, Form, Input, Row, Col, Radio, Tag, Collapse, Popconfirm, Modal, Result, Tooltip, message, Checkbox } from "antd";
 import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
 import { caseTypeList, createCaseExecution, downloadCase } from '../../../../api/biz'
 import moment from 'moment'
@@ -119,7 +119,9 @@ const CreateCase = () => {
 
     const handleClickSourceStep = (stepId) => {
         let clickedStep = stepData.find(step => step.id === stepId);
-
+        if(clickedStep.caseTypeStepItems && clickedStep.caseTypeStepItems.length > 0) {
+            clickedStep.caseTypeStepItems = clickedStep.caseTypeStepItems.map(item => ({...item, status: 2}));
+        }
         historyData.push(selectedStepData);
         setHistoryData(historyData);
         let newStepData = [...selectedStepData, { ...clickedStep, keyid: moment().format('X') + '' + selectedStepData.length }];
@@ -176,6 +178,18 @@ const CreateCase = () => {
             selectedStepData.map(
                 step => step.keyid === stepKeyId ?
                     { ...step, caseTypeStepItems: step.caseTypeStepItems.filter(item => item.id !== itemId) } :
+                    step
+            )
+        )
+    }
+
+    const handleStepItemClick = (stepKeyId, itemId, isChecked) => {
+        historyData.push(selectedStepData);
+        setHistoryData(historyData);
+        setSelectedStepData(
+            selectedStepData.map(
+                step => step.keyid === stepKeyId ?
+                    { ...step, caseTypeStepItems: step.caseTypeStepItems.map(item => (item.id === itemId ? { ...item, status: isChecked ? 1 : 2 } : item)) } :
                     step
             )
         )
@@ -358,14 +372,13 @@ const CreateCase = () => {
                                                         (step.caseTypeStepItems && step.caseTypeStepItems.length > 0) ?
                                                             step.caseTypeStepItems.map(item => (
                                                                 <Tooltip key={item.id} placement="topLeft" title={item.lawTitle} color="gold" arrowPointAtCenter>
-                                                                    <Tag
-                                                                        className="edit-tag"
+                                                                    
+                                                                    <Checkbox 
                                                                         key={item.id}
-                                                                        closable={true}
-                                                                        onClose={() => handleStepItemTagClose(step.keyid, item.id)}
-                                                                    >
-                                                                        {item.name}
-                                                                    </Tag>
+                                                                        checked={!item.status || item.status === 1} 
+                                                                        onChange={(e) => {handleStepItemClick(step.keyid ? step.keyid : step.id, item.keyid ? item.keyid : item.id, e.target.checked)}}>
+                                                                            {item.name}
+                                                                    </Checkbox>
                                                                 </Tooltip>
                                                             ))
                                                             : ""
