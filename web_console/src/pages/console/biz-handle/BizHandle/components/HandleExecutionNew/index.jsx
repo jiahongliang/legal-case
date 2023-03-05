@@ -64,7 +64,7 @@ const HandleExecution = (props) => {
         let newStepData = [...data.steps, {...clickedStep,
             id: null,
             keyid: moment().format('X') + '' + data.steps.length,
-            caseTypeStepItems: clickedStep.caseTypeStepItems.map(item => ({...item, keyid: moment().format('X') + '' + item.id, id: null}))}];
+            caseTypeStepItems: clickedStep.caseTypeStepItems.map(item => ({...item, keyid: moment().format('X') + '' + item.id, id: null, status: 2}))}];
         console.log('newStepData:',newStepData)
         newStepData = newStepData.sort((v1,v2) => {
             let s1 = ('' + v1.orderValue).padStart(6,'0') + (v1.suspect ? v1.suspect : '') + '';
