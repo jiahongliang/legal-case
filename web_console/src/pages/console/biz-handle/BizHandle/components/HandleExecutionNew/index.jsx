@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { handleCaseExecution, downloadCase } from '../../../../../../api/biz'
 import newCaseIcon from '../../../../../../assets/images/new-case.jpg';
 import { PageHeader, Button, Form,  Row, Col, Tag, Collapse, Popconfirm, Tooltip, Input, message, Checkbox} from "antd";
-import {CloseOutlined, PlusOutlined} from '@ant-design/icons';
+import {CloseOutlined, PlusOutlined, CheckCircleOutlined, UserOutlined} from '@ant-design/icons';
 import moment from 'moment'
 import './index.css'
 
@@ -174,6 +174,18 @@ const HandleExecution = (props) => {
         }));*/
     }
 
+    const handleStepCommentChange = (keyId,value) => {
+        stepHistory.push(data.steps);
+        setStepHistory(stepHistory);
+        setData({
+            ...data,
+            steps: data.steps.map(step =>{
+                let x = step.keyid ? step.keyid : step.id;
+                return x === keyId ? ({...step, comment: value}) : step 
+            })
+        })
+    }
+
     const handleSuspectBlur = () => {
         stepHistory.push(data.steps);
         setStepHistory(stepHistory);
@@ -330,7 +342,9 @@ const HandleExecution = (props) => {
                                         <Input style={{float: "right",marginLeft: '5px'}} size="small" placeholder="对象名称" value={step.suspect ? step.suspect : ''}
                                         onBlur={(event) => handleSuspectBlur()}
                                         onChange={(event) => handleSuspectChange(step.keyid ? step.keyid : step.id,event.target.value)} 
-                                        onClick={(event) => {event.stopPropagation()}}></Input></div>}
+                                        onClick={(event) => {event.stopPropagation()}}
+                                        prefix={<UserOutlined />}
+                                        ></Input></div>}
                                          key={step.keyid ? step.keyid : step.id} collapsible="header" extra={
                                             <><CloseOutlined  onClick={() => handleRemoveSelectedStep(step.keyid ? step.keyid : step.id)}/></>
                                             }>
@@ -347,6 +361,11 @@ const HandleExecution = (props) => {
                                                      )
                                                     : ''
                                             }
+                                            <Input style={{width: '200px',marginLeft: '5px'}} size="small" placeholder="自定义" value={step.comment ? step.comment : ''}
+                                                onChange={(event) => handleStepCommentChange(step.keyid ? step.keyid : step.id,event.target.value)} 
+                                                onClick={(event) => {event.stopPropagation()}}
+                                                prefix={<CheckCircleOutlined />}
+                                                ></Input>
                                         </Panel>
                                     )) : []
                                 }

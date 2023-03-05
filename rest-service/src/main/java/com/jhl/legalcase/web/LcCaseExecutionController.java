@@ -129,6 +129,7 @@ public class LcCaseExecutionController {
                             .executionId(req.getEntity().getId())
                             .name(step.getName())
                             .suspect(step.getSuspect())
+                            .comment(step.getComment())
                             .id(step.getId()).build();
                     lcCaseExecutionStepRepository.save(lcCaseExecutionStep);
                     list.addAll(step.getCaseTypeStepItems().stream().map(item -> {

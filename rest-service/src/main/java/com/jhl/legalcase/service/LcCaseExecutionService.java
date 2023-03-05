@@ -51,6 +51,7 @@ public class LcCaseExecutionService {
                     .executionId(caseExecution.getId())
                     .name(obj.getName())
                     .suspect(obj.getSuspect())
+                    .comment(obj.getComment())
                     .build();
             caseExecutionStepRepository.save(step);
 
