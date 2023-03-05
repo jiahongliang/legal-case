@@ -125,7 +125,7 @@ const HandleExecution = (props) => {
         setData({
             ...data,
             steps: data.steps.map(step =>
-                (step.id + '') === (stepId + '') ? ({
+                (step.id === null ? ((step.keyid + '') === (stepId + '')) : ((step.id + '') === (stepId + ''))) ? ({
                     ...step, caseTypeStepItems: step.caseTypeStepItems.map(item => (itemId + '') === (item.keyid ? (item.keyid + '') : (item.id + '')) ? ({ ...item, status: isChecked ? 1 : 2 }) : item)
                 }) : step
             )
