@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, createRef, React } from "react";
 import { PageHeader, Button, Form, Input, Row, Col, Radio, Tag, Collapse, Popconfirm, Modal, Result, Tooltip, message, Checkbox } from "antd";
-import { CloseOutlined, PlusOutlined } from '@ant-design/icons';
+import { CloseOutlined, PlusOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { caseTypeList, createCaseExecution, downloadCase } from '../../../../api/biz'
 import moment from 'moment'
 import newCaseIcon from '../../../../assets/images/new-case.jpg';
@@ -171,6 +171,7 @@ const CreateCase = () => {
         setSuspectsData(newTags);
     }*/
 
+    /*
     const handleStepItemTagClose = (stepKeyId, itemId) => {
         historyData.push(selectedStepData);
         setHistoryData(historyData);
@@ -178,6 +179,18 @@ const CreateCase = () => {
             selectedStepData.map(
                 step => step.keyid === stepKeyId ?
                     { ...step, caseTypeStepItems: step.caseTypeStepItems.filter(item => item.id !== itemId) } :
+                    step
+            )
+        )
+    }
+    */
+    const handleStepCommentChange = (keyId,value) => {
+        historyData.push(selectedStepData);
+        setHistoryData(historyData);
+        setSelectedStepData(
+            selectedStepData.map(
+                step => step.keyid === keyId ?
+                    { ...step, comment: value } :
                     step
             )
         )
@@ -275,11 +288,13 @@ const CreateCase = () => {
     }
 
     const exitCreateCase = () => {
+        resetPage();
+        /*
         setSaveResult({
             code: null,
             message: null
-        });
-        //navigate("/console/biz-handle/instance-list");
+        });*/
+        //navigate("/console/biz-handle/new-instance");
     }
 
     const downloadFile = res => {
@@ -383,6 +398,11 @@ const CreateCase = () => {
                                                             ))
                                                             : ""
                                                     }
+                                                    <Input style={{width: '200px',marginLeft: '5px'}} size="small" placeholder="自定义" value={step.comment ? step.comment : ''}
+                                                        onChange={(event) => handleStepCommentChange(step.keyid ? step.keyid : step.id,event.target.value)} 
+                                                        onClick={(event) => {event.stopPropagation()}}
+                                                        prefix={<CheckCircleOutlined />}
+                                                        ></Input>
                                                 </Panel>
                                             ))
                                         }

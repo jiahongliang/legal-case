@@ -29,6 +29,7 @@ const HandleExecution = (props) => {
                 return {...step, orderValue: o ? o.orderValue : 0}
             })
         ] : [];*/
+        /*
         setData({...props.data, steps: props.data.steps ? [
             ...props.data.steps.map(step => {
                 let o = ct.caseTypeSteps.find(s => s.name === step.name);
@@ -38,7 +39,8 @@ const HandleExecution = (props) => {
                 let s2 = ('' + v2.orderValue).padStart(6,'0') + (v2.suspect ? v2.suspect : '') + '';
                 return s1.localeCompare(s2);
             })
-        ] : []});
+        ] : []});*/
+        setRawData(props.data);
         setCaseTypeData(props.caseTypeData);
         setStepActiveKey(props.data.steps ? [...props.data.steps.map(step => step.id), -1] : [-1]);
         setStepData(ct.caseTypeSteps);
@@ -48,6 +50,20 @@ const HandleExecution = (props) => {
          console.log('data',data)
          setStepActiveKey(data.steps ? [...data.steps.map(step => step.keyid ? step.keyid : step.id), -1] : [-1]);
     }, [data]);
+
+    const setRawData = (obj) => {
+        let ct = props.caseTypeData.find(o => o.id === obj.typeId);
+        setData({...obj, steps: obj.steps ? [
+            ...obj.steps.map(step => {
+                let o = ct.caseTypeSteps.find(s => s.name === step.name);
+                return {...step, orderValue: o ? o.orderValue : 0}
+            }).sort((v1,v2) => {
+                let s1 = ('' + v1.orderValue).padStart(6,'0') + (v1.suspect ? v1.suspect : '') + '';
+                let s2 = ('' + v2.orderValue).padStart(6,'0') + (v2.suspect ? v2.suspect : '') + '';
+                return s1.localeCompare(s2);
+            })
+        ] : []});
+    }
 
     const handleStepFilterText = (e) => {
         setStepFilterText(e.target.value);
@@ -93,7 +109,7 @@ const HandleExecution = (props) => {
     }
 
     const handleSave = () => { 
-        console.log('saving:',data)
+        //console.log('saving:',data)
         let param = {
             entity: data
         }
@@ -102,6 +118,7 @@ const HandleExecution = (props) => {
         });
     }
 
+    /*
     const handleStepItemTagClose = (stepId, itemId) => {
         console.log('stepId type:',typeof(stepId),'stepId:',stepId);
         console.log('itemId type:',typeof(itemId),'itemId:',itemId);
@@ -115,7 +132,7 @@ const HandleExecution = (props) => {
                 }) : step
             )
         })
-    }
+    }*/
 
     const handleStepItemClick = (stepId, itemId,isChecked) => {
         console.log('stepId type:',typeof(stepId),'stepId:',stepId);
@@ -249,7 +266,15 @@ const HandleExecution = (props) => {
         }
         handleCaseExecution(param).then(res => {
             if(res && res.rows) {
-                setData(res.rows[0]);
+                let returnData = res.rows[0];
+                setData({
+                    ...returnData,
+                    steps: returnData.steps.sort((v1,v2) => {
+                        let s1 = ('' + v1.orderValue).padStart(6,'0') + (v1.suspect ? v1.suspect : '') + '';
+                        let s2 = ('' + v2.orderValue).padStart(6,'0') + (v2.suspect ? v2.suspect : '') + '';
+                        return s1.localeCompare(s2);
+                    })
+                })
             }
             downloadCase(data.id).then(res => {
                 console.log(res);

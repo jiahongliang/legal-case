@@ -20,6 +20,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletOutputStream;
@@ -27,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.jhl.legalcase.LegalCaseConstants.CASE_EXECUTION_STEP_ITEM_COMPLETED;
@@ -262,6 +265,7 @@ public class LcCaseExecutionController {
         font3.setBold(false);
         cellStyle3.setFont(font3);
 
+        Pattern pattern = Pattern.compile("[\u4e00-\u9fa5]");
         LcCaseType caseType = lcCaseTypeRepository.getReferenceById(execution.getTypeId());
         List<LcCaseTypeStep> caseTypeStepList = lcCaseTypeStepRepository.findAllByCaseType(caseType);
         //Map<String, Integer> caseTypeStepMap = caseTypeStepList.stream().collect(Collectors.toMap(LcCaseTypeStep::getName, LcCaseTypeStep::getOrderValue));
@@ -272,8 +276,8 @@ public class LcCaseExecutionController {
             }
         }
         List<LcCaseExecutionStepVo> stepVos = executionVo.getSteps().stream().sorted((a, b) -> {
-            String x = caseTypeStepMap.get(a.getName()) == null ? a.getSuspect() : (caseTypeStepMap.get(a.getName()).toString() + a.getSuspect());
-            String y = caseTypeStepMap.get(b.getName()) == null ? b.getSuspect() : (caseTypeStepMap.get(b.getName()).toString() + b.getSuspect());
+            String x = caseTypeStepMap.get(a.getName()) == null ? a.getSuspect() : (String.format("%06d", caseTypeStepMap.get(a.getName())) + a.getSuspect());
+            String y = caseTypeStepMap.get(b.getName()) == null ? b.getSuspect() : (String.format("%06d", caseTypeStepMap.get(b.getName())) + b.getSuspect());
             return x.compareTo(y);
         }).collect(Collectors.toList());
         for (LcCaseExecutionStepVo step : stepVos) {
@@ -284,9 +288,20 @@ public class LcCaseExecutionController {
             for (LcCaseExecutionStepItemVo item : step.getCaseTypeStepItems()) {
                 writer.writeRow(Arrays.asList(step.getName(), step.getSuspect(), item.getName(), item.getLawTitle(), ""));
                 writer.setRowHeight(rowIndex, 25);
-                writer.setRowStyleIfHasData(rowIndex,cellStyle3);
+                writer.setRowStyleIfHasData(rowIndex, cellStyle3);
                 rowIndex++;
             }
+
+            if(StringUtils.hasLength(step.getComment())) {
+                Matcher matcher = pattern.matcher(step.getComment());
+                if(matcher.find()) {
+                    writer.writeRow(Arrays.asList(step.getName(), step.getSuspect(), step.getComment(), "自定义", ""));
+                    writer.setRowHeight(rowIndex, 25);
+                    writer.setRowStyleIfHasData(rowIndex, cellStyle3);
+                    rowIndex++;
+                }
+            }
+
             if (rowIndex - 1 > stepStartIndex) {
                 writer.merge(stepStartIndex, rowIndex - 1, 0, 0, step.getName(), cellStyle3);
                 writer.merge(stepStartIndex, rowIndex - 1, 1, 1, step.getSuspect(), cellStyle3);
@@ -297,13 +312,13 @@ public class LcCaseExecutionController {
         List<LcCaseExecutionComment> comments = executionVo.getComments().stream().filter(comment -> comment.getStatus() == null || comment.getStatus().equals(1)).toList();
         if (CollectionUtils.isEmpty(comments)) {
             writer.merge(rowIndex, rowIndex, 1, 3, "-", cellStyle3);
-            writer.writeRow(Arrays.asList("备注", "-",""));
+            writer.writeRow(Arrays.asList("备注", "-", ""));
             writer.setRowStyleIfHasData(rowIndex, cellStyle3);
             writer.setRowHeight(rowIndex, 25);
             rowIndex++;
         } else if (comments.size() == 1) {
             writer.merge(rowIndex, rowIndex, 1, 3, "-", cellStyle3);
-            writer.writeRow(Arrays.asList("备注", comments.get(0).getName(),""));
+            writer.writeRow(Arrays.asList("备注", comments.get(0).getName(), ""));
             writer.setRowStyleIfHasData(rowIndex, cellStyle3);
             writer.setRowHeight(rowIndex, 25);
             rowIndex++;
@@ -332,5 +347,10 @@ public class LcCaseExecutionController {
         writer.flush(out, true);
         out.close();
         writer.close();
+    }
+
+    public static void main(String[] args) {
+        String format = String.format("%07d", 1);
+        System.out.println(format);
     }
 }
