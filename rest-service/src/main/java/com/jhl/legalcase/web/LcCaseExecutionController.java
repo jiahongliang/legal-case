@@ -5,6 +5,7 @@ import cn.hutool.poi.excel.ExcelWriter;
 import com.jhl.legalcase.entity.*;
 import com.jhl.legalcase.repository.*;
 import com.jhl.legalcase.service.LcCaseExecutionService;
+import com.jhl.legalcase.util.webmsg.WebQuery;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.util.webmsg.WebResp;
 import com.jhl.legalcase.web.vo.LcCaseExecutionStepItemVo;
@@ -12,6 +13,7 @@ import com.jhl.legalcase.web.vo.LcCaseExecutionStepVo;
 import com.jhl.legalcase.web.vo.LcCaseExecutionVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +29,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -54,9 +57,30 @@ public class LcCaseExecutionController {
     LcCaseTypeStepRepository lcCaseTypeStepRepository;
     @Autowired
     LcCaseTypeRepository lcCaseTypeRepository;
+    @Autowired
+    SysUserRepository sysUserRepository;
 
     @PostMapping("/list")
     public WebResp<LcCaseExecutionVo, Long> list(@RequestBody WebReq<LcCaseExecution, Long> req) throws ClassNotFoundException {
+        AbstractAuthenticationToken token = (AbstractAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        if (token != null) {
+            SysUser user = (SysUser) token.getDetails();
+            if (user != null && user.getDataRange() != null) {
+                if (user.getDataRange().equals("2")) {
+                    List<SysUser> sameDeptUsers = sysUserRepository.findAllByDeptName(user.getDeptName());
+                    if (!CollectionUtils.isEmpty(sameDeptUsers)) {
+                        String sameDeptUserIds = sameDeptUsers.stream().map(item -> item.getId().toString()).collect(Collectors.joining(","));
+                        req.getEntity().setCreatedBy(null);
+                        WebQuery webQuery = new WebQuery("createdBy", sameDeptUserIds, "in", "and");
+                        req.getWhere().add(webQuery);
+                    }
+                }
+
+                if (user.getDataRange().equals("3")) {
+                    req.getEntity().setCreatedBy(null);
+                }
+            }
+        }
         Page<LcCaseExecution> result = caseExecutionRepository.findAll(req.specification(), req.pageable());
         Page<LcCaseExecutionVo> map = result.map(obj -> caseExecutionService.get(obj));
         return WebResp.newInstance().rows(map.getContent()).pages(result.getTotalPages()).total(result.getTotalElements());
@@ -169,7 +193,7 @@ public class LcCaseExecutionController {
         return WebResp.newInstance().rows(Arrays.asList(executionVo));
     }
 
-    @GetMapping("/export-one/{id}")
+    /*@GetMapping("/export-one/{id}")
     public void export(HttpServletResponse response, @PathVariable Long id) throws ClassNotFoundException, IOException {
         LcCaseExecution execution = caseExecutionRepository.getReferenceById(id);
         LcCaseExecutionVo executionVo = caseExecutionService.get(execution);
@@ -181,17 +205,12 @@ public class LcCaseExecutionController {
 
         int rowIndex = 0;
 
-        CellStyle headCellStyle1 = writer.createCellStyle();//.getHeadCellStyle();
+        CellStyle headCellStyle1 = writer.createCellStyle();
         headCellStyle1.setAlignment(HorizontalAlignment.CENTER);
         headCellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
-        /*headCellStyle1.setBorderTop(BorderStyle.THIN);
-        headCellStyle1.setBorderBottom(BorderStyle.THIN);
-        headCellStyle1.setBorderLeft(BorderStyle.THIN);
-        headCellStyle1.setBorderRight(BorderStyle.THIN);*/
         Font head1Font = writer.createFont();
         head1Font.setFontHeightInPoints((short) 26);
         headCellStyle1.setFont(head1Font);
-        //headCellStyle1.setFillBackgroundColor(IndexedColors.WHITE1.getIndex());
         writer.merge(rowIndex, 0, 0, 4, "案件审核登记表", headCellStyle1);
         writer.setRowHeight(rowIndex, 40);
         writer.passCurrentRow();
@@ -268,7 +287,6 @@ public class LcCaseExecutionController {
         Pattern pattern = Pattern.compile("[\u4e00-\u9fa5]");
         LcCaseType caseType = lcCaseTypeRepository.getReferenceById(execution.getTypeId());
         List<LcCaseTypeStep> caseTypeStepList = lcCaseTypeStepRepository.findAllByCaseType(caseType);
-        //Map<String, Integer> caseTypeStepMap = caseTypeStepList.stream().collect(Collectors.toMap(LcCaseTypeStep::getName, LcCaseTypeStep::getOrderValue));
         Map<String, Integer> caseTypeStepMap = new HashMap<>();
         for (LcCaseTypeStep step : caseTypeStepList) {
             if (caseTypeStepMap.get(step.getName()) == null) {
@@ -338,6 +356,229 @@ public class LcCaseExecutionController {
         writer.setColumnWidth(1, 10);
         writer.setColumnWidth(2, 35);
         writer.setColumnWidth(3, 35);
+
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
+        String fileName = URLEncoder.encode("案件审核登记表", "UTF-8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName + ".xlsx");
+
+        ServletOutputStream out = response.getOutputStream();
+        writer.flush(out, true);
+        out.close();
+        writer.close();
+    }*/
+
+    @GetMapping("/export-one/{id}")
+    public void export(HttpServletResponse response, @PathVariable Long id) throws ClassNotFoundException, IOException {
+        LcCaseExecution execution = caseExecutionRepository.getReferenceById(id);
+        LcCaseExecutionVo executionVo = caseExecutionService.get(execution);
+        String allSuspects = executionVo.getSteps().stream().filter(item -> StringUtils.hasLength(item.getSuspect())).map(item -> item.getSuspect()).collect(Collectors.joining("、"));
+        if (allSuspects == null) {
+            allSuspects = "";
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+
+        AbstractAuthenticationToken token = (AbstractAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        final SysUser user = (SysUser) token.getDetails();
+
+        ExcelWriter writer = ExcelUtil.getWriter(true);
+
+        int rowIndex = 0;
+
+        CellStyle headCellStyle1 = writer.createCellStyle();
+        headCellStyle1.setAlignment(HorizontalAlignment.CENTER);
+        headCellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
+        Font head1Font = writer.createFont();
+        head1Font.setFontHeightInPoints((short) 26);
+        headCellStyle1.setFont(head1Font);
+        writer.merge(rowIndex, 0, 0, 8, "案件审核登记表", headCellStyle1);
+        writer.setRowHeight(rowIndex, 40);
+        writer.passCurrentRow();
+
+        rowIndex++;
+
+        CellStyle cellStyle1 = writer.createCellStyle();
+        cellStyle1.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle1.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle1.setBorderTop(BorderStyle.THIN);
+        cellStyle1.setBorderBottom(BorderStyle.THIN);
+        cellStyle1.setBorderLeft(BorderStyle.THIN);
+        cellStyle1.setBorderRight(BorderStyle.THIN);
+        cellStyle1.setWrapText(true);
+        Font font = writer.createFont();
+        font.setFontHeightInPoints((short) 14);
+        cellStyle1.setFont(font);
+        writer.merge(rowIndex, rowIndex, 1, 3, "", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 4, 5, "", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 6, 8, "", cellStyle1);
+        writer.writeRow(Arrays.asList(new XSSFRichTextString("案件\r\n名称"),
+                executionVo.getName(),
+                "当事人姓名",
+                allSuspects));
+        writer.writeCellValue(4, rowIndex, "当事人姓名");
+        writer.writeCellValue(6, rowIndex, allSuspects);
+        writer.setRowStyleIfHasData(rowIndex, cellStyle1);
+        writer.setRowHeight(rowIndex, 50);
+
+        rowIndex++;
+
+        writer.merge(rowIndex, rowIndex, 1, 2, "", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 3, 4, "", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 6, 7, "", cellStyle1);
+        writer.writeRow(Arrays.asList(new XSSFRichTextString("办案\r\n单位"),
+                user.getDeptName(),
+                "主办民警",
+                user.getName(),
+                "审核时间",
+                sdf.format(executionVo.getCreatedTime())));
+        writer.writeCellValue(3, rowIndex, "主办民警");
+        writer.writeCellValue(5, rowIndex, user.getName());
+        writer.writeCellValue(6, rowIndex, "审核时间");
+        writer.writeCellValue(8, rowIndex, sdf.format(executionVo.getCreatedTime()));
+        writer.setRowStyleIfHasData(rowIndex, cellStyle1);
+        writer.setRowHeight(rowIndex, 50);
+
+        rowIndex++;
+
+        writer.merge(rowIndex, rowIndex + 5, 0, 0, "", cellStyle1);
+        writer.merge(rowIndex, rowIndex + 5, 1, 8, "", cellStyle1);
+        writer.writeRow(Arrays.asList(new XSSFRichTextString("简\r\n要\r\n案\r\n情"), ""));
+        writer.setRowStyleIfHasData(rowIndex, cellStyle1);
+        writer.setRowHeight(rowIndex, 25);
+        writer.setRowStyleIfHasData(rowIndex + 1, cellStyle1);
+        writer.setRowHeight(rowIndex + 1, 25);
+        writer.setRowStyleIfHasData(rowIndex + 2, cellStyle1);
+        writer.setRowHeight(rowIndex + 2, 25);
+        writer.setRowStyleIfHasData(rowIndex + 3, cellStyle1);
+        writer.setRowHeight(rowIndex + 3, 25);
+        writer.setRowStyleIfHasData(rowIndex + 4, cellStyle1);
+        writer.setRowHeight(rowIndex + 4, 25);
+        writer.setRowStyleIfHasData(rowIndex + 5, cellStyle1);
+        writer.setRowHeight(rowIndex + 5, 25);
+
+        rowIndex = rowIndex + 6;
+
+        writer.merge(rowIndex, rowIndex, 0, 1, "", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 2, 8, "", cellStyle1);
+        writer.writeCellValue(0, rowIndex, "拟处理意见");
+        writer.setRowStyleIfHasData(rowIndex, cellStyle1);
+        writer.setRowHeight(rowIndex, 25);
+
+        rowIndex++;
+
+        CellStyle cellStyle3 = writer.createCellStyle();
+        cellStyle3.setAlignment(HorizontalAlignment.CENTER);
+        cellStyle3.setVerticalAlignment(VerticalAlignment.CENTER);
+        cellStyle3.setBorderTop(BorderStyle.THIN);
+        cellStyle3.setBorderBottom(BorderStyle.THIN);
+        cellStyle3.setBorderLeft(BorderStyle.THIN);
+        cellStyle3.setBorderRight(BorderStyle.THIN);
+        Font font3 = writer.createFont();
+        font3.setFontHeightInPoints((short) 12);
+        font3.setBold(false);
+        cellStyle3.setFont(font3);
+
+        Pattern pattern = Pattern.compile("[\u4e00-\u9fa5]");
+        LcCaseType caseType = lcCaseTypeRepository.getReferenceById(execution.getTypeId());
+        List<LcCaseTypeStep> caseTypeStepList = lcCaseTypeStepRepository.findAllByCaseType(caseType);
+        Map<String, Integer> caseTypeStepMap = new HashMap<>();
+        for (LcCaseTypeStep step : caseTypeStepList) {
+            if (caseTypeStepMap.get(step.getName()) == null) {
+                caseTypeStepMap.put(step.getName(), step.getOrderValue());
+            }
+        }
+        List<LcCaseExecutionStepVo> stepVos = executionVo.getSteps().stream().sorted((a, b) -> {
+            String x = caseTypeStepMap.get(a.getName()) == null ? a.getSuspect() : (String.format("%06d", caseTypeStepMap.get(a.getName())) + a.getSuspect());
+            String y = caseTypeStepMap.get(b.getName()) == null ? b.getSuspect() : (String.format("%06d", caseTypeStepMap.get(b.getName())) + b.getSuspect());
+            return x.compareTo(y);
+        }).collect(Collectors.toList());
+        for (LcCaseExecutionStepVo step : stepVos) {
+            if (!CollectionUtils.isEmpty(step.getCaseTypeStepItems())) {
+                step.setCaseTypeStepItems(step.getCaseTypeStepItems().stream().filter(item -> CASE_EXECUTION_STEP_ITEM_CREATED.equals(item.getStatus())).toList());
+            }
+            int stepStartIndex = rowIndex;
+            for (LcCaseExecutionStepItemVo item : step.getCaseTypeStepItems()) {
+                writer.merge(rowIndex, rowIndex, 2, 8, item.getName(), cellStyle3);
+                writer.setRowHeight(rowIndex, 25);
+                writer.setRowStyleIfHasData(rowIndex, cellStyle3);
+                rowIndex++;
+            }
+
+            if (StringUtils.hasLength(step.getComment())) {
+                Matcher matcher = pattern.matcher(step.getComment());
+                if (matcher.find()) {
+                    writer.merge(rowIndex, rowIndex, 2, 8, step.getComment(), cellStyle3);
+                    writer.setRowHeight(rowIndex, 25);
+                    writer.setRowStyleIfHasData(rowIndex, cellStyle3);
+                    rowIndex++;
+                }
+            }
+
+            if (rowIndex - 1 > stepStartIndex) {
+                writer.merge(stepStartIndex, rowIndex - 1, 0, 0, step.getName(), cellStyle3);
+                writer.merge(stepStartIndex, rowIndex - 1, 1, 1, step.getSuspect(), cellStyle3);
+            } else {
+                writer.writeCellValue(0, stepStartIndex, step.getName());
+                writer.writeCellValue(1, stepStartIndex, step.getSuspect());
+            }
+        }
+
+
+        int commentStartRowIndex = rowIndex;
+        List<LcCaseExecutionComment> comments = executionVo.getComments().stream().filter(comment -> comment.getStatus() == null || comment.getStatus().equals(1)).toList();
+        if (CollectionUtils.isEmpty(comments)) {
+            writer.merge(rowIndex, rowIndex, 2, 8, "-", cellStyle3);
+            writer.writeCellValue(0, rowIndex, "备注");
+            writer.writeCellValue(1, rowIndex, "-");
+            writer.setRowStyleIfHasData(rowIndex, cellStyle3);
+            writer.setRowHeight(rowIndex, 25);
+            rowIndex++;
+        } else if (comments.size() == 1) {
+            writer.merge(rowIndex, rowIndex, 2, 8, comments.get(0).getName(), cellStyle3);
+            writer.writeCellValue(0, rowIndex, "备注");
+            writer.writeCellValue(1, rowIndex, "-");
+            writer.setRowStyleIfHasData(rowIndex, cellStyle3);
+            writer.setRowHeight(rowIndex, 25);
+            rowIndex++;
+        } else {
+            for (LcCaseExecutionComment comment : comments) {
+                writer.merge(rowIndex, rowIndex, 2, 8, comment.getName(), cellStyle3);
+                writer.setRowHeight(rowIndex, 25);
+                writer.setRowStyleIfHasData(rowIndex, cellStyle3);
+                writer.passCurrentRow();
+                rowIndex++;
+            }
+            writer.merge(commentStartRowIndex, rowIndex - 1, 0, 0, "备注", cellStyle3);
+            writer.merge(commentStartRowIndex, rowIndex - 1, 1, 1, "-", cellStyle3);
+            writer.setRowHeight(rowIndex, 25);
+        }
+
+        writer.merge(rowIndex, rowIndex, 0, 1, "审核意见", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 2, 8, "", cellStyle1);
+        writer.writeCellValue(0, rowIndex, "审核意见");
+        writer.setRowStyleIfHasData(rowIndex, cellStyle1);
+        writer.setRowHeight(rowIndex, 25);
+
+        rowIndex++;
+
+        writer.merge(rowIndex, rowIndex, 0, 1, "主办民警签名", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 2, 3, "", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 4, 5, "审核人签名", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 6, 8, "", cellStyle1);
+        writer.setRowStyleIfHasData(rowIndex, cellStyle1);
+        writer.setRowHeight(rowIndex, 35);
+
+        rowIndex++;
+
+        writer.setColumnWidth(0, 15);
+        writer.setColumnWidth(1, 10);
+        writer.setColumnWidth(2, 20);
+        writer.setColumnWidth(3, 10);
+        writer.setColumnWidth(4, 5);
+        writer.setColumnWidth(5, 15);
+        writer.setColumnWidth(6, 8);
+        writer.setColumnWidth(7, 6);
+        writer.setColumnWidth(8, 15);
 
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=utf-8");
         String fileName = URLEncoder.encode("案件审核登记表", "UTF-8");

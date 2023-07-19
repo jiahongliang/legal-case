@@ -26,4 +26,5 @@ public class SysUser extends JpaAudit {
     private String role;
     private String memo;
     private Integer status;
+    private String dataRange;
 }

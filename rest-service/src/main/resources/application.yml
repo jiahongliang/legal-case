@@ -3,7 +3,7 @@ server:
   servlet:
     context-path: /legal-case
     session:
-      timeout: 30m
+      timeout: 0
   tomcat:
     max-http-form-post-size: 1GB
 
@@ -30,7 +30,6 @@ spring:
       max-file-size: 30MB
       max-request-size: 30MB
 
-
 legalCase:
   security:
     user:
@@ -40,6 +39,10 @@ legalCase:
       validateCode: false
   attachment:
     location: /Users/jiahongliang/Projects/temp/attachment
+  dataInterface:
+    role: provider  # provider,consumer,none
+    url: http://localhost:9090/legal-case/data-interface/provider/
+
 p6spy:
   config:
     appender: com.p6spy.engine.spy.appender.Slf4JLogger

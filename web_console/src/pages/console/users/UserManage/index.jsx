@@ -365,6 +365,13 @@ const UserManagePage = () => {
                                     }
                                 </Checkbox.Group>
                             </Form.Item>
+                            <Form.Item name="dataRange" label="数据权限" tooltip="请选择数据权限" rules={[{ required: true, message: '数据权限必须选择' }]}>
+                                <Select>
+                                    <Option value="1">个人</Option>
+                                    <Option value="2">本部门</Option>
+                                    <Option value="3">全部</Option>
+                                </Select>
+                            </Form.Item>
                             <Form.Item name="memo" label="备注" tooltip="请输入备注信息">
                                 <TextArea rows={4} />
                             </Form.Item>

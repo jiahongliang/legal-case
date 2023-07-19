@@ -12,7 +12,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.session.InvalidSessionStrategy;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -67,6 +66,7 @@ public class SecurityConfig {
                 .antMatchers("/login").permitAll()
                 .antMatchers("/verify_code/**").permitAll()
                 .antMatchers("/user/register").permitAll()
+                .antMatchers("/data-interface/provider/**").permitAll()
                 .anyRequest().authenticated();
 
         http.authenticationManager(authenticationManager).authenticationProvider(authenticationProvider);
