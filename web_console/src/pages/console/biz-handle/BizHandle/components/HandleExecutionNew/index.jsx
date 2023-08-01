@@ -342,6 +342,10 @@ const HandleExecution = (props) => {
                             <Form.Item label="名称">
                                 {data.name}
                             </Form.Item>
+
+                            <Form.Item label="办案人">
+                                {data.ownerDept ? '[' + data.ownerDept + ']' : ''}{data.owner}
+                            </Form.Item>
                             
                             <span style={{fontWeight: 600}}>可选步骤 <Input onChange={handleStepFilterText}></Input></span>
                             <div className="case-type-source-step-area">

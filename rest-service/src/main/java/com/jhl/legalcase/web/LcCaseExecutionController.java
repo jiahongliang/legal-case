@@ -426,13 +426,13 @@ public class LcCaseExecutionController {
         writer.merge(rowIndex, rowIndex, 3, 4, "", cellStyle1);
         writer.merge(rowIndex, rowIndex, 6, 7, "", cellStyle1);
         writer.writeRow(Arrays.asList(new XSSFRichTextString("办案\r\n单位"),
-                user.getDeptName(),
+                executionVo.getOwnerDept(),
                 "主办民警",
                 user.getName(),
                 "审核时间",
                 sdf.format(executionVo.getCreatedTime())));
         writer.writeCellValue(3, rowIndex, "主办民警");
-        writer.writeCellValue(5, rowIndex, user.getName());
+        writer.writeCellValue(5, rowIndex, executionVo.getOwner());
         writer.writeCellValue(6, rowIndex, "审核时间");
         writer.writeCellValue(8, rowIndex, sdf.format(executionVo.getCreatedTime()));
         writer.setRowStyleIfHasData(rowIndex, cellStyle1);
@@ -564,7 +564,7 @@ public class LcCaseExecutionController {
         writer.merge(rowIndex, rowIndex, 0, 1, "主办民警签名", cellStyle1);
         writer.merge(rowIndex, rowIndex, 2, 3, "", cellStyle1);
         writer.merge(rowIndex, rowIndex, 4, 5, "审核人签名", cellStyle1);
-        writer.merge(rowIndex, rowIndex, 6, 8, "", cellStyle1);
+        writer.merge(rowIndex, rowIndex, 6, 8, executionVo.getCreator(), cellStyle1);
         writer.setRowStyleIfHasData(rowIndex, cellStyle1);
         writer.setRowHeight(rowIndex, 35);
 
