@@ -22,6 +22,12 @@ public class LcCaseExecutionVo extends BaseVo {
     private List<LcCaseExecutionStepVo> steps;
     private List<LcCaseExecutionComment> comments;
     private Integer status = CASE_EXECUTION_CREATED;
+    private String creatorDept;
+    private String creatorDeptSearch;
+    private Long ownedBy;
+    private String owner;
+    private String ownerDept;
+    private String ownerDeptSearch;
 
     public static Map<String, String> excelHeaders() {
         Map<String, String> map = new LinkedHashMap<>();

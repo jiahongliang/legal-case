@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from 'react-router';
 import { useState } from "react";
-import { Card, Form, Input, Button, Image } from "antd";
+import { Form, Input, Button, Image } from "antd";
 import { LockOutlined, UserOutlined, HolderOutlined } from '@ant-design/icons';
 import { login, fetchValidateCodeRequiredFlag } from "../api/user";
 import { LOGIN_USER_TOKEN } from '../util/Constants'
@@ -57,7 +57,7 @@ const Login = () => {
         <div className="login-container">
             <div className="login-box">
                 
-                        <div className="login-logo"><img src={loginLogo} style={{'width': '230px'}}/><br/>内黄县公安局执法办案智能辅助平台</div>
+                        <div className="login-logo"><img src={loginLogo} alt="Login Logo" style={{'width': '230px'}}/><br/>{process.env.REACT_APP_TITLE}</div>
                     <Form form={form} className="login-form">
                         <Form.Item name="userName" rules={[{ required: true, message: '请输入用户名' }]}>
                             <Input addonBefore={<UserOutlined />} maxLength={20} size="large" placeholder="请输入用户名" />

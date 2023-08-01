@@ -48,6 +48,13 @@ export const userList = (data) => {
     });
 }
 
+export const allUserList = () => {
+    return serviceJson({
+        url: '/user/all-users',
+        method: 'get',
+    });
+}
+
 export const userAction = (data) => {
     return serviceJson({
         url: '/user/action',

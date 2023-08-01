@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef, createRef, React } from "react";
-import { PageHeader, Button, Form, Input, Row, Col, Radio, Tag, Collapse, Popconfirm, Modal, Result, Tooltip, message, Checkbox } from "antd";
+import { PageHeader, Button, Form, Input, Row, Col, Radio, Tag, Collapse, Popconfirm, Modal, Result, Tooltip, message, Checkbox, Select } from "antd";
 import { CloseOutlined, PlusOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { LOGIN_USER_TOKEN } from '../../../../util/Constants';
 import { caseTypeList, createCaseExecution, downloadCase } from '../../../../api/biz'
+import { allUserList } from "../../../../api/user";
 import moment from 'moment'
 import newCaseIcon from '../../../../assets/images/new-case.jpg';
 import './index.css';
-import { useNavigate } from 'react-router';
 
 const { Panel } = Collapse;
+const { Option } = Select;
 
 const CreateCase = () => {
     const [caseForm] = Form.useForm();
@@ -23,6 +25,7 @@ const CreateCase = () => {
     const suspectInputRef = createRef();
     //const [suspectInputValue, setSuspectInputValue] = useState('');
     const [stepData, setStepData] = useState([]);
+    const [userData, setUserData] = useState([]);
     const [stepFilterText, setStepFilterText] = useState('');
     const [selectedStepData, setSelectedStepData] = useState([]);
     const [historyData, setHistoryData] = useState([]);
@@ -34,10 +37,24 @@ const CreateCase = () => {
 
     const [caseTypeData, setCaseTypeData] = useState([]);
 
-    let navigate = useNavigate();
+    //let navigate = useNavigate();
 
     useEffect(() => {
         loadCaseTypeData();
+        loadAllUserData();
+        let loginUserToken = sessionStorage.getItem(LOGIN_USER_TOKEN);
+
+        if (loginUserToken && loginUserToken.length > 0) {
+            let userObj = JSON.parse(loginUserToken);
+            caseForm.setFieldsValue(
+                {
+                    'ownedBy':userObj.id, 
+                    'owner': userObj.name, 
+                    'ownerDept': userObj.deptName, 
+                    'ownerDeptSearch': userObj.deptNameSearch 
+                }
+            );
+        }
     }, [])
 
     useEffect(() => {
@@ -108,6 +125,28 @@ const CreateCase = () => {
         });
     }
 
+    const loadAllUserData = () => {
+        allUserList().then(res => {
+            setUserData(res.rows);
+        });
+    }
+
+    const handleOwnedByChange = (value) => {
+        let u = userData.find(v => v.id === value);
+        if (u) {
+            caseForm.setFieldsValue({ 'owner': u.owner, 'ownerDept': u.ownerDept, 'ownerDeptSearch': u.ownerDeptSearch });
+        }
+    }
+
+    // const handleUserSearch = (searchValue) => {
+    //     console.log('handleUserSearch',searchValue);
+    // }
+
+    const handleFilterUserOption = (inputValue, option) => {
+        console.log('option', option)
+        return option.searchtext?.includes(inputValue);
+    }
+
     const onCaseTypeChange = (event) => {
         let ct = caseTypeData.find(o => o.id === event.target.value)
         setStepData(ct.caseTypeSteps);
@@ -119,8 +158,8 @@ const CreateCase = () => {
 
     const handleClickSourceStep = (stepId) => {
         let clickedStep = stepData.find(step => step.id === stepId);
-        if(clickedStep.caseTypeStepItems && clickedStep.caseTypeStepItems.length > 0) {
-            clickedStep.caseTypeStepItems = clickedStep.caseTypeStepItems.map(item => ({...item, status: 2}));
+        if (clickedStep.caseTypeStepItems && clickedStep.caseTypeStepItems.length > 0) {
+            clickedStep.caseTypeStepItems = clickedStep.caseTypeStepItems.map(item => ({ ...item, status: 2 }));
         }
         historyData.push(selectedStepData);
         setHistoryData(historyData);
@@ -184,7 +223,7 @@ const CreateCase = () => {
         )
     }
     */
-    const handleStepCommentChange = (keyId,value) => {
+    const handleStepCommentChange = (keyId, value) => {
         historyData.push(selectedStepData);
         setHistoryData(historyData);
         setSelectedStepData(
@@ -231,12 +270,21 @@ const CreateCase = () => {
             return;
         }
 
+        let ownedBy = caseForm.getFieldValue('ownedBy') ? caseForm.getFieldValue('ownedBy') : null;
+        let owner = caseForm.getFieldValue('owner') ? caseForm.getFieldValue('owner') : null;
+        let ownerDept = caseForm.getFieldValue('ownerDept') ? caseForm.getFieldValue('ownerDept') : null;
+        let ownerDeptSearch = caseForm.getFieldValue('ownerDeptSearch') ? caseForm.getFieldValue('ownerDeptSearch') : null;
+
         let params = {
             entity: {
                 name,
                 typeId,
                 steps: selectedStepData.filter(sd => sd.caseTypeStepItems && sd.caseTypeStepItems.length > 0),
                 comments: commentsData,
+                ownedBy,
+                owner,
+                ownerDept,
+                ownerDeptSearch,
                 id: id
             }
         }
@@ -271,6 +319,20 @@ const CreateCase = () => {
         setStepActiveKey(['-1']);
         setCommentsData([]);
         setId(null);
+
+        let loginUserToken = sessionStorage.getItem(LOGIN_USER_TOKEN);
+        if (loginUserToken && loginUserToken.length > 0) {
+            let userObj = JSON.parse(loginUserToken);
+            caseForm.setFieldsValue(
+                {
+                    'ownedBy':userObj.id, 
+                    'owner': userObj.name, 
+                    'ownerDept': userObj.deptName, 
+                    'ownerDeptSearch': userObj.deptNameSearch 
+                }
+            );
+        }
+        
         setSaveResult({
             code: null,
             message: null
@@ -358,6 +420,22 @@ const CreateCase = () => {
                                     <Form.Item name="name" label="名称">
                                         <Input placeholder="请输入名称" maxLength={50} onFocus={e => e.target.select()} />
                                     </Form.Item>
+
+                                    <Form.Item name="ownedBy" label="办案人">
+                                        <Select placeholder="请选择办案人" onChange={handleOwnedByChange} showSearch={true}
+                                            filterOption={handleFilterUserOption}
+                                            optionLabelProp="label">
+                                            {
+                                                userData.map(item => (
+                                                    <Option key={item.id} value={item.id} label={item.name} searchtext={item.deptNameSearch + "-" + item.nameSearch}>{item.name}</Option>
+                                                ))
+                                            }
+                                        </Select>
+                                    </Form.Item>
+                                    <Form.Item name="owner" label="办案人名称" hidden={true}><Input /></Form.Item>
+                                    <Form.Item name="ownerDept" label="办案人部门名称" hidden={true}><Input /></Form.Item>
+                                    <Form.Item name="ownerDeptSearch" label="办案人部门搜索名称" hidden={true}><Input /></Form.Item>
+
                                     <span style={{ fontWeight: 600 }}>可选步骤 <Input onChange={handleStepFilterText}></Input></span>
                                     <div className="case-type-source-step-area">
                                         {
@@ -387,22 +465,22 @@ const CreateCase = () => {
                                                         (step.caseTypeStepItems && step.caseTypeStepItems.length > 0) ?
                                                             step.caseTypeStepItems.map(item => (
                                                                 <Tooltip key={item.id} placement="topLeft" title={item.lawTitle} color="gold" arrowPointAtCenter>
-                                                                    
-                                                                    <Checkbox 
+
+                                                                    <Checkbox
                                                                         key={item.id}
-                                                                        checked={!item.status || item.status === 1} 
-                                                                        onChange={(e) => {handleStepItemClick(step.keyid ? step.keyid : step.id, item.keyid ? item.keyid : item.id, e.target.checked)}}>
-                                                                            {item.name}
+                                                                        checked={!item.status || item.status === 1}
+                                                                        onChange={(e) => { handleStepItemClick(step.keyid ? step.keyid : step.id, item.keyid ? item.keyid : item.id, e.target.checked) }}>
+                                                                        {item.name}
                                                                     </Checkbox>
                                                                 </Tooltip>
                                                             ))
                                                             : ""
                                                     }
-                                                    <Input style={{width: '200px',marginLeft: '5px'}} size="small" placeholder="自定义" value={step.comment ? step.comment : ''}
-                                                        onChange={(event) => handleStepCommentChange(step.keyid ? step.keyid : step.id,event.target.value)} 
-                                                        onClick={(event) => {event.stopPropagation()}}
+                                                    <Input style={{ width: '200px', marginLeft: '5px' }} size="small" placeholder="自定义" value={step.comment ? step.comment : ''}
+                                                        onChange={(event) => handleStepCommentChange(step.keyid ? step.keyid : step.id, event.target.value)}
+                                                        onClick={(event) => { event.stopPropagation() }}
                                                         prefix={<CheckCircleOutlined />}
-                                                        ></Input>
+                                                    ></Input>
                                                 </Panel>
                                             ))
                                         }

@@ -38,20 +38,22 @@ public class BaseDataConsumer<T extends JpaAudit> {
     }
 
     @Scheduled(fixedRate = 3600000)
-    //@Scheduled(fixedRate = 2000)
+    //@Scheduled(fixedRate = 60000)
     public void consumeData() {
-        log.info("开始同步{}数据...", this.clazz.getSimpleName());
-        dataProviderRepository = (DataProviderRepository) LegalCaseApplication.applicationContext.getBean(repositoryBeanName);
-        T latest = dataProviderRepository.findFirstByIdIsNotNullOrderByCreatedTimeDesc();
-        Date latestTime = null;
-        if (latest != null) {
-            latestTime = latest.getCreatedTime();
-        }
-        List<T> data = consumerService.fetchData(latestTime, this.clazz.getSimpleName());
-        if (!CollectionUtils.isEmpty(data)) {
-            dataProviderRepository.saveAll(data);
-        }
+        if (LegalCaseApplication.applicationContext != null) {
+            log.info("开始同步{}数据...", this.clazz.getSimpleName());
+            dataProviderRepository = (DataProviderRepository) LegalCaseApplication.applicationContext.getBean(repositoryBeanName);
+            T latest = dataProviderRepository.findFirstByIdIsNotNullOrderByCreatedTimeDesc();
+            Date latestTime = null;
+            if (latest != null) {
+                latestTime = latest.getCreatedTime();
+            }
+            List<T> data = consumerService.fetchData(latestTime, this.clazz);
+            if (!CollectionUtils.isEmpty(data)) {
+                dataProviderRepository.saveAll(data);
+            }
 
-        log.info("同步{}数据完成，共同步了{}条数据...", this.clazz.getSimpleName(), data == null ? 0 : data.size());
+            log.info("同步{}数据完成，共同步了{}条数据...", this.clazz.getSimpleName(), data == null ? 0 : data.size());
+        }
     }
 }

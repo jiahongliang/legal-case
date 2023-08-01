@@ -9,19 +9,25 @@ import com.jhl.legalcase.util.common.MyBeanUtils;
 import com.jhl.legalcase.util.pinyin.PinyinUtil;
 import com.jhl.legalcase.util.webmsg.WebReq;
 import com.jhl.legalcase.util.webmsg.WebResp;
+import com.jhl.legalcase.web.vo.UserVo;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.jhl.legalcase.LegalCaseConstants.*;
 
@@ -52,6 +58,24 @@ public class SysUserController {
             e.printStackTrace();
         }*/
         return WebResp.newInstance().rows(result.getContent()).pages(result.getTotalPages()).total(result.getTotalElements());
+    }
+
+    @GetMapping("/all-users")
+    public WebResp<UserVo, Long> allUsers() {
+        List<SysUser> allUsers = sysUserRepository.findAllByStatusIn(Arrays.asList(USER_STATUS_CONFIRMED));
+        WebResp webResp = WebResp.newInstance();
+        if (!CollectionUtils.isEmpty(allUsers)) {
+            List<UserVo> collect = allUsers.stream().map(item -> {
+                UserVo userVo = new UserVo();
+                BeanUtils.copyProperties(item, userVo);
+                userVo.setName("[" + userVo.getDeptName() + "]" + userVo.getName());
+                return userVo;
+            }).collect(Collectors.toList());
+            webResp.rows(collect);
+        } else {
+            webResp.rows(Collections.emptyList());
+        }
+        return webResp;
     }
 
     @PostMapping("/action")

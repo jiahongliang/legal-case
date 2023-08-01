@@ -29,5 +29,7 @@ public interface SysUserRepository extends JpaRepositoryImplementation<SysUser, 
      */
     List<SysUser> findAllByNameSearchIsNull();
 
-    List<SysUser> findAllByDeptName(String deptName);
+    List<SysUser> findAllByDeptNameLike(String deptName);
+
+    List<SysUser> findAllByStatusIn(List<Integer> statusList);
 }

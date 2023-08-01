@@ -32,7 +32,7 @@
 }
 
 .case-type-source-step-area {
-    height: calc(100vh - 440px);
+    height: calc(100vh - 515px);
     overflow: auto;
     border: 1px solid #efefef;
     margin-top: 10px 5px 0 0;

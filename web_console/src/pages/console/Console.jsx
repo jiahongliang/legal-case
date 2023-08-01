@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import { useNavigate, useLocation } from 'react-router';
 import { Layout, Menu, Row, Col, Dropdown, Breadcrumb, Divider, Tag, Drawer, Form, Input, Button, Result, Tree } from "antd";
 import { menus } from "./menu";
-import { CONSOLE_NAVIGATE_TABS, LOGIN_USER_TOKEN, LOGIN_USER_MENUS } from '../../util/Constants'
+import { CONSOLE_NAVIGATE_TABS, LOGIN_USER_TOKEN } from '../../util/Constants'
 import { logout, updatePassword, menuOrderList, saveMenuOrder } from '../../api/user'
 import Base64 from 'base-64';
 

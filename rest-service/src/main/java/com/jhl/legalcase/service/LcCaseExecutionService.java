@@ -42,6 +42,10 @@ public class LcCaseExecutionService {
                 .name(caseExecutionVo.getName())
                 .nameSearch(caseExecutionVo.getName() == null ? "" : caseExecutionVo.getName() + "|" + PinyinUtil.toFirstChar(caseExecutionVo.getName()))
                 .status(CASE_EXECUTION_CREATED)
+                .ownedBy(caseExecutionVo.getOwnedBy())
+                .owner(caseExecutionVo.getOwner())
+                .ownerDept(caseExecutionVo.getOwnerDept())
+                .ownerDeptSearch(caseExecutionVo.getOwnerDeptSearch())
                 .build();
         caseExecutionRepository.save(caseExecution);
 
@@ -113,12 +117,12 @@ public class LcCaseExecutionService {
                 executionVo.setTypeName(caseType.getName());
             }
         }
-        if (executionVo.getCreatedBy() != null) {
+        /*if (executionVo.getCreatedBy() != null) {
             SysUser user = userRepository.getReferenceById(executionVo.getCreatedBy());
             if (user != null) {
                 executionVo.setCreator(user.getName());
             }
-        }
+        }*/
 
         return executionVo;
     }

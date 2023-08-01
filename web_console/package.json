@@ -9,6 +9,7 @@
     "antd": "^4.20.2",
     "axios": "^0.27.2",
     "base-64": "^1.0.0",
+    "dotenv-cli": "^7.2.1",
     "draft-js": "^0.11.7",
     "draftjs-to-html": "^0.9.1",
     "html-to-draftjs": "^1.5.0",
@@ -24,8 +25,10 @@
     "web-vitals": "^2.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start:police": "dotenv -e .env.police react-scripts start",
+    "start:justice": "dotenv -e .env.justice react-scripts start",
+    "build:police": "dotenv -e .env.police react-scripts build",
+    "build:justice": "dotenv -e .env.justice react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

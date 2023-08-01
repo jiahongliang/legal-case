@@ -190,6 +190,28 @@ const BizHandle = () => {
             width: 80
         },
         {
+            title: '办案人',
+            onHeaderCell: function (column) {
+                column.align = "center"
+            },
+            render: (_,record) => {
+                return ((record.ownerDept ? ("[" + record.ownerDept + "]") : '') + (record.owner ? record.owner : ''))
+            },
+            width: 120
+            
+        },
+        {
+            title: '填写人',
+            onHeaderCell: function (column) {
+                column.align = "center"
+            },
+            render: (_,record) => {
+                return ((record.creatorDept ? ("[" + record.creatorDept + "]") : '') + (record.creator ? record.creator : ''))
+            },
+            width: 120
+            
+        },
+        {
             title: '创建时间',
             dataIndex: 'createdTime',
             onHeaderCell: function (column) {

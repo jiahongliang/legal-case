@@ -40,8 +40,8 @@ legalCase:
   attachment:
     location: /Users/jiahongliang/Projects/temp/attachment
   dataInterface:
-    role: provider  # provider,consumer,none
-    url: http://localhost:9090/legal-case/data-interface/provider/
+    role: none  # provider,consumer,none
+    host: localhost:9091
 
 p6spy:
   config:

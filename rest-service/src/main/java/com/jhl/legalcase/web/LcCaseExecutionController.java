@@ -67,7 +67,7 @@ public class LcCaseExecutionController {
             SysUser user = (SysUser) token.getDetails();
             if (user != null && user.getDataRange() != null) {
                 if (user.getDataRange().equals("2")) {
-                    List<SysUser> sameDeptUsers = sysUserRepository.findAllByDeptName(user.getDeptName());
+                    List<SysUser> sameDeptUsers = sysUserRepository.findAllByDeptNameLike(user.getDeptName() + "%");
                     if (!CollectionUtils.isEmpty(sameDeptUsers)) {
                         String sameDeptUserIds = sameDeptUsers.stream().map(item -> item.getId().toString()).collect(Collectors.joining(","));
                         req.getEntity().setCreatedBy(null);

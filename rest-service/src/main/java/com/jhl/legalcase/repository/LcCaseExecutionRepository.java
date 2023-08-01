@@ -12,4 +12,6 @@ public interface LcCaseExecutionRepository extends JpaRepositoryImplementation<L
      * @return
      */
     List<LcCaseExecution> findAllByNameSearchIsNull();
+
+    List<LcCaseExecution> findAllByOwnedByIsNull();
 }
