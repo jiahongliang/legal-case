@@ -26,6 +26,7 @@ const CreateCase = () => {
     //const [suspectInputValue, setSuspectInputValue] = useState('');
     const [stepData, setStepData] = useState([]);
     const [userData, setUserData] = useState([]);
+    const [ownerObj, setOwnerObj] = useState(null);
     const [stepFilterText, setStepFilterText] = useState('');
     const [selectedStepData, setSelectedStepData] = useState([]);
     const [historyData, setHistoryData] = useState([]);
@@ -48,12 +49,10 @@ const CreateCase = () => {
             let userObj = JSON.parse(loginUserToken);
             caseForm.setFieldsValue(
                 {
-                    'ownedBy':userObj.id, 
-                    'owner': userObj.name, 
-                    'ownerDept': userObj.deptName, 
-                    'ownerDeptSearch': userObj.deptNameSearch 
+                    'ownedBy':userObj.id
                 }
             );
+            setOwnerObj(userObj);
         }
     }, [])
 
@@ -134,7 +133,8 @@ const CreateCase = () => {
     const handleOwnedByChange = (value) => {
         let u = userData.find(v => v.id === value);
         if (u) {
-            caseForm.setFieldsValue({ 'owner': u.owner, 'ownerDept': u.ownerDept, 'ownerDeptSearch': u.ownerDeptSearch });
+            setOwnerObj(u);
+            console.log('u',u);
         }
     }
 
@@ -270,10 +270,10 @@ const CreateCase = () => {
             return;
         }
 
-        let ownedBy = caseForm.getFieldValue('ownedBy') ? caseForm.getFieldValue('ownedBy') : null;
-        let owner = caseForm.getFieldValue('owner') ? caseForm.getFieldValue('owner') : null;
-        let ownerDept = caseForm.getFieldValue('ownerDept') ? caseForm.getFieldValue('ownerDept') : null;
-        let ownerDeptSearch = caseForm.getFieldValue('ownerDeptSearch') ? caseForm.getFieldValue('ownerDeptSearch') : null;
+        let ownedBy = ownerObj ? ownerObj.id : null;
+        let owner = ownerObj ? ownerObj.name : null;
+        let ownerDept = ownerObj ? ownerObj.deptName : null;
+        let ownerDeptSearch = ownerObj ? ownerObj.deptNameSearch : null;
 
         let params = {
             entity: {
@@ -323,12 +323,10 @@ const CreateCase = () => {
         let loginUserToken = sessionStorage.getItem(LOGIN_USER_TOKEN);
         if (loginUserToken && loginUserToken.length > 0) {
             let userObj = JSON.parse(loginUserToken);
+            setOwnerObj(userObj);
             caseForm.setFieldsValue(
                 {
-                    'ownedBy':userObj.id, 
-                    'owner': userObj.name, 
-                    'ownerDept': userObj.deptName, 
-                    'ownerDeptSearch': userObj.deptNameSearch 
+                    'ownedBy':userObj.id
                 }
             );
         }
@@ -432,9 +430,6 @@ const CreateCase = () => {
                                             }
                                         </Select>
                                     </Form.Item>
-                                    <Form.Item name="owner" label="办案人名称" hidden={true}><Input /></Form.Item>
-                                    <Form.Item name="ownerDept" label="办案人部门名称" hidden={true}><Input /></Form.Item>
-                                    <Form.Item name="ownerDeptSearch" label="办案人部门搜索名称" hidden={true}><Input /></Form.Item>
 
                                     <span style={{ fontWeight: 600 }}>可选步骤 <Input onChange={handleStepFilterText}></Input></span>
                                     <div className="case-type-source-step-area">

@@ -38,7 +38,7 @@ public class CaseExecutionOwnerHandler implements CommandLineRunner {
                     item.setCreator(sysUser.getName());
                     item.setCreatorDept(sysUser.getDeptName());
                     item.setCreatorDeptSearch(sysUser.getDeptNameSearch());
-                    item.setOwnedBy(item.getOwnedBy());
+                    item.setOwnedBy(item.getCreatedBy());
                     item.setOwner(sysUser.getName());
                     item.setOwnerDept(sysUser.getDeptName());
                     item.setOwnerDeptSearch(sysUser.getDeptNameSearch());

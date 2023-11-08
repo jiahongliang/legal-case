@@ -70,4 +70,14 @@ public class DateUtil {
     public static Date parse(String dateStr, String pattern) throws ParseException {
         return getSdf(pattern).parse(dateStr);
     }
+
+    public static void main(String[] args) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Date startDay = sdf.parse("2022-05-20");//开始时间
+        Date endDay=sdf.parse("2022-12-31");//结束时间
+        Long starTime=startDay.getTime();
+        Long endTime=endDay.getTime();
+        Long num=endTime-starTime;
+        System.out.println("相差天数为："+num/24/60/60/1000/7);
+    }
 }

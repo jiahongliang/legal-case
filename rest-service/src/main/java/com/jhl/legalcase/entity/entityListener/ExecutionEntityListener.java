@@ -13,6 +13,10 @@ import java.util.Optional;
 @Slf4j
 public class ExecutionEntityListener {
 
+    public ExecutionEntityListener() {
+        log.info("ExecutionEntityListener created.");
+    }
+
     @PrePersist
     public void prePersist(LcCaseExecution execution) {
         this.setCreatorData(execution);

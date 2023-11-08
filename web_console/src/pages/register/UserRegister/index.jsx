@@ -22,7 +22,7 @@ const UserRegister = () => {
 
     const saveForm = (formData) => {
         let params = {
-            entity: formData
+            entity: {...formData,dataRange: '1'}
         }
         registerUser(params).then(res => {
             // console.log(res);
